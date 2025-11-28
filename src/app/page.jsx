@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { User, Plus, Trash2, X, Anchor, Drum, ArrowRightLeft, ArrowUpFromLine, Save, RotateCcw, Wand2, RefreshCw, AlertCircle, Users, Pin, Calendar, Check, HelpCircle, ChevronRight, ArrowLeft, Pencil, XCircle, ShipWheel, Home, Settings, Camera, Target, Moon, Sun, Info, Crosshair, Scale } from 'lucide-react';
 
@@ -25,25 +27,61 @@ const db = {
 // --- CUSTOM LOGO COMPONENT ---
 const DragonLogo = ({ className }) => (
   <svg viewBox="0 0 100 100" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    {/* Körper & Schwanz */}
     <path d="M 20 80 Q 30 90, 50 85 Q 70 80, 75 60 Q 80 40, 60 35 Q 40 30, 35 50 Q 30 70, 50 75" className="text-blue-600 dark:text-blue-400" fill="currentColor" fillOpacity="0.1" strokeWidth="2.5"/>
-    {/* Kopf & Hals */}
     <path d="M 60 35 Q 50 15, 30 20 Q 15 25, 25 40 Q 35 55, 55 50" className="text-blue-700 dark:text-blue-300" fill="currentColor" fillOpacity="0.2"/>
-    {/* Details */}
     <circle cx="32" cy="28" r="2.5" fill="currentColor" className="text-slate-800 dark:text-slate-100" />
     <path d="M 30 20 L 25 5" strokeWidth="2.5" className="text-blue-800 dark:text-blue-200"/> 
     <path d="M 38 22 L 40 12" strokeWidth="2"/>
     <path d="M 48 26 L 52 16" strokeWidth="2"/>
-    {/* Arm & Hand */}
     <path d="M 55 50 Q 65 55, 70 50" strokeWidth="2.5"/>
     <path d="M 70 50 L 75 48 M 70 50 L 76 52 M 70 50 L 74 55" strokeWidth="2"/>
-    {/* Der "Plan" */}
     <path d="M 65 45 C 65 40, 85 40, 85 45 L 85 65 C 85 70, 65 70, 65 65 Z" className="text-amber-600 dark:text-amber-500" fill="currentColor" fillOpacity="0.2" strokeWidth="2"/>
     <line x1="70" y1="50" x2="80" y2="50" strokeWidth="1.5" className="text-amber-700 dark:text-amber-300"/>
     <line x1="70" y1="56" x2="80" y2="56" strokeWidth="1.5" className="text-amber-700 dark:text-amber-300"/>
     <line x1="70" y1="62" x2="75" y2="62" strokeWidth="1.5" className="text-amber-700 dark:text-amber-300"/>
   </svg>
 );
+
+// --- ONBOARDING MODAL (FIX: Added missing component) ---
+const OnboardingModal = ({ onClose }) => {
+  const [step, setStep] = useState(0);
+  const steps = [
+    {
+      title: "Willkommen an Bord!",
+      desc: "Dein neuer Assistent für die Drachenboot-Planung ist da. Verwalte dein Team, plane Trainings und optimiere die Bootsbesetzung mit wenigen Klicks.",
+      icon: <DragonLogo className="w-32 h-32 text-blue-600 dark:text-blue-400 mb-4" />
+    },
+    {
+      title: "Team & Termine",
+      desc: "Lege deinen Kader an, definiere Fähigkeiten (Links, Rechts, Trommel, Steuer) und erstelle Termine. Deine Sportler können direkt zu- oder absagen.",
+      icon: <div className="flex gap-6 text-blue-600 dark:text-blue-400 mb-6"><Users size={64} /><Calendar size={64} /></div>
+    },
+    {
+      title: "Smarte Boots-Planung",
+      desc: "Der Planungsmodus hilft dir, das Boot perfekt auszubalancieren. Nutze den 'Auto-Fill' Zauberstab, um basierend auf Gewicht und Skills automatisch die beste Sitzordnung zu finden.",
+      icon: <div className="flex gap-6 text-blue-600 dark:text-blue-400 mb-6"><ShipWheel size={64} /><Wand2 size={64} /></div>
+    }
+  ];
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+      <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col text-center relative">
+        <div className="p-8 flex flex-col items-center pt-12 pb-8 min-h-[400px]">
+            <div className="flex-1 flex flex-col items-center justify-center">
+                {steps[step].icon}
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">{steps[step].title}</h2>
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{steps[step].desc}</p>
+            </div>
+            <div className="w-full mt-8">
+                <div className="flex justify-center gap-2 mb-6">
+                    {steps.map((_, i) => (<div key={i} className={`h-2 rounded-full transition-all duration-300 ${i === step ? 'w-8 bg-blue-600' : 'w-2 bg-slate-200 dark:bg-slate-700'}`} />))}
+                </div>
+                <button onClick={() => step < steps.length - 1 ? setStep(step+1) : onClose()} className="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 dark:shadow-none active:scale-[0.98]">{step === steps.length - 1 ? "Los geht's!" : "Weiter"}</button>
+            </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // --- HELP MODAL ---
 const HelpModal = ({ onClose }) => (
@@ -58,45 +96,13 @@ const HelpModal = ({ onClose }) => (
         </button>
       </div>
       <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-600 dark:text-slate-300">
-        <section>
-           <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2">👋 Allgemein</h3>
-           <p>Willkommen im Drachenboot Planer! Diese App hilft dir, dein Team zu verwalten, Trainings zu planen und die optimale Bootsbesetzung basierend auf Gewicht und Fähigkeiten zu berechnen.</p>
-        </section>
-
-        <section>
-          <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Users size={18}/> 1. Team & Kader</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Kader verwalten:</strong> Füge neue Mitglieder mit Name, Gewicht und bevorzugter Seite hinzu.</li>
-            <li><strong>Skills:</strong> Weise Rollen zu. Nur "Trommel"/"Steuer"-Skills werden vom Auto-Fill auf diese Plätze gesetzt.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Calendar size={18}/> 2. Termine</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Erstelle Trainingstermine oder Regatten.</li>
-            <li>Klicke auf die Symbole in der Liste, um Zu- oder Absagen für Mitglieder einzutragen.</li>
-            <li>Mit "Planen" öffnest du die Bootsansicht für diesen Termin (nur anwesende Sportler werden angezeigt).</li>
-          </ul>
-        </section>
-
-        <section>
-          <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Wand2 size={18}/> 3. Auto-Fill & Ziel-Trimm</h3>
-          <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Ziel-Slider:</strong> Stelle mit dem Slider unter "Balance" ein, ob das Boot eher <strong>hecklastig (-kg)</strong> oder <strong>buglastig (+kg)</strong> sein soll.</li>
-            <li><strong>Auto-Fill:</strong> Wenn du auf "Auto-Fill" klickst, versucht der Algorithmus, die Besatzung so zu verteilen, dass dieser Zielwert erreicht wird.</li>
-            <li><strong>Fixieren:</strong> Nutze die Pins an den Sitzen, um Paddler vor dem Auto-Fill zu schützen.</li>
-          </ul>
-        </section>
-        
-        <section>
-          <h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Scale size={18}/> 4. Schwerpunkt</h3>
-          <p>Der <span className="text-red-500 font-bold">rote Punkt</span> im Boot zeigt den aktuellen physikalischen Schwerpunkt basierend auf den Gewichten der Paddler an.</p>
-        </section>
+        <section><h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2">👋 Allgemein</h3><p>Willkommen im Drachenboot Planer! Diese App hilft dir, dein Team zu verwalten, Trainings zu planen und die optimale Bootsbesetzung zu berechnen.</p></section>
+        <section><h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Users size={18}/> 1. Team & Kader</h3><ul className="list-disc pl-5 space-y-1"><li><strong>Kader verwalten:</strong> Füge neue Mitglieder mit Name, Gewicht und Seite hinzu.</li><li><strong>Skills:</strong> Weise Rollen zu. Nur "Trommel"/"Steuer"-Skills werden vom Auto-Fill auf diese Plätze gesetzt.</li></ul></section>
+        <section><h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Calendar size={18}/> 2. Termine</h3><ul className="list-disc pl-5 space-y-1"><li>Erstelle Trainingstermine oder Regatten.</li><li>Klicke auf die Symbole in der Liste, um Zu- oder Absagen für Mitglieder einzutragen.</li><li>Mit "Planen" öffnest du die Bootsansicht für diesen Termin.</li></ul></section>
+        <section><h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Wand2 size={18}/> 3. Auto-Fill & Ziel-Trimm</h3><ul className="list-disc pl-5 space-y-1"><li><strong>Ziel-Slider:</strong> Stelle mit dem Slider ein, ob das Boot hecklastig (-kg) oder buglastig (+kg) sein soll.</li><li><strong>Auto-Fill:</strong> Der Algorithmus versucht, die Besatzung so zu verteilen, dass dieser Zielwert erreicht wird.</li></ul></section>
+        <section><h3 className="font-bold text-slate-900 dark:text-white text-base mb-2 flex items-center gap-2"><Scale size={18}/> 4. Schwerpunkt</h3><p>Der <span className="text-red-500 font-bold">rote Punkt</span> im Boot zeigt den aktuellen Schwerpunkt basierend auf den Gewichten an.</p></section>
       </div>
-      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-center">
-        <button onClick={onClose} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Verstanden</button>
-      </div>
+      <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-center"><button onClick={onClose} className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">Verstanden</button></div>
     </div>
   </div>
 );
@@ -112,23 +118,13 @@ const ImprintModal = ({ onClose }) => (
           </button>
         </div>
         <div className="p-6 text-sm text-slate-600 dark:text-slate-300 space-y-4">
-          <div>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Angaben gemäß § 5 TMG</h3>
-            <p>Jan Hartje</p>
-            <p>Hamburger Allee 6</p>
-            <p>30161 Hannover</p>
-          </div>
-          <div>
-            <h3 className="font-bold text-slate-900 dark:text-white mb-1">Kontakt</h3>
-            <p>E-Mail: info@janhartje.com</p>
-          </div>
-          <div className="text-xs text-slate-400 mt-4">
-            <p>Dies ist ein privates Projekt zur Planung von Drachenboot-Teams.</p>
-          </div>
+          <div><h3 className="font-bold text-slate-900 dark:text-white mb-1">Angaben gemäß § 5 TMG</h3><p>Jan Hartje</p><p>Hamburger Allee 6</p><p>30161 Hannover</p></div>
+          <div><h3 className="font-bold text-slate-900 dark:text-white mb-1">Kontakt</h3><p>E-Mail: info@janhartje.com</p></div>
+          <div className="text-xs text-slate-400 mt-4"><p>Dies ist ein privates Projekt zur Planung von Drachenboot-Teams.</p></div>
         </div>
       </div>
     </div>
-  );
+);
 
 const DrachenbootPlaner = () => {
   // --- UI State ---
@@ -139,6 +135,7 @@ const DrachenbootPlaner = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showImprint, setShowImprint] = useState(false); 
+  const [showOnboarding, setShowOnboarding] = useState(false); 
   const boatRef = useRef(null); 
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
 
@@ -150,24 +147,17 @@ const DrachenbootPlaner = () => {
 
   // --- INIT ---
   useEffect(() => {
-    // Social Share Meta Tags Injection
+    // Social Share Meta Tags
     const metaTags = [
         { property: 'og:title', content: 'Drachenboot Planer - Team Manager' },
         { property: 'og:description', content: 'Verwalte dein Drachenboot-Team, plane Trainings und optimiere die Bootsbesetzung.' },
         { property: 'og:image', content: 'https://cdn-icons-png.flaticon.com/512/2043/2043693.png' }, 
-        { property: 'og:url', content: typeof window !== 'undefined' ? window.location.href : '' },
         { name: 'theme-color', content: '#2563eb' }
     ];
-
     metaTags.forEach(tag => {
-        let element = document.querySelector(`meta[property="${tag.property}"]`) || document.querySelector(`meta[name="${tag.name}"]`);
-        if (!element) {
-            element = document.createElement('meta');
-            if (tag.property) element.setAttribute('property', tag.property);
-            if (tag.name) element.setAttribute('name', tag.name);
-            document.head.appendChild(element);
-        }
-        element.setAttribute('content', tag.content);
+        let el = document.querySelector(`meta[property="${tag.property}"]`) || document.querySelector(`meta[name="${tag.name}"]`);
+        if (!el) { el = document.createElement('meta'); if(tag.property) el.setAttribute('property', tag.property); if(tag.name) el.setAttribute('name', tag.name); document.head.appendChild(el); }
+        el.setAttribute('content', tag.content);
     });
     document.title = "Drachenboot Planer";
 
@@ -188,13 +178,11 @@ const DrachenbootPlaner = () => {
     }
     setIsLoading(false);
 
-    if (!data && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setIsDarkMode(true);
-    }
+    const hasSeenOnboarding = localStorage.getItem('drachenboot_onboarding_seen');
+    if (!hasSeenOnboarding) setShowOnboarding(true);
 
-    return () => { 
-        if(document.body.contains(script)) document.body.removeChild(script); 
-    }
+    if (!data && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) setIsDarkMode(true);
+    return () => { if(document.body.contains(script)) document.body.removeChild(script); }
   }, []);
 
   // --- AUTO-SAVE ---
@@ -207,6 +195,11 @@ const DrachenbootPlaner = () => {
   }, [paddlers, events, assignmentsByEvent, isDarkMode, targetTrim, isLoading]);
 
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  
+  const closeOnboarding = () => {
+      localStorage.setItem('drachenboot_onboarding_seen', 'true');
+      setShowOnboarding(false);
+  };
 
   const seedInitialData = () => {
       const initialPaddlers = [
@@ -244,21 +237,17 @@ const DrachenbootPlaner = () => {
   const [paddlerFormWeight, setPaddlerFormWeight] = useState('');
   const [paddlerFormSkills, setPaddlerFormSkills] = useState({ left: false, right: false, drum: false, steer: false });
   const [editingPaddlerId, setEditingPaddlerId] = useState(null);
-  
   const [newEventTitle, setNewEventTitle] = useState('');
   const [newEventDate, setNewEventDate] = useState('');
 
   // --- Helpers ---
   const currentContextId = activeEventId || 'global';
   const assignments = useMemo(() => assignmentsByEvent[currentContextId] || {}, [assignmentsByEvent, currentContextId]);
-
   const updateAssignments = useCallback((newAssignments) => {
       setAssignmentsByEvent(prev => ({ ...prev, [currentContextId]: newAssignments }));
   }, [currentContextId]);
-
   const activeEvent = useMemo(() => events.find(e => e.id === activeEventId), [activeEventId, events]);
   const activeEventTitle = activeEvent ? activeEvent.title : 'Sandbox';
-
   const activePaddlerPool = useMemo(() => {
     let pool = paddlers;
     if (activeEventId && activeEvent) {
@@ -268,34 +257,23 @@ const DrachenbootPlaner = () => {
   }, [paddlers, activeEventId, activeEvent]);
 
   // --- ACTIONS ---
-
-  const toggleSkill = (skill) => {
-      setPaddlerFormSkills(prev => ({ ...prev, [skill]: !prev[skill] }));
-  };
-
+  const toggleSkill = (skill) => { setPaddlerFormSkills(prev => ({ ...prev, [skill]: !prev[skill] })); };
   const resetPaddlerForm = () => {
-      setEditingPaddlerId(null);
-      setPaddlerFormName(''); 
-      setPaddlerFormWeight(''); 
+      setEditingPaddlerId(null); setPaddlerFormName(''); setPaddlerFormWeight(''); 
       setPaddlerFormSkills({ left: false, right: false, drum: false, steer: false });
   };
-
   const handleSavePaddler = (e) => {
       e.preventDefault();
       if (!paddlerFormName || !paddlerFormWeight) return;
       const skillsArray = Object.keys(paddlerFormSkills).filter(k => paddlerFormSkills[k]);
       if (skillsArray.length === 0) { alert("Bitte eine Rolle wählen."); return; }
-
       const pData = { name: paddlerFormName, weight: parseFloat(paddlerFormWeight), skills: skillsArray };
       if (editingPaddlerId) {
           setPaddlers(prev => prev.map(p => p.id === editingPaddlerId ? { ...p, ...pData } : p));
           setEditingPaddlerId(null);
-      } else {
-          setPaddlers(prev => [...prev, { id: Date.now(), ...pData }]);
-      }
+      } else { setPaddlers(prev => [...prev, { id: Date.now(), ...pData }]); }
       resetPaddlerForm();
   };
-
   const handleEditPaddler = (p) => {
       setEditingPaddlerId(p.id); setPaddlerFormName(p.name); setPaddlerFormWeight(p.weight);
       const sObj = { left: false, right: false, drum: false, steer: false };
@@ -303,99 +281,63 @@ const DrachenbootPlaner = () => {
       setPaddlerFormSkills(sObj);
       window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
   const triggerDelete = (id) => {
-      if (deleteConfirmId === id) {
-          handleDeletePaddler(id);
-          setDeleteConfirmId(null);
-      } else {
-          setDeleteConfirmId(id);
-          setTimeout(() => setDeleteConfirmId(null), 3000);
-      }
+      if (deleteConfirmId === id) { handleDeletePaddler(id); setDeleteConfirmId(null); } 
+      else { setDeleteConfirmId(id); setTimeout(() => setDeleteConfirmId(null), 3000); }
   };
-
   const handleDeletePaddler = (id) => {
       setAssignmentsByEvent(prev => {
           const next = { ...prev };
           Object.keys(next).forEach(eid => {
-              const map = { ...next[eid] };
-              let chg = false;
+              const map = { ...next[eid] }; let chg = false;
               Object.keys(map).forEach(s => { if(map[s]===id) { delete map[s]; chg=true; } });
               if(chg) next[eid] = map;
-          });
-          return next;
+          }); return next;
       });
-      setEvents(prev => prev.map(ev => {
-          const att = { ...ev.attendance }; delete att[id];
-          return { ...ev, attendance: att };
-      }));
+      setEvents(prev => prev.map(ev => { const att = { ...ev.attendance }; delete att[id]; return { ...ev, attendance: att }; }));
       setPaddlers(prev => prev.filter(p => p.id !== id));
       if(editingPaddlerId === id) resetPaddlerForm();
   };
-
   const handleCreateEvent = (e) => {
-      e.preventDefault();
-      if (!newEventTitle || !newEventDate) return;
+      e.preventDefault(); if (!newEventTitle || !newEventDate) return;
       const nid = Date.now();
       const ne = { id: nid, title: newEventTitle, date: newEventDate, type: 'training', attendance: {} };
-      setEvents(prev => [...prev, ne]);
-      setAssignmentsByEvent(prev => ({ ...prev, [nid]: {} }));
+      setEvents(prev => [...prev, ne]); setAssignmentsByEvent(prev => ({ ...prev, [nid]: {} }));
       setNewEventTitle(''); setNewEventDate('');
   };
-
   const updateAttendance = (eid, pid, status) => {
-      setEvents(prev => prev.map(ev => {
-          if (ev.id !== eid) return ev;
-          return { ...ev, attendance: { ...ev.attendance, [pid]: status } };
-      }));
+      setEvents(prev => prev.map(ev => { if (ev.id !== eid) return ev; return { ...ev, attendance: { ...ev.attendance, [pid]: status } }; }));
   };
-
   const handlePlanEvent = (eid) => {
-      setActiveEventId(eid);
-      setView('planner');
-      setLockedSeats([]); setSelectedPaddlerId(null);
+      setActiveEventId(eid); setView('planner'); setLockedSeats([]); setSelectedPaddlerId(null);
       if (!assignmentsByEvent[eid]) setAssignmentsByEvent(prev => ({ ...prev, [eid]: {} }));
   };
-
-  const goHome = () => {
-      setActiveEventId(null);
-      setView('team');
-  };
-
+  const goHome = () => { setActiveEventId(null); setView('team'); };
   const handleExportImage = () => {
       if (!boatRef.current || !window.html2canvas) return;
       setIsExporting(true);
       setTimeout(() => {
-          window.html2canvas(boatRef.current, {
-              backgroundColor: null, 
-              scale: 3, 
-              useCORS: true
-          }).then(canvas => {
+          window.html2canvas(boatRef.current, { backgroundColor: null, scale: 3, useCORS: true }).then(canvas => {
               const link = document.createElement('a');
               link.download = `drachenboot-${activeEventTitle.replace(/\s+/g, '-')}.png`;
               link.href = canvas.toDataURL();
               link.click();
               setIsExporting(false);
-          }).catch(err => {
-              console.error("Export failed", err);
-              setIsExporting(false);
-          });
+          }).catch(err => { console.error("Export failed", err); setIsExporting(false); });
       }, 150);
   };
 
-  // --- BOAT LOGIC ---
+  // --- BOAT ---
   const rows = 10;
   const boatConfig = useMemo(() => {
     const s = []; s.push({ id: 'drummer', type: 'drummer' });
     for(let i=1; i<=rows; i++) { s.push({ id: `row-${i}-left`, type: 'paddler', side: 'left', row: i }); s.push({ id: `row-${i}-right`, type: 'paddler', side: 'right', row: i }); }
     s.push({ id: 'steer', type: 'steer' }); return s;
   }, []);
-
   const stats = useMemo(() => {
     let l=0, r=0, t=0, f=0, b=0, c=0;
     Object.entries(assignments).forEach(([sid, pid]) => {
-      const p = paddlers.find(x => x.id === pid);
-      if (!p) return;
+      const p = paddlers.find(x => x.id === pid); if (!p) return;
       t += p.weight; c++;
       if (sid.includes('row')) {
           if (sid.includes('left')) l += p.weight; else r += p.weight;
@@ -405,35 +347,22 @@ const DrachenbootPlaner = () => {
     });
     return { l, r, t, diffLR: l - r, f, b, diffFB: f - b, c };
   }, [assignments, paddlers]);
-
-  // --- CENTER OF GRAVITY ---
   const cgStats = useMemo(() => {
-    let totalWeight = 0;
-    let weightedSumX = 0; 
-    let weightedSumY = 0; 
-
+    let totalWeight = 0; let weightedSumX = 0; let weightedSumY = 0; 
     Object.entries(assignments).forEach(([sid, pid]) => {
-      const p = paddlers.find(x => x.id === pid);
-      if (!p) return;
+      const p = paddlers.find(x => x.id === pid); if (!p) return;
       totalWeight += p.weight;
-      let xPos = 50; 
-      if (sid.includes('left')) xPos = 25; else if (sid.includes('right')) xPos = 75;
+      let xPos = 50; if (sid.includes('left')) xPos = 25; else if (sid.includes('right')) xPos = 75;
       let yPos = 50;
-      
-      // Revised Y-Position Mapping to match visual center of seats
-      if (sid === 'drummer') yPos = 4; 
-      else if (sid === 'steer') yPos = 96; 
-      else if (sid.includes('row')) {
-        const r = parseInt(sid.match(/row-(\d+)/)[1]);
-        yPos = 12 + ((r - 1) / 9) * 70; 
-      }
+      if (sid === 'drummer') yPos = 4; else if (sid === 'steer') yPos = 96; 
+      else if (sid.includes('row')) { const r = parseInt(sid.match(/row-(\d+)/)[1]); yPos = 12 + ((r - 1) / 9) * 70; }
       weightedSumX += p.weight * xPos; weightedSumY += p.weight * yPos;
     });
     const cgX = totalWeight > 0 ? weightedSumX / totalWeight : 50;
     const cgY = totalWeight > 0 ? weightedSumY / totalWeight : 50;
-
-    return { x: cgX, y: cgY };
-  }, [assignments, paddlers]);
+    const targetY = 50 - (targetTrim * 0.1); 
+    return { x: cgX, y: cgY, targetY };
+  }, [assignments, paddlers, targetTrim]);
 
   const handleSeatClick = (sid) => {
     if (lockedSeats.includes(sid)) return;
@@ -443,17 +372,14 @@ const DrachenbootPlaner = () => {
       nAss[sid] = selectedPaddlerId; updateAssignments(nAss); setSelectedPaddlerId(null);
     } else if (assignments[sid]) { setSelectedPaddlerId(assignments[sid]); }
   };
-
   const handleUnassign = (sid, e) => {
     e.stopPropagation(); if (lockedSeats.includes(sid)) return;
     const nAss = { ...assignments }; delete nAss[sid]; updateAssignments(nAss);
   };
-
   const toggleLock = (sid, e) => {
     e.stopPropagation(); if (!assignments[sid]) return;
     setLockedSeats(prev => prev.includes(sid) ? prev.filter(i => i !== sid) : [...prev, sid]);
   };
-
   const clearBoat = () => {
       if (confirmClear) {
           const nAss = { ...assignments };
@@ -461,8 +387,6 @@ const DrachenbootPlaner = () => {
           updateAssignments(nAss); setConfirmClear(false);
       } else { setConfirmClear(true); setTimeout(() => setConfirmClear(false), 3000); }
   };
-
-  // --- AUTO FILL (TARGET AWARE) ---
   const runAutoFill = () => {
     setIsSimulating(true);
     setTimeout(() => {
@@ -470,43 +394,26 @@ const DrachenbootPlaner = () => {
         lockedSeats.forEach(s => { if(assignments[s]) lockedAss[s] = assignments[s]; });
         const lockedIds = Object.values(lockedAss);
         let pool = activePaddlerPool.filter(p => !lockedIds.includes(p.id));
-
         if(pool.length === 0) { setIsSimulating(false); return; }
-
         let bestAss = null, bestScore = -Infinity;
         for (let i = 0; i < 1500; i++) {
             let currAss = { ...lockedAss };
             let currPool = [...pool].sort(() => Math.random() - 0.5);
-
             if(!currAss['steer']) {
                 const steers = currPool.filter(p => p.skills && p.skills.includes('steer'));
-                if(steers.length) {
-                    const p = steers[0];
-                    currAss['steer'] = p.id;
-                    currPool = currPool.filter(x => x.id !== p.id);
-                }
+                if(steers.length) { const p = steers[0]; currAss['steer'] = p.id; currPool = currPool.filter(x => x.id !== p.id); }
             }
-
             const sortedW = [...currPool].sort((a,b) => a.weight - b.weight);
             const light = sortedW.slice(0, Math.max(2, Math.floor(currPool.length*0.3)));
             ['row-1-left', 'row-1-right'].forEach(sid => {
                 if(currAss[sid] || currPool.length===0) return;
                 const side = sid.includes('left') ? 'left' : 'right';
                 const cands = light.filter(p => currPool.includes(p) && p.skills && p.skills.includes(side));
-                if(cands.length) {
-                    const p = cands[Math.floor(Math.random()*cands.length)];
-                    currAss[sid] = p.id;
-                    currPool = currPool.filter(x => x.id !== p.id);
-                }
+                if(cands.length) { const p = cands[Math.floor(Math.random()*cands.length)]; currAss[sid] = p.id; currPool = currPool.filter(x => x.id !== p.id); }
             });
-
             currPool.sort((a, b) => (b.weight + Math.random()*5) - (a.weight + Math.random()*5));
             const free = [];
-            for(let r=1; r<=rows; r++) {
-                if(!currAss[`row-${r}-left`]) free.push({id: `row-${r}-left`, side: 'left', r});
-                if(!currAss[`row-${r}-right`]) free.push({id: `row-${r}-right`, side: 'right', r});
-            }
-
+            for(let r=1; r<=rows; r++) { if(!currAss[`row-${r}-left`]) free.push({id: `row-${r}-left`, side: 'left', r}); if(!currAss[`row-${r}-right`]) free.push({id: `row-${r}-right`, side: 'right', r}); }
             for(let p of currPool) {
                 if (p.skills.length === 1 && p.skills[0] === 'drum') continue;
                 let l=0, r=0, f=0, b=0;
@@ -516,41 +423,27 @@ const DrachenbootPlaner = () => {
                     if(sid.includes('left')) l+=pad.weight; else r+=pad.weight;
                     if(parseInt(sid.match(/row-(\d+)/)[1]) <= 5) f+=pad.weight; else b+=pad.weight;
                 });
-                
-                // Target Logic
-                const currentTrim = f - b;
-                const needsBack = currentTrim > targetTrim; // Try to reach target
-
+                const nLeft = l<=r, nBack = (f - b) > targetTrim;
                 const valid = free.filter(s => p.skills && p.skills.includes(s.side));
-                
                 if(valid.length) {
                     valid.sort((A, B) => {
                         let sa=0, sb=0;
                         if(l<=r && A.side==='left') sa+=50; else if(l>r && A.side==='right') sa+=50;
                         if(l<=r && B.side==='left') sb+=50; else if(l>r && B.side==='right') sb+=50;
-                        const oA = A.side==='left'?'right':'left';
-                        const oB = B.side==='left'?'right':'left';
-                        if(currAss[`row-${A.r}-${oA}`]) sa+=80;
-                        if(currAss[`row-${B.r}-${oB}`]) sb+=80;
-                        if(needsBack) { sa+=A.r*3; sb+=B.r*3; } else { sa+=(11-A.r)*3; sb+=(11-B.r)*3; }
+                        const oA = A.side==='left'?'right':'left'; const oB = B.side==='left'?'right':'left';
+                        if(currAss[`row-${A.r}-${oA}`]) sa+=80; if(currAss[`row-${B.r}-${oB}`]) sb+=80;
+                        if(nBack) { sa+=A.r*3; sb+=B.r*3; } else { sa+=(11-A.r)*3; sb+=(11-B.r)*3; }
                         return sb - sa;
                     });
-                    const best = valid[0];
-                    currAss[best.id] = p.id;
-                    free.splice(free.findIndex(x => x.id === best.id), 1);
+                    const best = valid[0]; currAss[best.id] = p.id; free.splice(free.findIndex(x => x.id === best.id), 1);
                 }
             }
-
             const assignedIds = Object.values(currAss);
             let remainingForDrum = pool.filter(p => !assignedIds.includes(p.id));
             if(!currAss['drummer'] && remainingForDrum.length > 0) {
                 const drummers = remainingForDrum.filter(p => p.skills && p.skills.includes('drum'));
-                if(drummers.length) {
-                    const p = drummers[0];
-                    currAss['drummer'] = p.id;
-                }
+                if(drummers.length) { const p = drummers[0]; currAss['drummer'] = p.id; }
             }
-
             let fl=0, fr=0, ff=0, fb=0, full=0;
             for(let r=1; r<=rows; r++) { if(currAss[`row-${r}-left`] && currAss[`row-${r}-right`]) full++; }
             Object.entries(currAss).forEach(([sid, pid]) => {
@@ -560,15 +453,9 @@ const DrachenbootPlaner = () => {
                 if(parseInt(sid.match(/row-(\d+)/)[1]) <= 5) ff+=pad.weight; else fb+=pad.weight;
             });
             let sc = -Math.pow(Math.abs(fl-fr), 2);
-            
-            // Target Scoring
-            const trim = ff - fb;
-            const dist = Math.abs(trim - targetTrim);
-            sc -= dist * 8; 
-
+            const trim = ff - fb; const dist = Math.abs(trim - targetTrim); sc -= dist * 8; 
             sc += full*80;
             if(currAss['drummer']) sc+=200; if(currAss['steer']) sc+=200;
-
             if(sc > bestScore) { bestScore = sc; bestAss = currAss; }
         }
         updateAssignments(bestAss); setIsSimulating(false);
@@ -589,6 +476,10 @@ const DrachenbootPlaner = () => {
       const sortedPaddlers = [...paddlers].sort((a,b) => a.name.localeCompare(b.name));
       return (
           <div className="min-h-screen bg-slate-100 p-2 md:p-4 font-sans text-slate-800 pb-20 dark:bg-slate-950 dark:text-slate-100 transition-colors">
+              {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+              {showImprint && <ImprintModal onClose={() => setShowImprint(false)} />}
+              {showOnboarding && <OnboardingModal onClose={closeOnboarding} />}
+
               <div className="max-w-6xl mx-auto"> 
                   <header className="mb-6 flex justify-between items-center bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 sticky top-0 z-30">
                     <div className="flex items-center gap-3">
@@ -610,8 +501,6 @@ const DrachenbootPlaner = () => {
                         </button>
                     </div>
                   </header>
-                  
-                  {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                       <div className="lg:col-span-1 space-y-4">
@@ -620,7 +509,7 @@ const DrachenbootPlaner = () => {
                               <form onSubmit={handleCreateEvent} className="space-y-2">
                                   <input className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm dark:text-white" placeholder="Titel" value={newEventTitle} onChange={e => setNewEventTitle(e.target.value)} />
                                   <input type="date" className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm dark:text-white" value={newEventDate} onChange={e => setNewEventDate(e.target.value)} />
-                                  <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded text-sm font-medium hover:bg-blue-700">+ Erstellen</button>
+                                  <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all">+ Erstellen</button>
                               </form>
                           </div>
                           <div className="space-y-4">
@@ -667,11 +556,11 @@ const DrachenbootPlaner = () => {
                                     <div className="flex flex-col md:flex-row gap-4">
                                         <div className="flex-1">
                                             <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Name</label>
-                                            <input className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm dark:text-white" value={paddlerFormName} onChange={(e) => setPaddlerFormName(e.target.value)} placeholder="Name" />
+                                            <input className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500 transition-all dark:text-white" value={paddlerFormName} onChange={(e) => setPaddlerFormName(e.target.value)} placeholder="Name" />
                                         </div>
                                         <div className="w-full md:w-32">
                                             <label className="text-[10px] uppercase font-bold text-slate-400 mb-1 block">Gewicht</label>
-                                            <input type="number" className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm dark:text-white" value={paddlerFormWeight} onChange={(e) => setPaddlerFormWeight(e.target.value)} placeholder="kg" />
+                                            <input type="number" className="w-full p-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded text-sm outline-none focus:bg-white dark:focus:bg-slate-700 focus:ring-2 focus:ring-blue-500 transition-all dark:text-white" value={paddlerFormWeight} onChange={(e) => setPaddlerFormWeight(e.target.value)} placeholder="kg" />
                                         </div>
                                     </div>
                                     <div>
@@ -684,7 +573,7 @@ const DrachenbootPlaner = () => {
                                         </div>
                                     </div>
                                     <div className="flex gap-2 pt-2">
-                                        {editingPaddlerId && <button type="button" onClick={resetPaddlerForm} className="bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded text-sm">Abbruch</button>}
+                                        {editingPaddlerId && <button type="button" onClick={resetPaddlerForm} className="bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded text-sm hover:bg-slate-50 dark:hover:bg-slate-700">Abbruch</button>}
                                         <button type="submit" className={`text-white px-6 py-2 rounded text-sm font-medium flex items-center gap-2 ${editingPaddlerId ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-600 hover:bg-blue-700'}`}>{editingPaddlerId ? <Save size={16}/> : <Plus size={16}/>} {editingPaddlerId ? 'Speichern' : 'Hinzufügen'}</button>
                                     </div>
                                 </form>

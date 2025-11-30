@@ -353,7 +353,7 @@ const DrachenbootPlaner = () => {
             <div className="flex gap-2">
               <button onClick={() => setShowHelp(true)} className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"><Info size={20} /></button>
               <button onClick={toggleDarkMode} className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">{isDarkMode ? <Sun size={20} /> : <Moon size={20} />}</button>
-              <button onClick={() => setView('planner')} className="px-4 py-2 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-slate-700 rounded-lg font-medium flex items-center gap-2"><ArrowLeft size={16} /> Zum Boots-Planer</button>
+              <button onClick={() => setView('planner')} className="px-4 py-2 bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-slate-700 rounded-lg font-medium flex items-center gap-2">Zum Boots-Planer</button>
             </div>
           </header>
         ) : (

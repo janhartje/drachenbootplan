@@ -13,8 +13,19 @@ import SkillBadges from '../ui/SkillBadges';
 import Header from '../ui/Header';
 import Footer from '../ui/Footer';
 
+import { useTour } from '@/context/TourContext';
+
 const PlannerView = ({ eventId }) => {
   const router = useRouter();
+  const { checkAndStartTour } = useTour();
+
+  useEffect(() => {
+    // Small delay to ensure elements are rendered
+    setTimeout(() => {
+      checkAndStartTour('planner');
+    }, 500);
+  }, []);
+
   const { 
     events, 
     paddlers, 
@@ -217,7 +228,7 @@ const PlannerView = ({ eventId }) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1 flex flex-col gap-4 lg:h-0 lg:min-h-full">
             {/* Stats & Tools Panel */}
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+            <div id="tour-planner-stats" className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
               <h2 className="font-bold text-sm text-slate-700 dark:text-slate-200 uppercase tracking-wide mb-3 flex items-center gap-2">
                 <ArrowRightLeft size={16} /> Balance & Schwerpunkt
               </h2>
@@ -235,10 +246,10 @@ const PlannerView = ({ eventId }) => {
               </div>
 
               <div className="grid grid-cols-3 gap-2 mt-4">
-                <button onClick={runAutoFill} disabled={isSimulating || activePaddlerPool.length === 0} className={`py-3 text-sm font-semibold rounded-lg border dark:border-slate-700 transition-all flex items-center justify-center gap-2 shadow-sm ${isSimulating ? 'bg-indigo-50 text-indigo-400 cursor-wait' : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95'} ${activePaddlerPool.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <button id="tour-planner-autofill" onClick={runAutoFill} disabled={isSimulating || activePaddlerPool.length === 0} className={`py-3 text-sm font-semibold rounded-lg border dark:border-slate-700 transition-all flex items-center justify-center gap-2 shadow-sm ${isSimulating ? 'bg-indigo-50 text-indigo-400 cursor-wait' : 'bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95'} ${activePaddlerPool.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`} title="Magic KI: Automatische Besetzung">
                   {isSimulating ? <RefreshCw size={16} className="animate-spin" /> : <Wand2 size={16} />}
                 </button>
-                <button onClick={handleExportImage} className="py-3 text-sm rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2" title="Bild speichern">
+                <button id="tour-planner-export" onClick={handleExportImage} className="py-3 text-sm rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2" title="Bild speichern">
                   <Camera size={16} />
                 </button>
                 <button onClick={clearBoat} className={`py-3 text-sm rounded-lg border dark:border-slate-700 transition-all flex items-center justify-center gap-2 active:scale-95 ${confirmClear ? 'bg-red-500 text-white border-red-600 font-bold' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 border-red-200'}`}>
@@ -248,12 +259,12 @@ const PlannerView = ({ eventId }) => {
             </div>
 
             {/* Paddler Pool */}
-            <div className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex-1 flex flex-col min-h-[400px]">
+            <div id="tour-planner-pool" className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex-1 flex flex-col min-h-[400px]">
               <div className="flex justify-between items-center mb-3">
                 <h2 className="font-bold text-sm text-slate-700 dark:text-slate-200 uppercase tracking-wide flex items-center gap-2"><User size={16} /> Verfügbar ({activePaddlerPool.length})</h2>
                 <div className="flex gap-1">
-                  <button onClick={handleAddCanister} className="p-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded hover:bg-amber-100 border border-amber-200 dark:border-amber-800" title="Kanister +25kg"><Box size={14} /></button>
-                  <button onClick={() => setShowGuestModal(true)} className="p-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 border border-blue-200 dark:border-blue-800 flex items-center gap-1 text-xs font-bold" title="Gast hinzufügen"><UserPlus size={14} /> Gast+</button>
+                  <button id="tour-planner-canister" onClick={handleAddCanister} className="p-1.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-500 rounded hover:bg-amber-100 border border-amber-200 dark:border-amber-800" title="Kanister +25kg"><Box size={14} /></button>
+                  <button id="tour-planner-guest" onClick={() => setShowGuestModal(true)} className="p-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 border border-blue-200 dark:border-blue-800 flex items-center gap-1 text-xs font-bold" title="Gast hinzufügen"><UserPlus size={14} /> Gast+</button>
                 </div>
               </div>
               {activePaddlerPool.length === 0 && <div className="text-center p-8 text-slate-500 dark:text-slate-400 italic text-sm border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">Keine Zusagen.</div>}
@@ -283,7 +294,7 @@ const PlannerView = ({ eventId }) => {
           </div>
 
           {/* Boat Visualization */}
-          <div className="lg:col-span-2 pb-10">
+          <div id="tour-planner-boat" className="lg:col-span-2 pb-10">
             <div className="bg-blue-100/30 dark:bg-blue-900/20 p-4 md:p-8 rounded-3xl border border-blue-100 dark:border-blue-800 flex justify-center items-start overflow-y-auto relative">
               <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 10px 10px, #3b82f6 1px, transparent 0)', backgroundSize: '30px 30px' }}></div>
               <div ref={boatRef} className="relative w-[360px] flex flex-col items-center">

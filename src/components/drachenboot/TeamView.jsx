@@ -118,7 +118,7 @@ const TeamView = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Neuer Termin */}
           <div className="lg:col-span-1 lg:order-1 flex flex-col">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-full">
+            <div id="tour-new-event" className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-full">
               <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
                 <Calendar size={16} className="text-slate-700 dark:text-slate-200" /> Neuer Termin
               </h3>
@@ -142,7 +142,7 @@ const TeamView = () => {
 
           {/* Paddler Form */}
           <div className="lg:col-span-2 lg:order-2 flex flex-col">
-            <div className={`p-6 rounded-xl shadow-sm border transition-all h-full ${editingPaddlerId ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 ring-1 ring-orange-200 dark:ring-orange-900' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+            <div id="tour-paddler-form" className={`p-6 rounded-xl shadow-sm border transition-all h-full ${editingPaddlerId ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 ring-1 ring-orange-200 dark:ring-orange-900' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
               <h3 className={`font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wide ${editingPaddlerId ? 'text-orange-800 dark:text-orange-200' : 'text-slate-700 dark:text-slate-200'}`}>
                 {editingPaddlerId ? <Pencil size={16} /> : <User size={16} />} {editingPaddlerId ? 'Paddler bearbeiten' : 'Neues Mitglied'}
               </h3>
@@ -178,7 +178,7 @@ const TeamView = () => {
             
           {/* Event Liste */}
           <div className="lg:col-span-1 lg:order-3 flex flex-col">
-            <div className="space-y-4 h-full">
+            <div id="tour-event-list" className="space-y-4 h-full">
               {events.sort((a, b) => new Date(a.date) - new Date(b.date)).map((evt) => {
                 const yesCount = Object.values(evt.attendance).filter((s) => s === 'yes').length;
                 return (
@@ -219,7 +219,7 @@ const TeamView = () => {
 
           {/* Paddler Grid */}
           <div className="lg:col-span-2 lg:order-4 flex flex-col">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-full">
+            <div id="tour-paddler-grid" className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-full">
               <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide"><Users size={16} /> Kader ({paddlers.length})</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {sortedPaddlers.map((p) => (

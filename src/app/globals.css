@@ -24,3 +24,53 @@ body {
 	color: var(--foreground);
 	font-family: var(--font-sans);
 }
+
+/* Driver.js Dark Mode Overrides */
+.dark .driver-popover {
+  background-color: #0f172a; /* slate-900 */
+  color: #f8fafc; /* slate-50 */
+  border: 1px solid #1e293b; /* slate-800 */
+}
+
+.dark .driver-popover-title {
+  color: #f8fafc; /* slate-50 */
+}
+
+.dark .driver-popover-description {
+  color: #cbd5e1; /* slate-300 */
+}
+
+.dark .driver-popover-footer button {
+  background-color: #1e293b; /* slate-800 */
+  color: #f8fafc; /* slate-50 */
+  border: 1px solid #334155; /* slate-700 */
+  text-shadow: none;
+}
+
+.dark .driver-popover-footer button:hover {
+  background-color: #334155; /* slate-700 */
+}
+
+.dark .driver-popover-close-btn {
+  color: #94a3b8; /* slate-400 */
+}
+
+.dark .driver-popover-close-btn:hover {
+  color: #f8fafc; /* slate-50 */
+}
+
+.dark .driver-popover-arrow-side-left.driver-popover-arrow {
+  border-left-color: #0f172a;
+}
+
+.dark .driver-popover-arrow-side-right.driver-popover-arrow {
+  border-right-color: #0f172a;
+}
+
+.dark .driver-popover-arrow-side-top.driver-popover-arrow {
+  border-top-color: #0f172a;
+}
+
+.dark .driver-popover-arrow-side-bottom.driver-popover-arrow {
+  border-bottom-color: #0f172a;
+}

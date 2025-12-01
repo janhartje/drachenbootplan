@@ -5,9 +5,9 @@ import { useLanguage } from '@/context/LanguageContext';
 const Header = ({ 
   title, 
   subtitle, 
-  logo, 
-  leftAction, 
-  children, 
+  logo = null, 
+  leftAction = null, 
+  children = null, 
   showHelp = true, 
   onHelp, 
   showThemeToggle = true, 

@@ -3,10 +3,12 @@ import { X } from 'lucide-react';
 
 const ImprintModal = ({ onClose }) => (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl p-6 relative">
-      <button onClick={onClose} className="absolute top-4 right-4 text-slate-500"><X size={20} /></button>
-      <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Impressum</h2>
-      <div className="text-sm text-slate-700 dark:text-slate-300 space-y-4 overflow-y-auto max-h-[60vh]">
+    <div className="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">Impressum</h2>
+        <button onClick={onClose}><X size={20} className="text-slate-500" /></button>
+      </div>
+      <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-700 dark:text-slate-300">
         <section>
           <h3 className="font-bold text-slate-900 dark:text-white mb-1">Angaben gemäß § 5 TMG</h3>
           <p>Jan Hartje<br />Hamburger Allee 6<br />30161 Hannover</p>
@@ -36,6 +38,9 @@ const ImprintModal = ({ onClose }) => (
           <h3 className="font-bold text-slate-900 dark:text-white mb-1">Urheberrecht</h3>
           <p className="text-xs">Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen.</p>
         </section>
+      </div>
+      <div className="p-4 border-t border-slate-100 dark:border-slate-800 text-center bg-slate-50 dark:bg-slate-800/50">
+        <button onClick={onClose} className="bg-slate-900 dark:bg-slate-700 text-white px-8 py-2.5 rounded-lg hover:bg-slate-800 dark:hover:bg-slate-600 font-medium transition-colors">Schließen</button>
       </div>
     </div>
   </div>

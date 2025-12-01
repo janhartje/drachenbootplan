@@ -2,8 +2,24 @@ import React from 'react';
 import { Target } from 'lucide-react';
 import DragonLogo from '../../ui/DragonLogo';
 import SeatBox from '../SeatBox';
+import { BoatConfigItem, Paddler, Assignments, Event, CGStats } from '@/types';
 
-const BoatVisualizer = React.forwardRef(({ 
+interface BoatVisualizerProps {
+  boatConfig: BoatConfigItem[];
+  paddlers: Paddler[];
+  assignments: Assignments;
+  activeEvent: Event | null;
+  activePaddlerPool: Paddler[];
+  lockedSeats: string[];
+  selectedPaddlerId: number | string | null;
+  cgStats: CGStats;
+  isExporting: boolean;
+  handleSeatClick: (seatId: string) => void;
+  handleUnassign: (seatId: string, e: React.MouseEvent) => void;
+  toggleLock: (seatId: string, e: React.MouseEvent) => void;
+}
+
+const BoatVisualizer = React.forwardRef<HTMLDivElement, BoatVisualizerProps>(({ 
   boatConfig, 
   paddlers, 
   assignments, 
@@ -50,8 +66,8 @@ const BoatVisualizer = React.forwardRef(({
                 {(() => {
                   const s = boatConfig[0];
                   const p = paddlers.find((x) => x.id === assignments[s.id]) || activeEvent?.guests?.find((g) => g.id === assignments[s.id]);
-                  const isMaybe = activeEvent && activeEvent.attendance[p?.id] === 'maybe';
-                  return <SeatBox seat={s} paddler={p} isMaybe={isMaybe} isLocked={lockedSeats.includes(s.id)} isSelected={selectedPaddlerId} onClick={() => handleSeatClick(s.id)} onUnassign={(e) => handleUnassign(s.id, e)} onLock={(e) => toggleLock(s.id, e)} hideWeight={isExporting} />;
+                  const isMaybe = activeEvent ? activeEvent.attendance[p?.id as string] === 'maybe' : false;
+                  return <SeatBox seat={s} paddler={p} isMaybe={isMaybe} isLocked={lockedSeats.includes(s.id)} isSelected={selectedPaddlerId === assignments[s.id]} onClick={() => handleSeatClick(s.id)} onUnassign={(e) => handleUnassign(s.id, e)} onLock={(e) => toggleLock(s.id, e)} hideWeight={isExporting} />;
                 })()}
               </div>
               {/* Rows */}
@@ -60,13 +76,13 @@ const BoatVisualizer = React.forwardRef(({
                 const ls = `row-${r}-left`, rs = `row-${r}-right`;
                 const pl = activePaddlerPool.find((x) => x.id === assignments[ls]) || paddlers.find((x) => x.id === assignments[ls]);
                 const pr = activePaddlerPool.find((x) => x.id === assignments[rs]) || paddlers.find((x) => x.id === assignments[rs]);
-                const ml = activeEvent && activeEvent.attendance[pl?.id] === 'maybe';
-                const mr = activeEvent && activeEvent.attendance[pr?.id] === 'maybe';
+                const ml = activeEvent ? activeEvent.attendance[pl?.id as string] === 'maybe' : false;
+                const mr = activeEvent ? activeEvent.attendance[pr?.id as string] === 'maybe' : false;
                 return (
                   <div key={r} className="flex items-center justify-between gap-2 relative">
                     <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 text-amber-900/10 dark:text-amber-100/10 text-4xl font-black pointer-events-none z-0 select-none">{r}</div>
-                    <SeatBox seat={{ id: ls, side: 'left' }} paddler={pl} isMaybe={ml} isLocked={lockedSeats.includes(ls)} isSelected={selectedPaddlerId} onClick={() => handleSeatClick(ls)} onUnassign={(e) => handleUnassign(ls, e)} onLock={(e) => toggleLock(ls, e)} hideWeight={isExporting} />
-                    <SeatBox seat={{ id: rs, side: 'right' }} paddler={pr} isMaybe={mr} isLocked={lockedSeats.includes(rs)} isSelected={selectedPaddlerId} onClick={() => handleSeatClick(rs)} onUnassign={(e) => handleUnassign(rs, e)} onLock={(e) => toggleLock(rs, e)} hideWeight={isExporting} />
+                    <SeatBox seat={{ id: ls, side: 'left', type: 'paddler', row: r }} paddler={pl} isMaybe={ml} isLocked={lockedSeats.includes(ls)} isSelected={selectedPaddlerId === assignments[ls]} onClick={() => handleSeatClick(ls)} onUnassign={(e) => handleUnassign(ls, e)} onLock={(e) => toggleLock(ls, e)} hideWeight={isExporting} />
+                    <SeatBox seat={{ id: rs, side: 'right', type: 'paddler', row: r }} paddler={pr} isMaybe={mr} isLocked={lockedSeats.includes(rs)} isSelected={selectedPaddlerId === assignments[rs]} onClick={() => handleSeatClick(rs)} onUnassign={(e) => handleUnassign(rs, e)} onLock={(e) => toggleLock(rs, e)} hideWeight={isExporting} />
                   </div>
                 );
               })}
@@ -75,8 +91,8 @@ const BoatVisualizer = React.forwardRef(({
                 {(() => {
                   const s = boatConfig[boatConfig.length - 1];
                   const p = activePaddlerPool.find((x) => x.id === assignments[s.id]) || paddlers.find((x) => x.id === assignments[s.id]);
-                  const isMaybe = activeEvent && activeEvent.attendance[p?.id] === 'maybe';
-                  return <SeatBox seat={s} paddler={p} isMaybe={isMaybe} isLocked={lockedSeats.includes(s.id)} isSelected={selectedPaddlerId} onClick={() => handleSeatClick(s.id)} onUnassign={(e) => handleUnassign(s.id, e)} onLock={(e) => toggleLock(s.id, e)} hideWeight={isExporting} />;
+                  const isMaybe = activeEvent ? activeEvent.attendance[p?.id as string] === 'maybe' : false;
+                  return <SeatBox seat={s} paddler={p} isMaybe={isMaybe} isLocked={lockedSeats.includes(s.id)} isSelected={selectedPaddlerId === assignments[s.id]} onClick={() => handleSeatClick(s.id)} onUnassign={(e) => handleUnassign(s.id, e)} onLock={(e) => toggleLock(s.id, e)} hideWeight={isExporting} />;
                 })()}
               </div>
             </div>

@@ -1,19 +1,25 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { Paddler } from '@/types';
 
-const AddGuestModal = ({ onClose, onAdd }) => {
+interface AddGuestModalProps {
+  onClose: () => void;
+  onAdd: (guest: Pick<Paddler, 'name' | 'weight' | 'skills'>) => void;
+}
+
+const AddGuestModal: React.FC<AddGuestModalProps> = ({ onClose, onAdd }) => {
   const { t } = useLanguage();
-  const [name, setName] = useState('');
-  const [weight, setWeight] = useState('');
+  const [name, setName] = useState<string>('');
+  const [weight, setWeight] = useState<string>('');
   const [skills, setSkills] = useState({ left: false, right: false, drum: false, steer: false });
 
-  const toggleSkill = (s) => setSkills((prev) => ({ ...prev, [s]: !prev[s] }));
+  const toggleSkill = (s: keyof typeof skills) => setSkills((prev) => ({ ...prev, [s]: !prev[s] }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !weight) return;
-    const skillsArr = Object.keys(skills).filter((k) => skills[k]);
+    const skillsArr = (Object.keys(skills) as Array<keyof typeof skills>).filter((k) => skills[k]);
     if (skillsArr.length === 0) {
       alert(t('pleaseChooseRole'));
       return;
@@ -47,8 +53,8 @@ const AddGuestModal = ({ onClose, onAdd }) => {
                 <button
                   key={skill}
                   type="button"
-                  onClick={() => toggleSkill(skill)}
-                  className={`px-3 py-1.5 rounded border text-sm capitalize ${skills[skill] ? 'bg-blue-500 text-white border-blue-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'}`}
+                  onClick={() => toggleSkill(skill as keyof typeof skills)}
+                  className={`px-3 py-1.5 rounded border text-sm capitalize ${skills[skill as keyof typeof skills] ? 'bg-blue-500 text-white border-blue-600' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'}`}
                 >
                   {skill === 'steer' ? t('steer') : skill === 'drum' ? t('drum') : t(skill)}
                 </button>

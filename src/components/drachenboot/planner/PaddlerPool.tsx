@@ -1,8 +1,20 @@
 import React from 'react';
 import { User, Box, UserPlus } from 'lucide-react';
 import SkillBadges from '../../ui/SkillBadges';
+import { Paddler, Assignments, Event } from '@/types';
 
-const PaddlerPool = ({ 
+interface PaddlerPoolProps {
+  activePaddlerPool: Paddler[];
+  assignments: Assignments;
+  selectedPaddlerId: number | string | null;
+  setSelectedPaddlerId: (id: number | string | null) => void;
+  activeEvent: Event | null;
+  handleAddCanister: () => void;
+  setShowGuestModal: (show: boolean) => void;
+  t: (key: string) => string;
+}
+
+const PaddlerPool: React.FC<PaddlerPoolProps> = ({ 
   activePaddlerPool, 
   assignments, 
   selectedPaddlerId, 

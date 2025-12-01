@@ -1,6 +1,13 @@
-export const runAutoFillAlgorithm = (activePaddlerPool, assignments, lockedSeats, targetTrim) => {
+import { Paddler, Assignments } from '../types';
+
+export const runAutoFillAlgorithm = (
+  activePaddlerPool: Paddler[],
+  assignments: Assignments,
+  lockedSeats: string[],
+  targetTrim: number
+): Assignments | null => {
   const rows = 10;
-  const lockedAss = {};
+  const lockedAss: Assignments = {};
   
   // Gesperrte Sitze behalten
   lockedSeats.forEach((s) => {
@@ -14,12 +21,12 @@ export const runAutoFillAlgorithm = (activePaddlerPool, assignments, lockedSeats
   
   if (pool.length === 0) return null;
 
-  let bestAss = null;
+  let bestAss: Assignments | null = null;
   let bestScore = -Infinity;
 
   // Simulation
   for (let i = 0; i < 1500; i++) {
-    let currAss = { ...lockedAss };
+    let currAss: Assignments = { ...lockedAss };
     let currPool = [...pool].sort(() => Math.random() - 0.5);
 
     // 1. Steuerleute priorisieren
@@ -50,7 +57,7 @@ export const runAutoFillAlgorithm = (activePaddlerPool, assignments, lockedSeats
     // Random shuffle with weight noise
     currPool.sort((a, b) => (b.weight + Math.random() * 5) - (a.weight + Math.random() * 5));
 
-    const free = [];
+    const free: { id: string; side: string; r: number }[] = [];
     for (let r = 1; r <= rows; r++) {
       if (!currAss[`row-${r}-left`]) free.push({ id: `row-${r}-left`, side: 'left', r });
       if (!currAss[`row-${r}-right`]) free.push({ id: `row-${r}-right`, side: 'right', r });
@@ -66,7 +73,8 @@ export const runAutoFillAlgorithm = (activePaddlerPool, assignments, lockedSeats
         const pad = activePaddlerPool.find((x) => x.id === pid);
         if (!pad) return;
         if (sid.includes('left')) l += pad.weight; else r += pad.weight;
-        if (parseInt(sid.match(/row-(\d+)/)[1]) <= 5) f += pad.weight; else b += pad.weight;
+        const match = sid.match(/row-(\d+)/);
+        if (match && parseInt(match[1]) <= 5) f += pad.weight; else b += pad.weight;
       });
 
       const nBack = f - b > targetTrim; // Benötigt Gewicht hinten?
@@ -126,7 +134,8 @@ export const runAutoFillAlgorithm = (activePaddlerPool, assignments, lockedSeats
       const pad = activePaddlerPool.find((x) => x.id === pid);
       if (!pad) return;
       if (sid.includes('left')) fl += pad.weight; else fr += pad.weight;
-      if (parseInt(sid.match(/row-(\d+)/)[1]) <= 5) ff += pad.weight; else fb += pad.weight;
+      const match = sid.match(/row-(\d+)/);
+      if (match && parseInt(match[1]) <= 5) ff += pad.weight; else fb += pad.weight;
     });
 
     let sc = -Math.pow(Math.abs(fl - fr), 2); // Links/Rechts Strafe

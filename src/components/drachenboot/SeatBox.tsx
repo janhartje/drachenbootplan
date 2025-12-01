@@ -1,8 +1,21 @@
 import React from 'react';
 import { Drum, ShipWheel, X, Pin, Box } from 'lucide-react';
 import SkillBadges from '../ui/SkillBadges';
+import { BoatConfigItem, Paddler } from '@/types';
 
-const SeatBox = ({
+interface SeatBoxProps {
+  seat: BoatConfigItem;
+  paddler?: Paddler;
+  isLocked?: boolean;
+  isSelected?: boolean;
+  onClick?: () => void;
+  onUnassign?: (e: React.MouseEvent) => void;
+  onLock?: (e: React.MouseEvent) => void;
+  hideWeight?: boolean;
+  isMaybe?: boolean;
+}
+
+const SeatBox: React.FC<SeatBoxProps> = ({
   seat,
   paddler,
   isLocked,

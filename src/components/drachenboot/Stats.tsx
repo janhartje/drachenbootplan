@@ -1,7 +1,13 @@
 import React from 'react';
 import { ArrowUpFromLine, Anchor } from 'lucide-react';
 
-export const BalanceBar = ({ left, right, diff }) => {
+interface BalanceBarProps {
+  left: number;
+  right: number;
+  diff: number;
+}
+
+export const BalanceBar: React.FC<BalanceBarProps> = ({ left, right, diff }) => {
   const total = left + right || 1;
   const lp = (left / total) * 100;
   const col = Math.abs(diff) > 20 ? 'bg-red-500' : Math.abs(diff) > 10 ? 'bg-yellow-400' : 'bg-green-500';
@@ -18,7 +24,13 @@ export const BalanceBar = ({ left, right, diff }) => {
   );
 };
 
-export const TrimBar = ({ front, back, diff }) => (
+interface TrimBarProps {
+  front: number;
+  back: number;
+  diff: number;
+}
+
+export const TrimBar: React.FC<TrimBarProps> = ({ front, back, diff }) => (
   <div className="w-full p-3 bg-blue-50/50 dark:bg-blue-900/30 rounded-lg border border-blue-100 dark:border-blue-800">
     <div className="flex justify-between text-xs text-blue-800 dark:text-blue-300 font-bold mb-1">
       <span className="flex gap-1"><ArrowUpFromLine size={12} /> Bug: {front}</span>

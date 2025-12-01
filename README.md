@@ -20,25 +20,27 @@ Der **Drachenboot Manager** ist eine Progressive Web App (PWA) zur Verwaltung vo
 ## 🛠 Tech Stack
 
 *   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+*   **Language**: [TypeScript](https://www.typescriptlang.org/)
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 *   **Icons**: [Lucide React](https://lucide.dev/)
 *   **State Management**: React Context API (`DrachenbootContext`, `LanguageContext`)
-*   **Persistence**: LocalStorage (via `src/utils/storage.js`)
+*   **Persistence**: LocalStorage (via `src/utils/storage.ts`)
 *   **Export**: `html2canvas` für Bild-Export der Aufstellung
 
 ## 📂 Projektstruktur
 
 ```
 src/
-├── app/                 # Next.js App Router Pages
-│   ├── layout.js        # Root Layout & Providers
-│   ├── page.js          # Home / Team View
+├── app/                 # Next.js App Router Pages (TSX)
+│   ├── layout.tsx       # Root Layout & Providers
+│   ├── page.tsx         # Home / Team View
 │   └── planner/         # Planner View Route
 ├── components/
 │   ├── drachenboot/     # Domain-spezifische Komponenten (TeamView, PlannerView)
 │   └── ui/              # Wiederverwendbare UI-Komponenten (Buttons, Modals, etc.)
 ├── context/             # Global State (Daten, Sprache, Tour)
 ├── locales/             # Übersetzungsdateien (de.json, en.json)
+├── types/               # TypeScript Definitionen (index.ts)
 └── utils/               # Hilfsfunktionen (Storage, Algorithmus)
 ```
 
@@ -46,7 +48,7 @@ src/
 
 ### Voraussetzungen
 
-*   Node.js 18+
+*   Node.js 18.17+
 *   npm oder yarn
 
 ### Installation

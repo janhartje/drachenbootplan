@@ -1,6 +1,16 @@
+import { Paddler, Event, Assignments } from '../types';
+
+interface AppData {
+  paddlers: Paddler[];
+  events: Event[];
+  assignmentsByEvent: Record<number, Assignments>;
+  darkMode?: boolean;
+  targetTrim?: number;
+}
+
 export const db = {
   KEY: 'drachenboot_pwa_data_v4',
-  load: () => {
+  load: (): AppData | null => {
     if (typeof window === 'undefined') return null;
     try {
       const data = localStorage.getItem('drachenboot_pwa_data_v4');
@@ -10,7 +20,7 @@ export const db = {
     }
     return null;
   },
-  save: (data) => {
+  save: (data: AppData): void => {
     if (typeof window === 'undefined') return;
     try {
       localStorage.setItem('drachenboot_pwa_data_v4', JSON.stringify(data));
@@ -20,8 +30,8 @@ export const db = {
   },
 };
 
-export const seedInitialData = () => {
-  const initialPaddlers = [
+export const seedInitialData = (): AppData => {
+  const initialPaddlers: Paddler[] = [
     { id: 1, name: 'Alex', weight: 85, skills: ['left', 'right'] },
     { id: 2, name: 'Anna', weight: 55, skills: ['drum', 'left', 'right'] },
     { id: 3, name: 'Christopher', weight: 82, skills: ['left'] },
@@ -49,8 +59,8 @@ export const seedInitialData = () => {
         date: new Date().toISOString().split('T')[0],
         type: 'training',
         attendance: initialPaddlers.reduce(
-          (acc, p) => ({ ...acc, [p.id]: 'yes' }),
-          {}
+          (acc, p) => ({ ...acc, [p.id]: 'yes' as const }),
+          {} as Record<string, 'yes' | 'no' | 'maybe'>
         ),
       },
     ],

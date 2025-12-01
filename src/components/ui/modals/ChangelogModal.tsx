@@ -2,7 +2,11 @@ import React from 'react';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
-const ChangelogModal = ({ onClose }) => {
+interface ChangelogModalProps {
+  onClose: () => void;
+}
+
+const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
   const { t } = useLanguage();
   return (
   <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">

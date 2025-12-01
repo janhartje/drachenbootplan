@@ -1,6 +1,10 @@
 import React from 'react';
 
-const DragonLogo = ({ className }) => (
+interface DragonLogoProps {
+  className?: string;
+}
+
+const DragonLogo: React.FC<DragonLogoProps> = ({ className }) => (
   <svg
     viewBox="0 0 100 100"
     className={className}

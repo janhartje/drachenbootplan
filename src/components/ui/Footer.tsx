@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { ImprintModal, ChangelogModal } from './Modals';
 
-const Footer = () => {
+const Footer: React.FC = () => {
   const { t } = useLanguage();
-  const [showImprint, setShowImprint] = useState(false);
-  const [showChangelog, setShowChangelog] = useState(false);
+  const [showImprint, setShowImprint] = useState<boolean>(false);
+  const [showChangelog, setShowChangelog] = useState<boolean>(false);
 
   return (
     <>

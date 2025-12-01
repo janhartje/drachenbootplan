@@ -1,8 +1,22 @@
 import React from 'react';
 import { ArrowRightLeft, RefreshCw, Wand2, Camera, AlertCircle, RotateCcw } from 'lucide-react';
 import { BalanceBar, TrimBar } from '../Stats';
+import { Stats, Paddler } from '@/types';
 
-const StatsPanel = ({ 
+interface StatsPanelProps {
+  stats: Stats;
+  targetTrim: number;
+  setTargetTrim: (trim: number) => void;
+  runAutoFill: () => void;
+  isSimulating: boolean;
+  activePaddlerPool: Paddler[];
+  handleExportImage: () => void;
+  clearBoat: () => void;
+  confirmClear: boolean;
+  t: (key: string) => string;
+}
+
+const StatsPanel: React.FC<StatsPanelProps> = ({ 
   stats, 
   targetTrim, 
   setTargetTrim, 

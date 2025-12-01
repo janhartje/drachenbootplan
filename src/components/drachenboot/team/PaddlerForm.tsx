@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { User, Pencil, Drum, ShipWheel, Save, Plus } from 'lucide-react';
+import { Paddler } from '@/types';
 
-const PaddlerForm = ({ paddlerToEdit, onSave, onCancel, t }) => {
-  const [name, setName] = useState('');
-  const [weight, setWeight] = useState('');
+interface PaddlerFormProps {
+  paddlerToEdit: Paddler | null;
+  onSave: (paddler: Pick<Paddler, 'name' | 'weight' | 'skills'>) => void;
+  onCancel: () => void;
+  t: (key: string) => string;
+}
+
+const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCancel, t }) => {
+  const [name, setName] = useState<string>('');
+  const [weight, setWeight] = useState<string>('');
   const [skills, setSkills] = useState({ left: false, right: false, drum: false, steer: false });
 
   useEffect(() => {
     if (paddlerToEdit) {
       setName(paddlerToEdit.name);
-      setWeight(paddlerToEdit.weight);
+      setWeight(paddlerToEdit.weight.toString());
       const sObj = { left: false, right: false, drum: false, steer: false };
-      if (paddlerToEdit.skills) paddlerToEdit.skills.forEach((s) => sObj[s] = true);
+      if (paddlerToEdit.skills) paddlerToEdit.skills.forEach((s) => {
+        if (s in sObj) sObj[s as keyof typeof sObj] = true;
+      });
       setSkills(sObj);
     } else {
       resetForm();
@@ -24,14 +34,14 @@ const PaddlerForm = ({ paddlerToEdit, onSave, onCancel, t }) => {
     setSkills({ left: false, right: false, drum: false, steer: false });
   };
 
-  const toggleSkill = (skill) => {
+  const toggleSkill = (skill: keyof typeof skills) => {
     setSkills((prev) => ({ ...prev, [skill]: !prev[skill] }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !weight) return;
-    const skillsArray = Object.keys(skills).filter((k) => skills[k]);
+    const skillsArray = (Object.keys(skills) as Array<keyof typeof skills>).filter((k) => skills[k]);
     if (skillsArray.length === 0) { alert(t('pleaseChooseRole')); return; }
     
     onSave({ name, weight: parseFloat(weight), skills: skillsArray });

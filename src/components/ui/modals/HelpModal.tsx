@@ -4,7 +4,11 @@ import { Info, X, PlayCircle } from 'lucide-react';
 import { useTour } from '@/context/TourContext';
 import { useLanguage } from '@/context/LanguageContext';
 
-const HelpModal = ({ onClose }) => {
+interface HelpModalProps {
+  onClose: () => void;
+}
+
+const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
   const { t } = useLanguage();
   const { startTour } = useTour();
   const pathname = usePathname();

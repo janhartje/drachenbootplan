@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import { Users, Pencil, Trash2 } from 'lucide-react';
 import SkillBadges from '../../ui/SkillBadges';
+import { Paddler } from '@/types';
 
-const PaddlerGrid = ({ paddlers, editingId, onEdit, onDelete, t }) => {
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+interface PaddlerGridProps {
+  paddlers: Paddler[];
+  editingId: number | string | null;
+  onEdit: (paddler: Paddler) => void;
+  onDelete: (id: number | string) => void;
+  t: (key: string) => string;
+}
 
-  const triggerDelete = (id) => {
+const PaddlerGrid: React.FC<PaddlerGridProps> = ({ paddlers, editingId, onEdit, onDelete, t }) => {
+  const [deleteConfirmId, setDeleteConfirmId] = useState<number | string | null>(null);
+
+  const triggerDelete = (id: number | string) => {
     if (deleteConfirmId === id) { 
       onDelete(id); 
       setDeleteConfirmId(null); 

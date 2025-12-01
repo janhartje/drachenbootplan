@@ -15,8 +15,13 @@ import { useTour } from '@/context/TourContext';
 import StatsPanel from './planner/StatsPanel';
 import PaddlerPool from './planner/PaddlerPool';
 import BoatVisualizer from './planner/BoatVisualizer';
+import { Assignments, BoatConfigItem, Paddler } from '@/types';
 
-const PlannerView = ({ eventId }) => {
+interface PlannerViewProps {
+  eventId: string;
+}
+
+const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
   const router = useRouter();
   const { t } = useLanguage();
   const { checkAndStartTour } = useTour();
@@ -43,19 +48,19 @@ const PlannerView = ({ eventId }) => {
   } = useDrachenboot();
 
   // --- LOCAL UI STATE ---
-  const [activeEventId, setActiveEventId] = useState(parseInt(eventId));
-  const [isSimulating, setIsSimulating] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-  const [showGuestModal, setShowGuestModal] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
-  const [selectedPaddlerId, setSelectedPaddlerId] = useState(null);
-  const [lockedSeats, setLockedSeats] = useState([]);
-  const [confirmClear, setConfirmClear] = useState(false);
+  const [activeEventId, setActiveEventId] = useState<number>(parseInt(eventId));
+  const [isSimulating, setIsSimulating] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [showGuestModal, setShowGuestModal] = useState<boolean>(false);
+  const [showHelp, setShowHelp] = useState<boolean>(false);
+  const [selectedPaddlerId, setSelectedPaddlerId] = useState<number | string | null>(null);
+  const [lockedSeats, setLockedSeats] = useState<string[]>([]);
+  const [confirmClear, setConfirmClear] = useState<boolean>(false);
   
-  const boatRef = useRef(null);
+  const boatRef = useRef<HTMLDivElement>(null);
 
   // --- COMPUTED ---
-  const activeEvent = useMemo(() => events.find((e) => e.id === activeEventId), [activeEventId, events]);
+  const activeEvent = useMemo(() => events.find((e) => e.id === activeEventId) || null, [activeEventId, events]);
   const activeEventTitle = activeEvent ? activeEvent.title : t('unknownEvent');
 
   const assignments = useMemo(() => assignmentsByEvent[activeEventId] || {}, [assignmentsByEvent, activeEventId]);
@@ -71,7 +76,7 @@ const PlannerView = ({ eventId }) => {
   // --- BOAT CONFIG ---
   const rows = 10;
   const boatConfig = useMemo(() => {
-    const s = [{ id: 'drummer', type: 'drummer' }];
+    const s: BoatConfigItem[] = [{ id: 'drummer', type: 'drummer' }];
     for (let i = 1; i <= rows; i++) { s.push({ id: `row-${i}-left`, type: 'paddler', side: 'left', row: i }); s.push({ id: `row-${i}-right`, type: 'paddler', side: 'right', row: i }); }
     s.push({ id: 'steer', type: 'steer' });
     return s;
@@ -86,8 +91,8 @@ const PlannerView = ({ eventId }) => {
       t += p.weight; c++;
       if (sid.includes('row')) {
         if (sid.includes('left')) l += p.weight; else r += p.weight;
-        const rw = parseInt(sid.match(/row-(\d+)/)[1]);
-        if (rw <= 5) f += p.weight; else b += p.weight;
+        const match = sid.match(/row-(\d+)/);
+        if (match && parseInt(match[1]) <= 5) f += p.weight; else b += p.weight;
       }
     });
     return { l, r, t, diffLR: l - r, f, b, diffFB: f - b, c };
@@ -100,7 +105,7 @@ const PlannerView = ({ eventId }) => {
       if (!p) return;
       totalWeight += p.weight;
       let xPos = 50; if (sid.includes('left')) xPos = 25; else if (sid.includes('right')) xPos = 75;
-      let yPos = 50; if (sid === 'drummer') yPos = 4; else if (sid === 'steer') yPos = 96; else if (sid.includes('row')) { const r = parseInt(sid.match(/row-(\d+)/)[1]); yPos = 12 + ((r - 1) / 9) * 70; }
+      let yPos = 50; if (sid === 'drummer') yPos = 4; else if (sid === 'steer') yPos = 96; else if (sid.includes('row')) { const match = sid.match(/row-(\d+)/); if (match) { const r = parseInt(match[1]); yPos = 12 + ((r - 1) / 9) * 70; } }
       weightedSumX += p.weight * xPos; weightedSumY += p.weight * yPos;
     });
     const cgX = totalWeight > 0 ? weightedSumX / totalWeight : 50;
@@ -113,18 +118,18 @@ const PlannerView = ({ eventId }) => {
 
   const handleAddCanister = () => {
     const canisterId = 'canister-' + Date.now();
-    const canister = { id: canisterId, name: t('canister'), weight: 25, skills: ['left', 'right'], isCanister: true };
+    const canister: Paddler = { id: canisterId, name: t('canister'), weight: 25, skills: ['left', 'right'], isCanister: true };
     setPaddlers((prev) => [...prev, canister]);
     setSelectedPaddlerId(canisterId);
   };
 
-  const handleAddGuest = (guestData) => {
+  const handleAddGuest = (guestData: Pick<Paddler, 'name' | 'weight' | 'skills'>) => {
     const guestId = addGuest(activeEventId, guestData);
     setSelectedPaddlerId(guestId);
     setShowGuestModal(false);
   };
 
-  const handleSeatClick = (sid) => {
+  const handleSeatClick = (sid: string) => {
     if (lockedSeats.includes(sid)) return;
     if (selectedPaddlerId) {
       const nAss = { ...assignments };
@@ -137,7 +142,7 @@ const PlannerView = ({ eventId }) => {
     }
   };
 
-  const handleUnassign = (sid, e) => {
+  const handleUnassign = (sid: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (lockedSeats.includes(sid)) return;
     const paddlerId = assignments[sid];
@@ -152,7 +157,7 @@ const PlannerView = ({ eventId }) => {
     }
   };
 
-  const toggleLock = (sid, e) => {
+  const toggleLock = (sid: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (!assignments[sid]) return;
     setLockedSeats((prev) => prev.includes(sid) ? prev.filter((i) => i !== sid) : [...prev, sid]);
@@ -183,15 +188,17 @@ const PlannerView = ({ eventId }) => {
     if (!boatRef.current) return;
     setIsExporting(true);
     setTimeout(() => {
-      html2canvas(boatRef.current, { backgroundColor: null, scale: 3, useCORS: true })
-        .then((canvas) => {
-          const link = document.createElement('a');
-          link.download = `drachenboot-${activeEventTitle.replace(/\s+/g, '-')}.png`;
-          link.href = canvas.toDataURL();
-          link.click();
-          setIsExporting(false);
-        })
-        .catch((err) => { console.error('Export failed', err); setIsExporting(false); });
+      if (boatRef.current) {
+        html2canvas(boatRef.current, { backgroundColor: null, scale: 3, useCORS: true })
+          .then((canvas) => {
+            const link = document.createElement('a');
+            link.download = `drachenboot-${activeEventTitle.replace(/\s+/g, '-')}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+            setIsExporting(false);
+          })
+          .catch((err) => { console.error('Export failed', err); setIsExporting(false); });
+      }
     }, 150);
   };
 
@@ -280,4 +287,3 @@ const PlannerView = ({ eventId }) => {
 };
 
 export default PlannerView;
-

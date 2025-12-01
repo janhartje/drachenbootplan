@@ -1,7 +1,16 @@
 import React from 'react';
 import { Calendar, ChevronRight, Check, HelpCircle, X } from 'lucide-react';
+import { Event, Paddler } from '@/types';
 
-const EventList = ({ events, sortedPaddlers, onPlan, onUpdateAttendance, t }) => {
+interface EventListProps {
+  events: Event[];
+  sortedPaddlers: Paddler[];
+  onPlan: (eventId: number) => void;
+  onUpdateAttendance: (eventId: number, paddlerId: number | string, status: 'yes' | 'no' | 'maybe') => void;
+  t: (key: string) => string;
+}
+
+const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, onUpdateAttendance, t }) => {
   return (
     <div id="tour-event-list" className="space-y-4 h-full">
       {events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).map((evt) => {
@@ -13,8 +22,8 @@ const EventList = ({ events, sortedPaddlers, onPlan, onUpdateAttendance, t }) =>
                 <div className="font-bold text-slate-800 dark:text-white text-lg">{evt.title}</div>
                 <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-1"><Calendar size={14} /> {new Date(evt.date).toLocaleDateString('de-DE')}</div>
               </div>
-              <div className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase ${evt.type === 'race' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200' : 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200'}`}>
-                {evt.type === 'race' ? t('regatta') : t('training')}
+              <div className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase ${evt.type === 'regatta' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200' : 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200'}`}>
+                {evt.type === 'regatta' ? t('regatta') : t('training')}
               </div>
             </div>
             <div className="flex justify-between items-center mt-4 pb-4 border-b border-slate-100 dark:border-slate-800">

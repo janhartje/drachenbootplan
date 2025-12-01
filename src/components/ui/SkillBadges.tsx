@@ -1,7 +1,11 @@
 import React from 'react';
 import { Drum, ShipWheel } from 'lucide-react';
 
-const SkillBadges = ({ skills }) => {
+interface SkillBadgesProps {
+  skills?: string[];
+}
+
+const SkillBadges: React.FC<SkillBadgesProps> = ({ skills }) => {
   return (
     <div className="flex gap-1 items-center justify-center">
       {skills?.includes('left') && <span className="w-5 h-4 flex items-center justify-center rounded border text-[9px] font-bold bg-red-50 text-red-600 border-red-100 dark:bg-red-900/50 dark:text-red-300 dark:border-red-800">L</span>}

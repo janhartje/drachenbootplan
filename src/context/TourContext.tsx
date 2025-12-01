@@ -1,21 +1,32 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { driver } from 'driver.js';
+import { driver, Driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
 
 import { useLanguage } from '@/context/LanguageContext';
 
-const TourContext = createContext();
+interface TourContextType {
+  startTour: (tourName?: string) => void;
+  checkAndStartTour: (tourName: string) => void;
+}
 
-export const useTour = () => useContext(TourContext);
+const TourContext = createContext<TourContextType | undefined>(undefined);
 
-export const TourProvider = ({ children }) => {
-  const [driverObj, setDriverObj] = useState(null);
+export const useTour = () => {
+  const context = useContext(TourContext);
+  if (!context) {
+    throw new Error('useTour must be used within a TourProvider');
+  }
+  return context;
+};
+
+export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [driverObj, setDriverObj] = useState<Driver | null>(null);
   const { t } = useLanguage();
 
   // Define tour configurations
-  const tours = {
+  const tours: { [key: string]: any[] } = {
     welcome: [
       { 
         element: '#tour-welcome', 
@@ -155,7 +166,7 @@ export const TourProvider = ({ children }) => {
     }
   };
 
-  const checkAndStartTour = (tourName) => {
+  const checkAndStartTour = (tourName: string) => {
     const tourSeen = localStorage.getItem(`${tourName}_tour_seen`);
     if (!tourSeen && driverObj) {
       startTour(tourName);

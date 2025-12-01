@@ -12,8 +12,9 @@ import NewEventForm from './team/NewEventForm';
 import PaddlerForm from './team/PaddlerForm';
 import EventList from './team/EventList';
 import PaddlerGrid from './team/PaddlerGrid';
+import { Paddler } from '@/types';
 
-const TeamView = () => {
+const TeamView: React.FC = () => {
   const router = useRouter();
   const { t } = useLanguage();
   const { 
@@ -29,8 +30,8 @@ const TeamView = () => {
   } = useDrachenboot();
 
   // --- LOCAL UI STATE ---
-  const [editingPaddlerId, setEditingPaddlerId] = useState(null);
-  const [showHelp, setShowHelp] = useState(false);
+  const [editingPaddlerId, setEditingPaddlerId] = useState<number | string | null>(null);
+  const [showHelp, setShowHelp] = useState<boolean>(false);
 
   // --- COMPUTED ---
   const sortedPaddlers = useMemo(() => 
@@ -38,19 +39,19 @@ const TeamView = () => {
   [paddlers]);
 
   const paddlerToEdit = useMemo(() => 
-    editingPaddlerId ? paddlers.find(p => p.id === editingPaddlerId) : null,
+    editingPaddlerId ? paddlers.find(p => p.id === editingPaddlerId) || null : null,
   [editingPaddlerId, paddlers]);
 
   // --- ACTIONS ---
-  const handleCreateEvent = (title, date) => {
+  const handleCreateEvent = (title: string, date: string) => {
     createEvent(title, date);
   };
 
-  const handlePlanEvent = (eid) => {
+  const handlePlanEvent = (eid: number) => {
     router.push(`/planner?id=${eid}`);
   };
 
-  const handleSavePaddler = (data) => {
+  const handleSavePaddler = (data: Pick<Paddler, 'name' | 'weight' | 'skills'>) => {
     if (editingPaddlerId) {
       updatePaddler(editingPaddlerId, data);
       setEditingPaddlerId(null);
@@ -59,12 +60,12 @@ const TeamView = () => {
     }
   };
 
-  const handleEditPaddler = (p) => {
+  const handleEditPaddler = (p: Paddler) => {
     setEditingPaddlerId(p.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeletePaddler = (id) => {
+  const handleDeletePaddler = (id: number | string) => {
     deletePaddler(id);
     if (editingPaddlerId === id) setEditingPaddlerId(null);
   };
@@ -134,4 +135,3 @@ const TeamView = () => {
 };
 
 export default TeamView;
-

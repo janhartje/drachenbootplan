@@ -2,7 +2,20 @@ import React from 'react';
 import { Sun, Moon, Info } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
-const Header = ({ 
+interface HeaderProps {
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  logo?: React.ReactNode;
+  leftAction?: React.ReactNode;
+  children?: React.ReactNode;
+  showHelp?: boolean;
+  onHelp?: () => void;
+  showThemeToggle?: boolean;
+  isDarkMode?: boolean;
+  toggleDarkMode?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ 
   title, 
   subtitle, 
   logo = null, 
@@ -45,13 +58,13 @@ const Header = ({
         
         {(children && (showHelp || showThemeToggle)) && <div className="w-px h-8 bg-slate-100 dark:bg-slate-800 mx-2"></div>}
 
-        {showHelp && (
+        {showHelp && onHelp && (
           <button onClick={onHelp} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors">
             <Info size={20} />
           </button>
         )}
         
-        {showThemeToggle && (
+        {showThemeToggle && toggleDarkMode && (
           <button onClick={toggleDarkMode} className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors">
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>

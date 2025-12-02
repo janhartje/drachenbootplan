@@ -30,39 +30,66 @@ export default function LandingPage() {
     }
   };
 
-  // JSON-LD Structured Data for SEO
+  // JSON-LD Structured Data for SEO (English/International focus)
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Organization",
-        "name": "Drachenboot Manager",
+        "name": language === 'de' ? "Drachenboot Manager" : "Dragon Boat Manager",
+        "alternateName": language === 'de' ? "Dragon Boat Manager" : "Drachenboot Manager",
         "url": process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
         "logo": `${process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"}/icons/logo-512.png`,
-        "description": "Team Management Software für Drachenboot Teams",
+        "description": language === 'de' 
+          ? "Team Management Software für Drachenboot Teams" 
+          : "Team Management Software for Dragon Boat Teams",
         "founder": {
           "@type": "Person",
           "name": "Jan Hartje"
-        }
+        },
+        "inLanguage": ["en", "de"]
       },
       {
         "@type": "WebApplication",
-        "name": "Drachenboot Manager",
+        "name": language === 'de' ? "Drachenboot Manager" : "Dragon Boat Manager",
         "url": process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000",
-        "applicationCategory": "SportApplication",
+        "applicationCategory": "SportsApplication",
         "operatingSystem": "Web Browser, iOS, Android",
         "offers": {
           "@type": "Offer",
           "price": "0",
           "priceCurrency": "EUR"
         },
-        "description": "Progressive Web App zur Verwaltung von Drachenboot-Teams, Terminplanung und optimaler Bootsbesetzung",
-        "featureList": [
-          "Team Management",
-          "Terminplanung",
-          "Optimale Bootsbesetzung mit KI",
-          "Offline-Funktionalität",
-          "Gewichtstrimmung und Balance"
+        "description": language === 'de'
+          ? "Progressive Web App zur Verwaltung von Drachenboot-Teams, Terminplanung und optimaler Bootsbesetzung"
+          : "Progressive Web App for managing dragon boat teams, event planning, and optimal boat lineup",
+        "featureList": language === 'de' 
+          ? [
+              "Team Management",
+              "Terminplanung",
+              "Optimale Bootsbesetzung mit KI",
+              "Offline-Funktionalität",
+              "Gewichtstrimmung und Balance"
+            ]
+          : [
+              "Team Management",
+              "Event Planning",
+              "Optimal Boat Lineup with AI",
+              "Offline Functionality",
+              "Weight Trimming and Balance"
+            ],
+        "inLanguage": ["en", "de"],
+        "availableLanguage": [
+          {
+            "@type": "Language",
+            "name": "English",
+            "alternateName": "en"
+          },
+          {
+            "@type": "Language",
+            "name": "German",
+            "alternateName": "de"
+          }
         ]
       }
     ]

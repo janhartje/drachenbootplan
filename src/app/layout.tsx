@@ -10,39 +10,49 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Drachenboot Manager - Team & Bootsbesetzung Planen",
-    template: "%s | Drachenboot Manager"
+    default: "Dragon Boat Manager - Team & Boat Lineup Planning",
+    template: "%s | Dragon Boat Manager"
   },
-  description: "Plane dein Drachenboot-Team effizient: Mitgliederverwaltung, Terminplanung und optimale Bootsbesetzung mit KI-Unterstützung. Funktioniert offline als installierbare App.",
-  keywords: ["Drachenboot", "Team Management", "Bootsbesetzung", "Trainingsplanung", "Paddler", "Dragon Boat", "PWA", "Offline App"],
+  description: "Plan your dragon boat team efficiently: member management, event planning, and optimal boat lineup with AI support. Works offline as installable app. / Plane dein Drachenboot-Team effizient mit KI-Unterstützung.",
+  keywords: [
+    // English keywords
+    "Dragon Boat", "Dragon Boat Manager", "Team Management", "Boat Lineup", "Paddler Management", "Training Planning", "Regatta Planning", "PWA", "Offline App", "Dragon Boat Team", "Crew Planning",
+    // German keywords  
+    "Drachenboot", "Drachenboot Manager", "Team Management", "Bootsbesetzung", "Trainingsplanung", "Paddler", "Regatta", "Mannschaftsverwaltung"
+  ],
   authors: [{ name: "Jan Hartje" }],
   creator: "Jan Hartje",
   publisher: "Jan Hartje",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'),
   alternates: {
     canonical: "/",
+    languages: {
+      'de-DE': '/',
+      'en-US': '/',
+      'en': '/',
+    },
   },
   openGraph: {
     type: "website",
-    locale: "de_DE",
-    alternateLocale: ["en_US"],
+    locale: "en_US",
+    alternateLocale: ["de_DE", "en_GB"],
     url: "/",
-    title: "Drachenboot Manager - Team & Bootsbesetzung Planen",
-    description: "Plane dein Drachenboot-Team effizient: Mitgliederverwaltung, Terminplanung und optimale Bootsbesetzung mit KI-Unterstützung.",
-    siteName: "Drachenboot Manager",
+    title: "Dragon Boat Manager - Team & Boat Lineup Planning",
+    description: "Plan your dragon boat team efficiently: member management, event planning, and optimal boat lineup with AI support. Works offline as installable app.",
+    siteName: "Dragon Boat Manager",
     images: [
       {
         url: "/opengraph-image.png",
         width: 1200,
         height: 630,
-        alt: "Drachenboot Manager - Dein Team perfekt organisiert",
+        alt: "Dragon Boat Manager - Your Team Perfectly Organized / Dein Team Perfekt Organisiert",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Drachenboot Manager - Team & Bootsbesetzung Planen",
-    description: "Plane dein Drachenboot-Team effizient mit KI-Unterstützung. Offline-fähige Progressive Web App.",
+    title: "Dragon Boat Manager - Team & Boat Lineup Planning",
+    description: "Plan your dragon boat team efficiently with AI support. Offline-capable Progressive Web App for team management and optimal boat lineups.",
     images: ["/opengraph-image.png"],
     creator: "@drachenbootplan",
   },

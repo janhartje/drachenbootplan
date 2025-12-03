@@ -86,7 +86,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 {t('teamName') || 'Team Name'}
               </label>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={name}
@@ -97,7 +97,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
                 <button
                   onClick={handleSave}
                   disabled={!name.trim() || name === team.name}
-                  className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg flex items-center justify-center gap-2 font-medium transition-all whitespace-nowrap ${
                     saveSuccess 
                       ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                       : !name.trim() || name === team.name
@@ -129,16 +129,16 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
                 </div>
                 
                 {deleteConfirm ? (
-                  <div className="flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-200">
                     <button
                       onClick={handleDelete}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm"
+                      className="w-full sm:w-auto px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors shadow-sm"
                     >
                       {t('confirmDelete') || 'Yes, delete team'}
                     </button>
                     <button
                       onClick={() => setDeleteConfirm(false)}
-                      className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg font-medium transition-colors"
+                      className="w-full sm:w-auto px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg font-medium transition-colors"
                     >
                       {t('cancel') || 'Cancel'}
                     </button>

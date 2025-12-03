@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex gap-2 items-center justify-end md:justify-start w-full md:w-auto">
         {children}
         
         {(children && (showHelp || showThemeToggle)) && <div className="w-px h-8 bg-slate-100 dark:bg-slate-800 mx-2"></div>}

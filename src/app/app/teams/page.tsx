@@ -49,7 +49,7 @@ export default function TeamManagementPage() {
             className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm shadow-sm"
           >
             <Plus size={16} />
-            <span className="hidden sm:inline">{t('createTeam') || 'Create Team'}</span>
+            <span>{t('createTeam') || 'Create Team'}</span>
           </button>
         </Header>
 
@@ -91,7 +91,7 @@ export default function TeamManagementPage() {
                         e.stopPropagation(); 
                         router.push(`/app/teams/${team.id}`); 
                       }}
-                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                      className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                       title={t('edit') || 'Edit'}
                     >
                       <Edit2 size={18} />

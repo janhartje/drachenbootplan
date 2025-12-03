@@ -102,7 +102,11 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
       const p = activePaddlerPool.find((x) => x.id === pid) || paddlers.find((x) => x.id === pid);
       if (!p) return;
       t += p.weight; c++;
-      if (sid.includes('row')) {
+      if (sid === 'drummer') {
+        f += p.weight;
+      } else if (sid === 'steer') {
+        b += p.weight;
+      } else if (sid.includes('row')) {
         if (sid.includes('left')) l += p.weight; else r += p.weight;
         const match = sid.match(/row-(\d+)/);
         // Adjust front/back calculation based on rows

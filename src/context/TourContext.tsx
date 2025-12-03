@@ -85,6 +85,15 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       },
       {
+        element: '#tour-planner-boat-size',
+        popover: {
+          title: t('tourBoatSizeTitle'), 
+          description: t('tourBoatSizeDesc'), 
+          side: "right", 
+          align: 'start'
+        }
+      },
+      {
         element: '#tour-planner-pool',
         popover: {
           title: t('tourPoolTitle'), 

@@ -39,7 +39,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({
           <ArrowRightLeft size={16} /> {t('balance')}
         </h2>
         
-        <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+        <div id="tour-planner-boat-size" className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
           <button 
             onClick={() => setBoatSize('standard')}
             className={`px-2 py-1 text-xs font-bold rounded-md transition-all ${boatSize === 'standard' ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'}`}

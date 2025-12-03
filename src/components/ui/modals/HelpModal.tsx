@@ -41,6 +41,25 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
 
           <section>
             <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <span className="bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-300 p-1 rounded">📏</span> {t('helpBoatSize')}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 ml-1 text-sm">{t('helpBoatSizeDesc')}</p>
+          </section>
+
+          <section>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+              <span className="bg-cyan-100 dark:bg-cyan-900 text-cyan-600 dark:text-cyan-300 p-1 rounded">🧮</span> {t('helpCalculation')}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 ml-1 text-sm mb-2">{t('helpCalculationDesc')}</p>
+            <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 ml-1">
+              <li>{t('helpCalculation1')}</li>
+              <li>{t('helpCalculation2')}</li>
+              <li>{t('helpCalculation3')}</li>
+            </ul>
+          </section>
+
+          <section>
+            <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
               <span className="bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-300 p-1 rounded">📦</span> {t('helpSpecialItems')}
             </h3>
             <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400 ml-1">

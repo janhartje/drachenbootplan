@@ -4,9 +4,9 @@ export const runAutoFillAlgorithm = (
   activePaddlerPool: Paddler[],
   assignments: Assignments,
   lockedSeats: string[],
-  targetTrim: number
+  targetTrim: number,
+  rows: number = 10
 ): Assignments | null => {
-  const rows = 10;
   const lockedAss: Assignments = {};
   
   // Gesperrte Sitze behalten
@@ -29,80 +29,86 @@ export const runAutoFillAlgorithm = (
     let currAss: Assignments = { ...lockedAss };
     let currPool = [...pool].sort(() => Math.random() - 0.5);
 
-    // 1. Steuerleute priorisieren
-    if (!currAss['steer']) {
-      const steers = currPool.filter((p) => p.skills && p.skills.includes('steer'));
-      if (steers.length) {
-        const p = steers[0];
-        currAss['steer'] = p.id;
-        currPool = currPool.filter((x) => x.id !== p.id);
-      }
-    }
-
-    // 2. Leichte Reihe 1 (Schlagreihe)
-    const sortedW = [...currPool].sort((a, b) => a.weight - b.weight);
-    const light = sortedW.slice(0, Math.max(2, Math.floor(currPool.length * 0.3)));
-    
-    ['row-1-left', 'row-1-right'].forEach((sid) => {
-      if (currAss[sid] || currPool.length === 0) return;
-      const side = sid.includes('left') ? 'left' : 'right';
-      const cands = light.filter((p) => currPool.includes(p) && p.skills && p.skills.includes(side));
-      if (cands.length) {
-        const p = cands[Math.floor(Math.random() * cands.length)];
-        currAss[sid] = p.id;
-        currPool = currPool.filter((x) => x.id !== p.id);
-      }
-    });
-
     // Random shuffle with weight noise
     currPool.sort((a, b) => (b.weight + Math.random() * 5) - (a.weight + Math.random() * 5));
 
+    const mid = (rows + 1) / 2;
+
     const free: { id: string; side: string; r: number }[] = [];
+    if (!currAss['drummer']) free.push({ id: 'drummer', side: 'drum', r: 0 });
+    
     for (let r = 1; r <= rows; r++) {
       if (!currAss[`row-${r}-left`]) free.push({ id: `row-${r}-left`, side: 'left', r });
       if (!currAss[`row-${r}-right`]) free.push({ id: `row-${r}-right`, side: 'right', r });
     }
+    
+    if (!currAss['steer']) free.push({ id: 'steer', side: 'steer', r: rows + 1 });
 
     for (let p of currPool) {
-      if (p.skills.length === 1 && p.skills[0] === 'drum') continue;
-      
       // Berechne aktuelle Balance für Heuristik
       let l = 0, r = 0, f = 0, b = 0;
       Object.entries(currAss).forEach(([sid, pid]) => {
-        if (sid === 'drummer' || sid === 'steer') return;
         const pad = activePaddlerPool.find((x) => x.id === pid);
         if (!pad) return;
-        if (sid.includes('left')) l += pad.weight; else r += pad.weight;
-        const match = sid.match(/row-(\d+)/);
-        if (match && parseInt(match[1]) <= 5) f += pad.weight; else b += pad.weight;
+        
+        if (sid === 'drummer') {
+          f += pad.weight;
+        } else if (sid === 'steer') {
+          b += pad.weight;
+        } else if (sid.includes('row')) {
+          if (sid.includes('left')) l += pad.weight; else r += pad.weight;
+          const match = sid.match(/row-(\d+)/);
+          if (match) {
+            const rowNum = parseInt(match[1]);
+            if (rowNum < mid) f += pad.weight;
+            else if (rowNum > mid) b += pad.weight;
+          }
+        }
       });
 
-      const nBack = f - b > targetTrim; // Benötigt Gewicht hinten?
-
+      const currentTrim = f - b;
+      const trimDiff = targetTrim - currentTrim; // Positiv = Brauche mehr Vorne, Negativ = Brauche mehr Hinten
+      
       const valid = free.filter((s) => p.skills && p.skills.includes(s.side));
       
       if (valid.length) {
         valid.sort((A, B) => {
           let sa = 0, sb = 0;
-          // Balance Strategie
-          if (l <= r && A.side === 'left') sa += 50;
-          else if (l > r && A.side === 'right') sa += 50;
-          if (l <= r && B.side === 'left') sb += 50;
-          else if (l > r && B.side === 'right') sb += 50;
+          
+          // Role Bonus (ensure they get filled if possible)
+          if (A.side === 'drum' || A.side === 'steer') sa += 40;
+          if (B.side === 'drum' || B.side === 'steer') sb += 40;
+
+          // Balance Strategie (L/R)
+          if (A.side === 'left' || A.side === 'right') {
+             if (l <= r && A.side === 'left') sa += 50;
+             else if (l > r && A.side === 'right') sa += 50;
+          }
+          if (B.side === 'left' || B.side === 'right') {
+             if (l <= r && B.side === 'left') sb += 50;
+             else if (l > r && B.side === 'right') sb += 50;
+          }
 
           // Nachbar Bonus (Reihe füllen)
-          const oA = A.side === 'left' ? 'right' : 'left';
-          const oB = B.side === 'left' ? 'right' : 'left';
-          if (currAss[`row-${A.r}-${oA}`]) sa += 80;
-          if (currAss[`row-${B.r}-${oB}`]) sb += 80;
+          if (A.side === 'left' || A.side === 'right') {
+            const oA = A.side === 'left' ? 'right' : 'left';
+            if (currAss[`row-${A.r}-${oA}`]) sa += 80;
+          }
+          if (B.side === 'left' || B.side === 'right') {
+            const oB = B.side === 'left' ? 'right' : 'left';
+            if (currAss[`row-${B.r}-${oB}`]) sb += 80;
+          }
 
-          // Trim Strategie
-          if (nBack) {
-            sa += A.r * 3;
-            sb += B.r * 3;
+          // Trim Strategie (Proportional)
+          // trimDiff > 0 => Brauche Vorne => Kleine Reihennummer bevorzugen
+          // trimDiff < 0 => Brauche Hinten => Große Reihennummer bevorzugen
+          const factor = 5; // Stärke der Trim-Beeinflussung
+          if (trimDiff > 0) {
+             sa += (rows + 1 - A.r) * factor;
+             sb += (rows + 1 - B.r) * factor;
           } else {
-            sa += (11 - A.r) * 3;
-            sb += (11 - B.r) * 3;
+             sa += A.r * factor;
+             sb += B.r * factor;
           }
           return sb - sa;
         });
@@ -113,35 +119,34 @@ export const runAutoFillAlgorithm = (
       }
     }
 
-    // Trommler check
-    const assignedIds = Object.values(currAss);
-    let remainingForDrum = pool.filter((p) => !assignedIds.includes(p.id));
-    if (!currAss['drummer'] && remainingForDrum.length > 0) {
-      const drummers = remainingForDrum.filter((p) => p.skills && p.skills.includes('drum'));
-      if (drummers.length) {
-        const p = drummers[0];
-        currAss['drummer'] = p.id;
-      }
-    }
-
     // Scoring
     let fl = 0, fr = 0, ff = 0, fb = 0, full = 0;
     for (let r = 1; r <= rows; r++) {
       if (currAss[`row-${r}-left`] && currAss[`row-${r}-right`]) full++;
     }
     Object.entries(currAss).forEach(([sid, pid]) => {
-      if (sid === 'drummer' || sid === 'steer') return;
       const pad = activePaddlerPool.find((x) => x.id === pid);
       if (!pad) return;
-      if (sid.includes('left')) fl += pad.weight; else fr += pad.weight;
-      const match = sid.match(/row-(\d+)/);
-      if (match && parseInt(match[1]) <= 5) ff += pad.weight; else fb += pad.weight;
+      
+      if (sid === 'drummer') {
+        ff += pad.weight;
+      } else if (sid === 'steer') {
+        fb += pad.weight;
+      } else if (sid.includes('row')) {
+        if (sid.includes('left')) fl += pad.weight; else fr += pad.weight;
+        const match = sid.match(/row-(\d+)/);
+        if (match) {
+          const rowNum = parseInt(match[1]);
+          if (rowNum < mid) ff += pad.weight;
+          else if (rowNum > mid) fb += pad.weight;
+        }
+      }
     });
 
     let sc = -Math.pow(Math.abs(fl - fr), 2); // Links/Rechts Strafe
     const trim = ff - fb;
     const dist = Math.abs(trim - targetTrim);
-    sc -= dist * 8; // Trim Strafe
+    sc -= dist * 20; // Trim Strafe (erhöht für genaueres Ziel)
     sc += full * 80; // Volle Reihen Bonus
     if (currAss['drummer']) sc += 200;
     if (currAss['steer']) sc += 200;

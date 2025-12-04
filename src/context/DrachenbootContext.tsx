@@ -609,7 +609,7 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
         }));
       } else {
         const err = await res.json();
-        alert(err.error || 'Fehler beim Löschen');
+        console.error('Canister removal failed:', err.error || 'Unknown error');
       }
     } catch(e) { console.error(e); }
   }, []);

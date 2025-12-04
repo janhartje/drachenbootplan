@@ -1,5 +1,6 @@
 import { DrachenbootProvider } from "@/context/DrachenbootContext";
 import { TourProvider } from "@/context/TourContext";
+import { AlertProvider } from "@/context/AlertContext";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
@@ -13,8 +14,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <DrachenbootProvider>
       <TourProvider>
-        {children}
+        <AlertProvider>
+          {children}
+        </AlertProvider>
       </TourProvider>
     </DrachenbootProvider>
   );
 }
+

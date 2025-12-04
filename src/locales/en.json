@@ -260,5 +260,7 @@
     "clV190Item3": "UI Standardization: Unified input fields (FormInput) for better contrast in dark mode.",
     "clV190Item4": "Account Linking: Paddlers can now be linked to registered user accounts.",
     "clV190Item5": "Improved validation in forms.",
-    "errorSavingPaddler": "Error saving paddler."
+    "errorSavingPaddler": "Error saving paddler.",
+    "warning": "Warning",
+    "info": "Info"
 }

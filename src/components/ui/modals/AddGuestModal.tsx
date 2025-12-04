@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useAlert } from '@/context/AlertContext';
 import { Paddler } from '@/types';
 
 import { FormInput } from '@/components/ui/FormInput';
@@ -12,6 +13,7 @@ interface AddGuestModalProps {
 
 const AddGuestModal: React.FC<AddGuestModalProps> = ({ onClose, onAdd }) => {
   const { t } = useLanguage();
+  const { showAlert } = useAlert();
   const [name, setName] = useState<string>('');
   const [weight, setWeight] = useState<string>('');
   const [skills, setSkills] = useState({ left: false, right: false, drum: false, steer: false });
@@ -23,7 +25,7 @@ const AddGuestModal: React.FC<AddGuestModalProps> = ({ onClose, onAdd }) => {
     if (!name || !weight) return;
     const skillsArr = (Object.keys(skills) as Array<keyof typeof skills>).filter((k) => skills[k]);
     if (skillsArr.length === 0) {
-      alert(t('pleaseChooseRole'));
+      showAlert(t('pleaseChooseRole'), 'warning');
       return;
     }
     onAdd({ name, weight: parseFloat(weight), skills: skillsArr });

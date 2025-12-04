@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Team } from '@/types';
 import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Check } from 'lucide-react';
+import { useAlert } from '@/context/AlertContext';
 
 import { FormInput } from '@/components/ui/FormInput';
 
@@ -13,6 +14,7 @@ interface TeamSettingsFormProps {
 }
 
 const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave, onCancel, t, className = '' }) => {
+  const { showAlert } = useAlert();
   const [formData, setFormData] = useState<Partial<Team>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -111,7 +113,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
                 const file = e.target.files?.[0];
                 if (file) {
                   if (file.size > 5 * 1024 * 1024) { // 5MB limit
-                    alert(t('imageTooLarge') || 'Image too large (max 5MB)');
+                    showAlert(t('imageTooLarge') || 'Image too large (max 5MB)', 'error');
                     return;
                   }
                   const reader = new FileReader();

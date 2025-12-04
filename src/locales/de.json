@@ -209,7 +209,7 @@
     "settings": "Einstellungen",
     "backToHome": "Zurück zur Startseite",
     "welcomeBack": "Willkommen zurück",
-    "loginSubtitle": "Bitte melden Sie sich an, um fortzufahren.",
+    "loginSubtitle": "Bitte melde dich an, um fortzufahren.",
     "inviteMembers": "Mitglieder einladen",
     "teamMembers": "Team Mitglieder",
     "captain": "Kapitän",
@@ -248,7 +248,7 @@
     "helpTeamEditMembers3": "Mitglieder aus dem Team entfernen",
     "helpContextPlanner": "Planer",
     "helpContextHome": "Startseite",
-    "errorUserNotFound": "Benutzer nicht gefunden. Bitte bitte ihn/sie, sich erst zu registrieren.",
+    "errorUserNotFound": "Benutzer nicht gefunden. Bitte ihn/sie, sich erst zu registrieren.",
     "errorUserAlreadyMember": "Benutzer ist bereits Mitglied.",
     "linkedAccount": "Verknüpfter Account",
     "noAccount": "Kein Account verknüpft",
@@ -260,5 +260,7 @@
     "clV190Item3": "UI Standardisierung: Einheitliche Eingabefelder (FormInput) für besseren Kontrast im Dark Mode.",
     "clV190Item4": "Account Linking: Paddler können nun mit registrierten Benutzerkonten verknüpft werden.",
     "clV190Item5": "Verbesserte Validierung in Formularen.",
-    "errorSavingPaddler": "Fehler beim Speichern des Paddlers."
+    "errorSavingPaddler": "Fehler beim Speichern des Paddlers.",
+    "warning": "Warnung",
+    "info": "Information"
 }

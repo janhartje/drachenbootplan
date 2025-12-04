@@ -125,12 +125,13 @@ const TeamView: React.FC = () => {
         >
 
           <TeamSwitcher />
+          <div className="w-px h-8 bg-slate-100 dark:bg-slate-800 mx-2"></div>
           <UserMenu />
         </Header>
 
-        {/* Team Metadata / Social Links */}
-        {currentTeam && (
-          <div className="mb-6 flex flex-wrap items-center gap-4 px-2">
+        {/* Team Metadata / Social Links - only render if there are links */}
+        {currentTeam && (currentTeam.website || currentTeam.instagram || currentTeam.facebook || currentTeam.twitter || currentTeam.email) && (
+          <div className="-mt-4 mb-6 flex flex-wrap items-center gap-4 px-2">
             {currentTeam.website && (
               <a href={currentTeam.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors">
                 <Globe size={16} />

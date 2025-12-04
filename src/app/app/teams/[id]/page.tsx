@@ -11,7 +11,7 @@ import Footer from '@/components/ui/Footer';
 import DragonLogo from '@/components/ui/DragonLogo';
 import TeamSettingsForm from '@/components/drachenboot/team/TeamSettingsForm';
 import { InviteMemberForm } from '@/components/drachenboot/team/InviteMemberForm';
-import { HelpModal } from '@/components/ui/Modals';
+import { HelpModal, AlertModal } from '@/components/ui/Modals';
 
 export default function TeamDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -21,6 +21,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'members'>('general');
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const team = teams.find(t => t.id === params.id);
 
@@ -58,7 +59,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
     if (newRole === 'PADDLER') {
       const captains = members.filter(m => m.role === 'CAPTAIN');
       if (captains.length <= 1 && captains[0].id === paddlerId) {
-        alert(t('cannotRemoveLastCaptain') || 'Cannot remove the last captain');
+        setAlertMessage(t('cannotRemoveLastCaptain') || 'Cannot remove the last captain');
         return;
       }
     }
@@ -253,6 +254,13 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
         <Footer />
         
         {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+        
+        <AlertModal
+          isOpen={!!alertMessage}
+          message={alertMessage || ''}
+          onClose={() => setAlertMessage(null)}
+          type="warning"
+        />
       </div>
     </div>
   );

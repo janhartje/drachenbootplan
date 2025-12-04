@@ -202,5 +202,6 @@
     "confirmDelete": "Ja, Team löschen",
     "deleteTeam": "Team löschen",
     "generalSettings": "Allgemeine Einstellungen",
-    "imageTooLarge": "Bild ist zu groß (max 5MB)"
+    "imageTooLarge": "Bild ist zu groß (max 5MB)",
+    "teamSettings": "Team Einstellungen"
 }

@@ -30,9 +30,9 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
   const versions: VersionData[] = [
     {
       version: '2.2.0',
-      features: [t('clV220F1'), t('clV220F2'), t('clV220F3'), t('clV220F4'), t('clV220F5')],
-      technical: [t('clV220T1'), t('clV220T2')],
-      bugfixes: []
+      features: [t('clV220F1'), t('clV220F2'), t('clV220F3'), t('clV220F4'), t('clV220F5'), t('clV220F6')],
+      technical: [t('clV220T1'), t('clV220T2'), t('clV220T3')],
+      bugfixes: [t('clV220B1')]
     },
     {
       version: '2.1.0',

@@ -16,6 +16,9 @@ import Footer from '../ui/Footer';
 import { useTour } from '@/context/TourContext';
 import { useDebounce } from '@/hooks/useDebounce';
 
+import LoadingSkeleton from '../ui/LoadingScreens';
+import PageTransition from '../ui/PageTransition';
+
 // Sub-components
 import StatsPanel from './planner/StatsPanel';
 import PaddlerPool from './planner/PaddlerPool';
@@ -30,13 +33,6 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
   const router = useRouter();
   const { t } = useLanguage();
   const { checkAndStartTour } = useTour();
-
-  useEffect(() => {
-    // Small delay to ensure elements are rendered
-    setTimeout(() => {
-      checkAndStartTour('planner');
-    }, 500);
-  }, []);
 
   const { 
     events, 
@@ -53,11 +49,24 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     isDarkMode,
     toggleDarkMode,
     setPaddlers, // needed for canister
-    currentTeam
+    currentTeam,
+    isLoading,
+    isDataLoading
   } = useDrachenboot();
+
+  useEffect(() => {
+    // Only start tour if data is loaded
+    if (!isDataLoading && !isLoading) {
+      setTimeout(() => {
+        checkAndStartTour('planner');
+      }, 500);
+    }
+  }, [isDataLoading, isLoading]);
 
   // --- LOCAL UI STATE ---
   const [activeEventId, setActiveEventId] = useState<string>(eventId);
+
+
 
   useEffect(() => {
     setActiveEventId(eventId);
@@ -389,8 +398,13 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     }
   };
 
+  if (isLoading || isDataLoading) {
+    return <LoadingSkeleton />;
+  }
+
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <PageTransition>
     <div className="min-h-screen font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300 bg-slate-100 dark:bg-slate-950 p-2 md:p-4 pb-20">
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
       {showGuestModal && <AddGuestModal onClose={() => setShowGuestModal(false)} onAdd={handleAddGuest} />}
@@ -506,6 +520,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
         <Footer />
       </div>
     </div>
+    </PageTransition>
     <DragOverlay dropAnimation={null}>
       {activeDragData ? (
         <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl border-2 border-blue-500 w-28 h-16 flex flex-col items-center justify-center opacity-90 cursor-grabbing scale-105 touch-none relative z-50">

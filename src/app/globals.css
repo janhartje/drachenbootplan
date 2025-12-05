@@ -2,6 +2,18 @@
 
 @theme {
 	--font-sans: 'Inter', sans-serif;
+  
+  --animate-pulse-slow: pulse-slow 4s ease-in-out infinite;
+  --animate-fade-in-up: fade-in-up 0.8s ease-out forwards;
+
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.1); }
+  }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 }
 
 /* Manueller Dark Mode statt Media-Query */

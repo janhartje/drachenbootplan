@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { ArrowRight, Smartphone, Zap, Users, Sun, Moon } from "lucide-react";
+import { ArrowRight, Smartphone, Zap, Users, Sun, Moon, Scale, MousePointerClick, Save, ShieldCheck, Heart, Ship } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import DragonBoatAnimation from "@/components/ui/DragonBoatAnimation";
 import DragonLogo from "@/components/ui/DragonLogo";
@@ -198,19 +198,34 @@ export default function LandingPage() {
           
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             <FeatureCard 
-              icon={<Smartphone className="w-6 h-6 text-blue-600" />}
+              icon={<Zap className="w-6 h-6 text-amber-500" />}
               title={t('landingFeature1Title')}
               description={t('landingFeature1Desc')}
             />
             <FeatureCard 
-              icon={<Zap className="w-6 h-6 text-amber-500" />}
+              icon={<Ship className="w-6 h-6 text-blue-600" />}
               title={t('landingFeature2Title')}
               description={t('landingFeature2Desc')}
             />
             <FeatureCard 
-              icon={<Users className="w-6 h-6 text-emerald-500" />}
+              icon={<Smartphone className="w-6 h-6 text-indigo-500" />}
               title={t('landingFeature3Title')}
               description={t('landingFeature3Desc')}
+            />
+            <FeatureCard 
+              icon={<Users className="w-6 h-6 text-emerald-500" />}
+              title={t('landingFeature4Title')}
+              description={t('landingFeature4Desc')}
+            />
+            <FeatureCard 
+              icon={<ShieldCheck className="w-6 h-6 text-slate-600 dark:text-slate-400" />}
+              title={t('landingFeature5Title')}
+              description={t('landingFeature5Desc')}
+            />
+            <FeatureCard 
+              icon={<Heart className="w-6 h-6 text-red-500" />}
+              title={t('landingFeature6Title')}
+              description={t('landingFeature6Desc')}
             />
           </div>
         </div>

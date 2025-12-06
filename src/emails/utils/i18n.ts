@@ -3,7 +3,7 @@ import en from '@/locales/en.json';
 
 export type Language = 'de' | 'en';
 
-const locales: Record<Language, Record<string, string>> = { de, en };
+const locales: Record<Language, Record<string, any>> = { de, en };
 
 /**
  * Simple translation function for emails.

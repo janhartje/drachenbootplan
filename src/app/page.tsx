@@ -142,7 +142,7 @@ export default function LandingPage() {
                   className="bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 px-5 sm:px-7 py-2.5 rounded-full font-medium transition-all shadow-lg shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-0.5 flex items-center gap-2 whitespace-nowrap text-sm sm:text-base mr-2 sm:mr-0"
                 >
                   <span className="hidden xs:inline">{t('landingStartApp')}</span>
-                  <span className="xs:hidden">{t('landingStartApp').split(' ')[0]}</span>
+                  <span className="xs:hidden">{(t('landingStartApp') as string).split(' ')[0]}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -160,7 +160,7 @@ export default function LandingPage() {
                 
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 sm:mb-8">
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-blue-800 to-slate-900 dark:from-white dark:via-blue-200 dark:to-white">
-                    {t('landingHeroTitle').split('\\n').map((line, i) => (
+                    {(t('landingHeroTitle') as string).split('\\n').map((line, i) => (
                       <span key={i} className="block">
                         {line}
                       </span>

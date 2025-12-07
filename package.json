@@ -3,6 +3,10 @@
   "version": "2.2.0",
   "private": true,
   "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d && sleep 2 && npx prisma migrate dev",
+    "db:studio": "npx prisma studio",
     "dev": "next dev",
     "build": "prisma migrate deploy && next build",
     "start": "next start",

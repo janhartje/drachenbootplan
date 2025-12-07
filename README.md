@@ -69,11 +69,33 @@ prisma/
 
 ### Konfiguration
 
+#### Lokale Entwicklung (empfohlen)
+
+Für die lokale Entwicklung wird Docker für die PostgreSQL-Datenbank verwendet:
+
+1. Docker Desktop installieren (falls nicht vorhanden)
+2. `.env` Datei erstellen basierend auf `.env.example`:
+   ```bash
+   cp .env.example .env
+   ```
+3. Datenbank starten:
+   ```bash
+   npm run db:up
+   ```
+
+**Verfügbare Datenbank-Befehle:**
+*   `npm run db:up` - Startet die PostgreSQL-Datenbank
+*   `npm run db:down` - Stoppt die Datenbank
+*   `npm run db:reset` - Setzt die Datenbank zurück (löscht alle Daten!)
+*   `npm run db:studio` - Öffnet Prisma Studio (Web-UI zur Datenbank-Inspektion)
+
+#### Produktion (Vercel)
+
 Erstelle eine `.env` Datei im Hauptverzeichnis (siehe `.env.example`):
 
 ```bash
 NEXT_PUBLIC_SERVER_URL=http://localhost:3000
-DATABASE_URL="postgresql://user:password@localhost:5432/drachenboot?schema=public"
+POSTGRES_URL="postgresql://user:password@localhost:5432/drachenboot"
 ```
 
 ### Installation

@@ -64,13 +64,18 @@ export async function POST(
       }
     }
 
-    // 1. Batch create those without email
+    // 1. Create paddlers without email (individually to avoid PostgreSQL array issues with createMany)
     let count = 0;
-    if (paddlersToBatch.length > 0) {
-      const res = await prisma.paddler.createMany({
-        data: paddlersToBatch,
-      });
-      count += res.count;
+    for (const paddlerData of paddlersToBatch) {
+      try {
+        await prisma.paddler.create({
+          data: paddlerData,
+        });
+        count++;
+      } catch (dbError) {
+        console.error("Failed to import paddler:", paddlerData.name, dbError);
+        // Continue with next paddler
+      }
     }
 
     // 2. Create and Invite those with email

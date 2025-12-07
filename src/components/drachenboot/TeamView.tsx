@@ -194,6 +194,9 @@ const TeamView: React.FC = () => {
         // multiple values can be comma separated
         const sideStrRaw = sideKey ? String(row[sideKey]).toLowerCase() : '';
         
+        console.log('[Import Debug] Row:', row);
+        console.log('[Import Debug] sideKey:', sideKey, 'sideStrRaw:', sideStrRaw);
+        
         // Dictionary for multilingual support
         const dict = {
           left: ['left', 'links', 'l', 'gauche', 'sinistra', 'izquierda', 'lewa'],
@@ -207,6 +210,8 @@ const TeamView: React.FC = () => {
 
         // Normalize delimiters and split
         const parts = sideStrRaw.split(/[,/|&+\s]+/).filter(p => p.trim().length > 0);
+        
+        console.log('[Import Debug] parts:', parts);
 
         parts.forEach(part => {
              const p = part.trim();
@@ -222,6 +227,8 @@ const TeamView: React.FC = () => {
                if (dict.steer.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('steer');
              }
         });
+        
+        console.log('[Import Debug] foundRoles:', Array.from(foundRoles));
 
         // Determine main 'side' property for UI preference
         let side: 'left' | 'right' | 'both' | null = null;
@@ -240,6 +247,8 @@ const TeamView: React.FC = () => {
              side = 'left'; 
              skills = ['left'];
         }
+        
+        console.log('[Import Debug] Final skills for', name, ':', skills);
 
         return {
            name,
@@ -249,6 +258,8 @@ const TeamView: React.FC = () => {
            inviteEmail: emailKey ? row[emailKey] : undefined
         };
       }).filter(p => p !== null);
+      
+      console.log('[Import Debug] mappedPaddlers:', JSON.stringify(mappedPaddlers, null, 2));
 
       if (mappedPaddlers.length > 0) {
          await importPaddlers(mappedPaddlers);

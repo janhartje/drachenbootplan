@@ -18,6 +18,7 @@ export const columnAliases: { [key: string]: string } = {
   'side': 'side',
   'seite': 'side',
   'rolle': 'side',
+  'skill': 'side',
   'skills': 'side'
 };
 

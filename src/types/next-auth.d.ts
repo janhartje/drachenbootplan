@@ -6,14 +6,12 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      /** The user's weight in kg. */
-      weight?: number | null
-      /** The user's ID. */
-      id: string
+      /** The user's role. */
+      isAdmin?: boolean
     } & DefaultSession["user"]
   }
 
   interface User {
-    weight?: number | null
+    isAdmin?: boolean
   }
 }

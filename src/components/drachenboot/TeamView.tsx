@@ -253,7 +253,7 @@ const TeamView: React.FC = () => {
         return {
            name,
            weight: isNaN(weight) ? 0 : weight,
-           side,
+
            skills,
            inviteEmail: emailKey ? row[emailKey] : undefined
         };

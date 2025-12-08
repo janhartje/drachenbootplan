@@ -4,8 +4,9 @@ import { auth } from '@/auth';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,7 +15,7 @@ export async function PUT(
   try {
     // Fetch paddler to check team ownership
     const existingPaddler = await prisma.paddler.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: { teamId: true }
     });
 
@@ -38,7 +39,7 @@ export async function PUT(
     
     // Authorization Logic
     const isCaptain = membership.role === 'CAPTAIN';
-    const isSelfUpdate = membership.id === params.id;
+    const isSelfUpdate = membership.id === id;
 
     if (!isCaptain) {
         if (!isSelfUpdate) {
@@ -50,7 +51,7 @@ export async function PUT(
     }
 
     const paddler = await prisma.paddler.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         weight: body.weight,
@@ -95,8 +96,9 @@ import TeamRemovalEmail from '@/emails/templates/TeamRemovalEmail';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -105,7 +107,7 @@ export async function DELETE(
   try {
     // Fetch paddler to be deleted with necessary relations for checks and email
     const targetPaddler = await prisma.paddler.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { 
         team: true,
         user: true 
@@ -173,7 +175,7 @@ export async function DELETE(
     }
 
     await prisma.paddler.delete({
-      where: { id: params.id },
+      where: { id },
     });
     return NextResponse.json({ success: true });
   } catch (error) {

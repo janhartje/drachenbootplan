@@ -4,7 +4,7 @@ import { auth, signIn } from '@/auth';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -12,7 +12,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id: teamId } = params;
+    const { id: teamId } = await params;
 
     // Verify team membership/ownership and get inviter language
     const user = await prisma.user.findUnique({

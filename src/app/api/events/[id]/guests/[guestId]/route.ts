@@ -4,7 +4,7 @@ import { auth } from '@/auth';
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string; guestId: string } }
+  { params }: { params: Promise<{ id: string; guestId: string }> }
 ) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -12,7 +12,7 @@ export async function DELETE(
   }
 
   try {
-    const { id: eventId, guestId } = params;
+    const { id: eventId, guestId } = await params;
 
     // Fetch event to check team ownership
     const event = await prisma.event.findUnique({

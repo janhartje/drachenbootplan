@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useDrachenboot } from '@/context/DrachenbootContext';
@@ -14,7 +14,8 @@ import { InviteMemberForm } from '@/components/drachenboot/team/InviteMemberForm
 import { HelpModal, AlertModal, ConfirmModal } from '@/components/ui/Modals';
 import PageTransition from '@/components/ui/PageTransition';
 
-export default function TeamDetailPage({ params }: { params: { id: string } }) {
+export default function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { teams, updateTeam, deleteTeam, isDarkMode, toggleDarkMode, paddlers, updatePaddler, deletePaddler, refetchPaddlers, userRole, isDataLoading } = useDrachenboot();
   const { t } = useLanguage();
@@ -25,10 +26,10 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [memberToRemove, setMemberToRemove] = useState<any>(null);
 
-  const team = teams.find(t => t.id === params.id);
+  const team = teams.find(t => t.id === id);
 
   // Filter for actual users (members) of this team, including pending invites
-  const members = paddlers.filter(p => p.teamId === params.id && (p.userId || p.inviteEmail));
+  const members = paddlers.filter(p => p.teamId === id && (p.userId || p.inviteEmail));
 
   const [showHelp, setShowHelp] = useState(false);
 
@@ -41,7 +42,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
         router.push('/app/teams');
       }
     }
-  }, [teams, team, router, params.id]);
+  }, [teams, team, router, id]);
 
   const handleSave = async (data: any) => {
     if (team) {

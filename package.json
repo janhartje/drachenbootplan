@@ -7,7 +7,7 @@
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d && sleep 2 && npx prisma migrate dev",
     "db:studio": "npx prisma studio",
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "prisma migrate deploy && next build --webpack",
     "start": "next start",
     "lint": "eslint .",

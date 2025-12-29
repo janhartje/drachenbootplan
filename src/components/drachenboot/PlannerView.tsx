@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, User, Box } from 'lucide-react';
+import { ArrowLeft, Box } from 'lucide-react';
 import { toPng } from 'html-to-image';
 import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, useSensor, useSensors, PointerSensor, TouchSensor } from '@dnd-kit/core';
 import DragonLogo from '../ui/DragonLogo';
@@ -23,7 +23,7 @@ import PageTransition from '../ui/PageTransition';
 import StatsPanel from './planner/StatsPanel';
 import PaddlerPool from './planner/PaddlerPool';
 import BoatVisualizer from './planner/BoatVisualizer';
-import { Assignments, BoatConfigItem, Paddler } from '@/types';
+import { BoatConfigItem, Paddler } from '@/types';
 
 interface PlannerViewProps {
   eventId: string;
@@ -381,10 +381,10 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
   );
 
-  const [activeDragData, setActiveDragData] = useState<any>(null);
+  const [activeDragData, setActiveDragData] = useState<{ id: string; name: string; weight: number; isGuest?: boolean; isCanister?: boolean; source?: string; seatId?: string } | null>(null);
 
   const handleDragStart = (event: DragStartEvent) => {
-      setActiveDragData(event.active.data.current);
+      setActiveDragData(event.active.data.current as unknown as typeof activeDragData);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {

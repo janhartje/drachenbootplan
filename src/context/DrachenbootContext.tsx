@@ -38,8 +38,8 @@ interface DrachenbootContextType {
   currentPaddler: Paddler | null;
   refetchPaddlers: () => Promise<void>;
   refetchEvents: () => Promise<void>;
-  importPaddlers: (data: any[]) => Promise<void>;
-  importEvents: (data: any[]) => Promise<void>;
+  importPaddlers: (data: Record<string, unknown>[]) => Promise<void>;
+  importEvents: (data: Record<string, unknown>[]) => Promise<void>;
 }
 
 const DrachenbootContext = createContext<DrachenbootContextType | undefined>(undefined);
@@ -111,13 +111,13 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
         const data = await res.json();
         // Transform API data to App state
         const loadedEvents: Event[] = [];
-        const loadedAssignments: Record<number, Assignments> = {};
+        const loadedAssignments: Record<string, Assignments> = {};
 
-        data.forEach((apiEvent: any) => {
+        data.forEach((apiEvent: { attendances: { paddlerId: string; status: 'yes' | 'no' | 'maybe' }[]; assignments: { isCanister: boolean; seatId: string; paddlerId?: string }[]; id: string; title: string; date: string; type: 'training' | 'regatta'; boatSize?: 'standard' | 'small'; canisterCount?: number; comment?: string; guests?: any[] }) => {
           // Transform attendance array to object
           const attendance: Record<string, 'yes' | 'no' | 'maybe'> = {};
           if (apiEvent.attendances) {
-            apiEvent.attendances.forEach((att: any) => {
+            apiEvent.attendances.forEach((att: { paddlerId: string; status: 'yes' | 'no' | 'maybe' }) => {
               attendance[att.paddlerId] = att.status;
             });
           }
@@ -127,7 +127,7 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
           let canisterCounter = 1;
           
           if (apiEvent.assignments) {
-            apiEvent.assignments.forEach((a: any) => {
+            apiEvent.assignments.forEach((a: { isCanister: boolean; seatId: string; paddlerId?: string }) => {
               if (a.isCanister) {
                 assignments[a.seatId] = `canister-${canisterCounter}`;
                 canisterCounter++;
@@ -710,7 +710,7 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
       currentPaddler: myPaddler,
       refetchPaddlers: fetchPaddlers,
       refetchEvents: fetchEvents,
-      importPaddlers: async (data: any[]) => {
+      importPaddlers: async (data: Record<string, unknown>[]) => {
         if (!currentTeam) return;
         try {
           const res = await fetch(`/api/teams/${currentTeam.id}/import/paddlers`, {
@@ -725,7 +725,7 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
           throw e;
         }
       },
-      importEvents: async (data: any[]) => {
+      importEvents: async (data: Record<string, unknown>[]) => {
         if (!currentTeam) return;
         try {
           const res = await fetch(`/api/teams/${currentTeam.id}/import/events`, {
@@ -743,10 +743,10 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
   }, [
     teams, currentTeam, createTeam, switchTeam,
-    paddlers, events, assignmentsByEvent, targetTrim, isDarkMode, isLoading,
+    paddlers, events, assignmentsByEvent, targetTrim, isDarkMode, isLoading, isDataLoading,
     toggleDarkMode, addPaddler, updatePaddler, deletePaddler, createEvent, deleteEvent, updateEvent,
     updateAttendance, updateAssignments, addGuest, removeGuest, addCanister, removeCanister,
-    session, paddlers // Added dependencies
+    session, fetchTeams, updateTeam, fetchPaddlers, fetchEvents, deleteTeam
   ]);
 
   return (

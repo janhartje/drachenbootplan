@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 
   try {
     let paddlers;
-    let roleMap = new Map<string, string>();
+    const roleMap = new Map<string, string>();
 
     // OPTIMIZATION: Parallelize fetches
     if (teamId) {
@@ -75,7 +75,7 @@ export async function GET(request: Request) {
     });
 
     return NextResponse.json(redactedPaddlers);
-  } catch (error) {
+  } catch (_) {
     return NextResponse.json({ error: 'Failed to fetch paddlers' }, { status: 500 });
   }
 }

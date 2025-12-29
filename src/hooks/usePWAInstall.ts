@@ -14,7 +14,8 @@ export const usePWAInstall = () => {
     window.addEventListener('beforeinstallprompt', handler);
 
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      setCanInstall(false);
+       // Avoid synchronous state update warning
+       setTimeout(() => setCanInstall(false), 0);
     }
 
     return () => {

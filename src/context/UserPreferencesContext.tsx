@@ -32,7 +32,10 @@ export const UserPreferencesProvider: React.FC<{ children: React.ReactNode }> = 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+      const updateTheme = () => {
+         setSystemTheme(mediaQuery.matches ? 'dark' : 'light');
+      };
+      updateTheme();
 
       const handler = (e: MediaQueryListEvent) => {
         setSystemTheme(e.matches ? 'dark' : 'light');

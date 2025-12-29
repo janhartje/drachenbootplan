@@ -26,7 +26,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { t } = useLanguage();
 
   // Define tour configurations
-  const tours: { [key: string]: any[] } = {
+  const tours: { [key: string]: unknown[] } = {
     welcome: [
       { 
         element: '#tour-welcome', 
@@ -160,7 +160,12 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Steps will be set dynamically
     });
 
-    setDriverObj(driverInstance);
+    // We use a small timeout to ensure DOM is ready and avoid synchronous state update in effect
+    const timer = setTimeout(() => {
+        setDriverObj(driverInstance);
+    }, 0);
+    
+    return () => clearTimeout(timer);
   }, [t]);
 
   const startTour = (tourName = 'welcome') => {
@@ -171,7 +176,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
         doneBtnText: t('tourDone'),
         nextBtnText: t('tourNext'),
         prevBtnText: t('tourPrev'),
-        steps: tours[tourName],
+        steps: tours[tourName] as any[],
         onDestroyed: () => {
           localStorage.setItem(`${tourName}_tour_seen`, 'true');
         }

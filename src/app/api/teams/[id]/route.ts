@@ -4,8 +4,9 @@ import { auth } from '@/auth';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -15,7 +16,7 @@ export async function PUT(
     // Check if user is a member of the team
     const membership = await prisma.paddler.findFirst({
       where: {
-        teamId: params.id,
+        teamId: id,
         userId: session.user.id,
         role: 'CAPTAIN',
       },
@@ -35,19 +36,20 @@ export async function PUT(
     }
 
     const team = await prisma.team.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, website, icon, instagram, facebook, twitter, email },
     });
     return NextResponse.json(team);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update team' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -57,7 +59,7 @@ export async function DELETE(
     // Check if user is a member of the team (ideally CAPTAIN role)
     const membership = await prisma.paddler.findFirst({
       where: {
-        teamId: params.id,
+        teamId: id,
         userId: session.user.id,
         role: 'CAPTAIN', // Only captains can delete teams
       },
@@ -72,7 +74,7 @@ export async function DELETE(
     await prisma.assignment.deleteMany({
       where: {
         event: {
-          teamId: params.id
+          teamId: id
         }
       }
     });
@@ -81,24 +83,24 @@ export async function DELETE(
     await prisma.attendance.deleteMany({
       where: {
         event: {
-          teamId: params.id
+          teamId: id
         }
       }
     });
 
     // Delete events
     await prisma.event.deleteMany({
-      where: { teamId: params.id }
+      where: { teamId: id }
     });
 
     // Delete paddlers
     await prisma.paddler.deleteMany({
-      where: { teamId: params.id }
+      where: { teamId: id }
     });
 
     // Finally delete the team
     await prisma.team.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

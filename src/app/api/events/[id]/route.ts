@@ -4,15 +4,16 @@ import { auth } from '@/auth';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const eventId = params.id;
+    const eventId = id;
     
     // Fetch event to check team ownership
     const existingEvent = await prisma.event.findUnique({
@@ -49,22 +50,23 @@ export async function PUT(
       },
     });
     return NextResponse.json(event);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update event' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const eventId = params.id;
+    const eventId = id;
 
     // Fetch event to check team ownership
     const existingEvent = await prisma.event.findUnique({

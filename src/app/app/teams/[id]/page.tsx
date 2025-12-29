@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useDrachenboot } from '@/context/DrachenbootContext';
@@ -14,35 +14,34 @@ import { InviteMemberForm } from '@/components/drachenboot/team/InviteMemberForm
 import { HelpModal, AlertModal, ConfirmModal } from '@/components/ui/Modals';
 import PageTransition from '@/components/ui/PageTransition';
 
-export default function TeamDetailPage({ params }: { params: { id: string } }) {
+export default function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const router = useRouter();
   const { teams, updateTeam, deleteTeam, isDarkMode, toggleDarkMode, paddlers, updatePaddler, deletePaddler, refetchPaddlers, userRole, isDataLoading } = useDrachenboot();
   const { t } = useLanguage();
   
-  const [isLoading, setIsLoading] = useState(true);
+
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'members'>('general');
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [memberToRemove, setMemberToRemove] = useState<any>(null);
 
-  const team = teams.find(t => t.id === params.id);
+  const team = teams.find(t => t.id === id);
 
   // Filter for actual users (members) of this team, including pending invites
-  const members = paddlers.filter(p => p.teamId === params.id && (p.userId || p.inviteEmail));
+  const members = paddlers.filter(p => p.teamId === id && (p.userId || p.inviteEmail));
 
   const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
-    if (teams.length > 0) {
-      if (team) {
-        setIsLoading(false);
-      } else {
-        // Team not found, redirect
-        router.push('/app/teams');
-      }
+    if (teams.length > 0 && !team && !isDataLoading) {
+      // Team not found, redirect
+      router.push('/app/teams');
     }
-  }, [teams, team, router, params.id]);
+  }, [teams, team, router, isDataLoading]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSave = async (data: any) => {
     if (team) {
       await updateTeam(team.id, data);
@@ -76,7 +75,7 @@ export default function TeamDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
-  if (isLoading || isDataLoading || !team) {
+  if (isDataLoading || !team) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 dark:bg-slate-950">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

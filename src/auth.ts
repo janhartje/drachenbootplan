@@ -52,15 +52,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       sendVerificationRequest: async ({ identifier: email, url }) => {
         // Normalize email to lowercase for consistent lookup
         email = email.toLowerCase();
-        console.log("[Auth] SendVerificationRequest URL:", url);
+
         // Try to detect user's language preference
         let lang: Language = 'de'; // Default to German
         
         // Check if there is a pending invite for this email (Paddler with inviteEmail)
         // OR if the user is a member of a team (to send welcome back email)
+        // OR if the user is a member of a team (to send welcome back email)
         // We prioritize the TeamInviteEmail if we find a pending invite
         let teamName = '';
-        let inviterName = undefined;
+
         let shouldUseTeamInvite = false;
         let invitedPaddlerFound = false;
 
@@ -132,7 +133,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ? TeamInviteEmail({ url, teamName, lang }) // inviterName unavailable here efficiently
             : MagicLinkEmail({ url, lang });
 
-        const subjectKey = shouldUseTeamInvite ? 'emailTeamInviteSubject' : 'emailMagicLinkSubject';
+
         
         // If team invite, append team name to subject?
         // t(lang, 'emailTeamInviteSubject') is "Du wurdest zum Team eingeladen"

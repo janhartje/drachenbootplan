@@ -5,7 +5,7 @@ import { parseEventDateTime } from '@/utils/importUtils';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -13,7 +13,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { id: teamId } = params;
+    const { id: teamId } = await params;
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
@@ -37,6 +37,7 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid data format' }, { status: 400 });
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eventsToCreate = events.map((e: any) => {
       // Use centralized date/time parsing utility
       const eventDate = parseEventDateTime(

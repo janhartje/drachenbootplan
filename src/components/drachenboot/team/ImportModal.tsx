@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { useLanguage } from '@/context/LanguageContext';
 import { Upload, FileUp, AlertCircle, CheckCircle, X, Download } from 'lucide-react';
@@ -7,8 +7,8 @@ import { normalizeHeader } from '@/utils/importUtils';
 interface ImportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportPaddlers: (data: any[]) => Promise<void>;
-  onImportEvents: (data: any[]) => Promise<void>;
+  onImportPaddlers: (data: Record<string, unknown>[]) => Promise<void>;
+  onImportEvents: (data: Record<string, unknown>[]) => Promise<void>;
 }
 
 type ImportType = 'paddler' | 'event';
@@ -23,7 +23,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const [activeTab, setActiveTab] = useState<ImportType>('paddler');
   const [isDragOver, setIsDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [previewData, setPreviewData] = useState<any[]>([]);
+  const [previewData, setPreviewData] = useState<Record<string, unknown>[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -61,13 +61,13 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     try {
       const data = await parseExcel(file);
       setPreviewData(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Error parsing file');
+      setError(err instanceof Error ? err.message : 'Error parsing file');
     }
   };
 
-  const parseExcel = async (file: File): Promise<any[]> => {
+  const parseExcel = async (file: File): Promise<Record<string, unknown>[]> => {
     const buffer = await file.arrayBuffer();
     const workbook = new ExcelJS.Workbook();
     
@@ -99,12 +99,12 @@ export const ImportModal: React.FC<ImportModalProps> = ({
     const worksheet = workbook.worksheets[0];
     if (!worksheet) return [];
 
-    const jsonData: any[] = [];
+    const jsonData: Record<string, unknown>[] = [];
     
     // Iterate over rows starting from 2 (assuming header is 1)
     // ExcelJS rows are 1-based.
     // We need to map headers first.
-    let headers: string[] = [];
+    const headers: string[] = [];
     
     worksheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) {
@@ -114,7 +114,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         });
       } else {
         // Capture data
-        const rowData: any = {};
+        const rowData: Record<string, unknown> = {};
         // Initialize all known headers to null/empty
         headers.forEach(h => { if(h) rowData[h] = ''; });
 
@@ -123,9 +123,9 @@ export const ImportModal: React.FC<ImportModalProps> = ({
           if (header) {
              let val = cell.value;
              if (typeof val === 'object' && val !== null && 'text' in val) {
-                 val = (val as any).text; 
+                 val = (val as any).text; // eslint-disable-line @typescript-eslint/no-explicit-any 
              } else if (typeof val === 'object' && val !== null && 'result' in val) {
-                 val = (val as any).result;
+                 val = (val as any).result; // eslint-disable-line @typescript-eslint/no-explicit-any
              }
              rowData[header] = val;
           }
@@ -155,8 +155,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         setFile(null);
         setPreviewData([]);
       }, 1500);
-    } catch (err: any) {
-      setError(err.message || t('importError') || 'Import failed');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t('importError') || 'Import failed');
     } finally {
       setIsProcessing(false);
     }
@@ -412,7 +412,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                         {previewData.map((row, i) => (
                           <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                            {Object.values(row).map((val: any, j) => (
+                            {Object.values(row).map((val: unknown, j) => (
                               <td key={j} className="px-3 py-2 whitespace-nowrap text-slate-700 dark:text-slate-300">
                                 {String(val)}
                               </td>

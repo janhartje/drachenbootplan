@@ -1,6 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+interface Particle {
+  id: number;
+  top: number;
+  width: number;
+  duration: number;
+  delay: number;
+}
 
 const DragonBoatAnimation: React.FC = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -12,12 +20,28 @@ const DragonBoatAnimation: React.FC = () => {
     setMousePos({ x, y });
   };
 
+  // Stabilize random values
+  // Stabilize random values
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    setParticles([...Array(15)].map((_, i) => ({ // eslint-disable-line react-hooks/set-state-in-effect
+        id: i,
+        top: Math.random() * 100,
+        width: 100 + Math.random() * 300,
+        duration: 2 + Math.random() * 3,
+        delay: -Math.random() * 5
+      })));
+
+  }, []);
+
   return (
     <div 
       className="relative w-full h-full bg-transparent overflow-hidden flex flex-col items-center justify-center perspective-1000"
       onMouseMove={handleMouseMove}
       style={{ perspective: '1000px' }}
     >
+      {/* eslint-disable-next-line react/no-unknown-property */}
       <style jsx>{`
         @keyframes grid-move {
           0% { transform: translateY(0); opacity: 0; }
@@ -54,15 +78,15 @@ const DragonBoatAnimation: React.FC = () => {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(59,130,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(59,130,246,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,black,transparent)]"></div>
         
         {/* Speed Partikel */}
-        {[...Array(15)].map((_, i) => (
+        {particles.map((p) => (
           <div 
-            key={i}
+            key={p.id}
             className="absolute h-[1px] bg-gradient-to-l from-blue-500 dark:from-cyan-500 to-transparent opacity-30 rounded-full"
             style={{
-              top: `${Math.random() * 100}%`,
-              width: `${100 + Math.random() * 300}px`,
-              animation: `flow ${2 + Math.random() * 3}s linear infinite`,
-              animationDelay: `-${Math.random() * 5}s`
+              top: `${p.top}%`,
+              width: `${p.width}px`,
+              animation: `flow ${p.duration}s linear infinite`,
+              animationDelay: `${p.delay}s`
             }}
           />
         ))}

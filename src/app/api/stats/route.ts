@@ -17,14 +17,15 @@ export async function POST(request: Request) {
 
     // Determine active assignments and IDs to fetch
     let assignments = assignmentsOverride;
-    let event: any = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let event: { assignments: any[]; boatSize: string } | null = null;
     let paddlers: { id: string, weight: number }[] = [];
     let rows = 10;
 
     if (assignments) {
       // OPTIMIZATION: Parallel Fetch if we have assignments
       const paddlerIds = Object.values(assignments)
-        .filter((id: any) => typeof id === 'string' && !id.startsWith('canister-')) as string[];
+        .filter((id: unknown) => typeof id === 'string' && !id.startsWith('canister-')) as string[];
 
       const [eventResult, paddlersResult] = await Promise.all([
         prisma.event.findUnique({
@@ -55,7 +56,7 @@ export async function POST(request: Request) {
       
       assignments = {};
       let canisterCounter = 1;
-      event.assignments.forEach((a: any) => {
+      event.assignments.forEach((a: { isCanister: boolean; seatId: string; paddlerId?: string }) => {
         if (a.isCanister) {
           assignments[a.seatId] = `canister-${canisterCounter}`;
           canisterCounter++;
@@ -66,7 +67,7 @@ export async function POST(request: Request) {
 
       // Now fetch weights for these assignments
       const paddlerIds = Object.values(assignments)
-        .filter((id: any) => typeof id === 'string' && !id.startsWith('canister-')) as string[];
+        .filter((id: unknown) => typeof id === 'string' && !id.startsWith('canister-')) as string[];
       
       paddlers = await prisma.paddler.findMany({
         where: { id: { in: paddlerIds } },

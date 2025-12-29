@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+
 import Link from 'next/link';
 import { useSession } from "next-auth/react";
 import { useDrachenboot } from '@/context/DrachenbootContext';
@@ -13,28 +13,27 @@ import TeamSwitcher from './TeamSwitcher';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { updateProfile } from '@/app/actions/user';
 
-import { Settings, Globe, Instagram, Facebook, Twitter, Mail, Plus, FileUp, Calendar } from 'lucide-react';
-import { Team } from '@/types';
-// import NewEventForm from './team/NewEventForm'; // Removed
-import { Event } from '@/types';
+import { Globe, Instagram, Plus, FileUp, Calendar } from 'lucide-react';
+
+
+import { Event, Paddler } from '@/types';
 import { EventModal } from './team/EventModal';
 import PaddlerModal from './team/PaddlerModal';
 import { EventsSection } from './team/EventsSection';
 import PaddlerGrid from './team/PaddlerGrid';
-import { Paddler } from '@/types';
 import LoadingSkeleton from '../ui/LoadingScreens';
 import PageTransition from '../ui/PageTransition';
 import WelcomeView from './WelcomeView';
 import { ImportModal } from './team/ImportModal';
 
 const TeamView: React.FC = () => {
-  const router = useRouter();
+
   const { t } = useLanguage();
   const { 
     teams,
     paddlers,
     currentTeam,
-    updateTeam,
+    // updateTeam,
     addPaddler, 
     updatePaddler, 
     deletePaddler,
@@ -55,7 +54,7 @@ const TeamView: React.FC = () => {
   React.useEffect(() => {
     refetchPaddlers();
     refetchEvents();
-  }, []);
+  }, [refetchPaddlers, refetchEvents]);
 
   // --- LOCAL UI STATE ---
   const [editingPaddlerId, setEditingPaddlerId] = useState<number | string | null>(null);
@@ -116,8 +115,9 @@ const TeamView: React.FC = () => {
 
 
   // --- ACTIONS ---
-  const handleOnboardingSave = async (data: any) => {
+  const handleOnboardingSave = async (data: Partial<import('@/types').Paddler>) => {
     if (!myPaddler) return;
+    if (!data.name || !data.weight) return;
     try {
       // Use updateProfile to sync Name/Weight globally and set Skills efficiently
       // Pass currentTeam.id to ensure skills are updated for this team context
@@ -125,15 +125,15 @@ const TeamView: React.FC = () => {
         { 
           name: data.name, 
           weight: data.weight, 
-          skills: data.skills 
+          skills: data.skills || []
         }, 
         currentTeam?.id
       );
       
       // Refresh local data
       await updatePaddler(myPaddler.id, data); // Keep this to trigger context refresh if needed, roughly redundant but safe
-    } catch (e: any) {
-      setErrorMessage(e.message || t('errorSavingPaddler'));
+    } catch (e: unknown) {
+      setErrorMessage(e instanceof Error ? e.message : t('errorSavingPaddler'));
     }
   };
 
@@ -148,8 +148,8 @@ const TeamView: React.FC = () => {
         await addPaddler(data);
       }
       setEditingPaddlerId(null);
-    } catch (e: any) {
-      setErrorMessage(e.message || t('errorSavingPaddler'));
+    } catch (e: unknown) {
+      setErrorMessage(e instanceof Error ? e.message : t('errorSavingPaddler'));
     }
   };
 
@@ -163,17 +163,9 @@ const TeamView: React.FC = () => {
     if (editingPaddlerId === id) setEditingPaddlerId(null);
   };
 
-  const handleCancelEdit = () => {
-    setEditingPaddlerId(null);
-  };
 
-  const handleUpdateTeam = async (data: Partial<Team>) => {
-    if (currentTeam) {
-      await updateTeam(currentTeam.id, data);
-    }
-  };
 
-    const handleImportPaddlers = async (rows: any[]) => {
+    const handleImportPaddlers = async (rows: Record<string, unknown>[]) => {
       // Expected: Name | Weight | Side | Skills | Email
       // Backend expects: { name, weight, side, skills, ... }
       // We map the rows to match backend expectation
@@ -187,15 +179,14 @@ const TeamView: React.FC = () => {
         if (!nameKey || !row[nameKey]) return null;
 
         const name = row[nameKey];
-        const weight = weightKey ? parseFloat(row[weightKey]) : 0;
+        const weight = weightKey ? parseFloat(String(row[weightKey])) : 0;
         
         // Parse Side/Role
         // Valid: left, right, drum, steer (case insensitive)
         // multiple values can be comma separated
         const sideStrRaw = sideKey ? String(row[sideKey]).toLowerCase() : '';
         
-        console.log('[Import Debug] Row:', row);
-        console.log('[Import Debug] sideKey:', sideKey, 'sideStrRaw:', sideStrRaw);
+
         
         // Dictionary for multilingual support
         const dict = {
@@ -208,10 +199,7 @@ const TeamView: React.FC = () => {
 
         const foundRoles = new Set<string>();
 
-        // Normalize delimiters and split
-        const parts = sideStrRaw.split(/[,/|&+\s]+/).filter(p => p.trim().length > 0);
-        
-        console.log('[Import Debug] parts:', parts);
+        const parts = sideStrRaw.split(/[,/|&+\s]+/).filter((p: string) => p.trim().length > 0);
 
         parts.forEach(part => {
              const p = part.trim();
@@ -227,14 +215,9 @@ const TeamView: React.FC = () => {
                if (dict.steer.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('steer');
              }
         });
-        
-        console.log('[Import Debug] foundRoles:', Array.from(foundRoles));
 
         // Determine main 'side' property for UI preference
-        let side: 'left' | 'right' | 'both' | null = null;
-        if (foundRoles.has('left') && foundRoles.has('right')) side = 'both';
-        else if (foundRoles.has('left')) side = 'left';
-        else if (foundRoles.has('right')) side = 'right';
+
 
         // Skills MUST contain 'left'/'right' for the algorithm to work, plus drum/steer
         let skills = Array.from(foundRoles);
@@ -244,11 +227,11 @@ const TeamView: React.FC = () => {
         // But maybe that's intended (pure drummer).
         // If nothing at all:
         if (skills.length === 0) {
-             side = 'left'; 
+ 
              skills = ['left'];
         }
         
-        console.log('[Import Debug] Final skills for', name, ':', skills);
+
 
         return {
            name,
@@ -256,17 +239,15 @@ const TeamView: React.FC = () => {
 
            skills,
            inviteEmail: emailKey ? row[emailKey] : undefined
-        };
-      }).filter(p => p !== null);
-      
-      console.log('[Import Debug] mappedPaddlers:', JSON.stringify(mappedPaddlers, null, 2));
+        } as unknown as import('@/types').Paddler;
+      }).filter((p): p is import('@/types').Paddler => p !== null);
 
       if (mappedPaddlers.length > 0) {
-         await importPaddlers(mappedPaddlers);
+         await importPaddlers(mappedPaddlers as unknown as Record<string, unknown>[]);
       }
     };
 
-    const handleImportEvents = async (rows: any[]) => {
+    const handleImportEvents = async (rows: Record<string, unknown>[]) => {
       // Expected: Title | Date | Time | Type | BoatSize
       const mappedEvents = rows.map(row => {
         const keys = Object.keys(row);
@@ -311,11 +292,11 @@ const TeamView: React.FC = () => {
 
         const comment = commentKey ? row[commentKey] : null;
 
-        return { title, date: dateTimeStr, type, boatSize, comment };
-      }).filter(e => e !== null);
+        return { title, date: dateTimeStr, type, boatSize, comment } as Event;
+      }).filter((e): e is Event => e !== null);
 
       if (mappedEvents.length > 0) {
-        await importEvents(mappedEvents);
+        await importEvents(mappedEvents as unknown as Record<string, unknown>[]);
       }
     };
 

@@ -4,15 +4,16 @@ import { auth } from '@/auth';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    const eventId = params.id;
+    const eventId = id;
     
     // Fetch event to check team ownership
     const event = await prisma.event.findUnique({
@@ -39,7 +40,7 @@ export async function POST(
     let body;
     try {
       body = await request.json();
-    } catch (e) {
+    } catch {
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 

@@ -14,7 +14,8 @@
     "test": "jest --maxWorkers=10",
     "test:watch": "jest --watch --maxWorkers=1",
     "email": "email dev --dir src/emails --port 3010",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "prepare": "husky"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
@@ -51,6 +52,8 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
     "@eslint/compat": "^2.0.0",
     "@next/eslint-plugin-next": "^16.1.1",
     "@prisma/client": "^7.2.0",
@@ -69,6 +72,7 @@
     "eslint-config-next": "16.1.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.1.7",
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8",

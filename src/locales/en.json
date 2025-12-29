@@ -142,6 +142,23 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "2.8.0",
+            "date": "December 2025",
+            "features": [
+                "Mail Queue System: A new robust system ensures reliable background email delivery.",
+                "Error Pages: User-friendly 404 and error pages.",
+                "Tour Sync: Your tour progress is now saved to your profile and synced across devices."
+            ],
+            "technical": [
+                "SEO Optimization: Improved keywords and metadata for better discoverability.",
+                "Database Cleanup: Removed legacy email logs and replaced them with a centralized queuing system."
+            ],
+            "bugfixes": [
+                "Tour Fix: The interactive tour now starts correctly on the team dashboard and checks for an active team.",
+                "UI Fix: Prevented screen flickering on reload by immediately applying theme and language settings."
+            ]
+        },
+        {
             "version": "2.7.1",
             "date": "December 2025",
             "features": [],
@@ -652,5 +669,14 @@
     "import": "Import",
     "supportedFormats": "Supports .xlsx, .xls, .csv",
     "paddlerTemplateColumns": "Name | Weight | Side | Skills | Email",
-    "eventTemplateColumns": "Title | Date | Time | Type | BoatSize | Comment"
+    "eventTemplateColumns": "Title | Date | Time | Type | BoatSize | Comment",
+    "errorNotFoundTitle": "Page not found",
+    "errorNotFoundMessage": "The page you are looking for does not exist or has been moved.",
+    "errorGenericTitle": "An error occurred",
+    "errorGenericMessage": "An unexpected error occurred.",
+    "errorTryAgain": "Try again",
+    "errorHome": "Home",
+    "errorGlobalTitle": "Critical Error",
+    "errorGlobalMessage": "A critical error occurred and the application could not be loaded.",
+    "errorReload": "Reload"
 }

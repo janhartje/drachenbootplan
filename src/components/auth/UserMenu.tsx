@@ -109,6 +109,8 @@ export function UserMenu() {
                   <span className="text-base sm:text-sm">{t('helpCenterTitle') || 'Help Center'}</span>
                 </button>
 
+
+
                 {/* Leave Team Option - Only for Paddlers (not Captains) and when inside a team */}
                 {currentTeam && userRole !== 'CAPTAIN' && (
                   <button

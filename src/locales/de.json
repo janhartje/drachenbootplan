@@ -149,17 +149,22 @@
                 "Einfache Zahlungsverwaltung via Stripe (Kreditkarte, SEPA, PayPal, etc.).",
                 "InfoCards: Wichtige Hinweise können nun dauerhaft ausgeblendet werden (gespeichert in Datenbank).",
                 "Team-Wechsel: Schnellerer Wechsel zwischen Teams und verbesserte Verwaltung.",
-                "Erweiterte Zahlungsarten: Support für SEPA Lastschrift, Bancontact, iDEAL und mehr."
+                "Erweiterte Zahlungsarten: Support für SEPA Lastschrift, Bancontact, iDEAL und mehr.",
+                "Abo-Historie: Übersicht vergangener Abonnements direkt in den Team-Einstellungen.",
+                "Team-Zuordnung: Der Abo-Status zeigt jetzt an, für welches Team das Abo gilt."
             ],
             "technical": [
                 "Server-Side Persistenz für InfoCard-Status.",
                 "Optimierte Stripe Webhooks für Abo-Synchronisation.",
-                "Refactoring der Navigationsstruktur und Header-Komponenten."
+                "Refactoring der Navigationsstruktur und Header-Komponenten.",
+                "Billing-Ansicht in Team-Einstellungen integriert (kein separater Redirect mehr)."
             ],
             "bugfixes": [
                 "Fix: Anzeige des Abo-Status bei gekündigten Abos korrigiert.",
                 "Fix: URL-Updates beim Tab-Wechsel auf der Team-Seite.",
-                "Fix: Team-Switcher verhält sich nun korrekt auf Unterseiten."
+                "Fix: Team-Switcher verhält sich nun korrekt auf Unterseiten.",
+                "Fix: Irrelevante Rechnungen (z.B. abgebrochene Checkout-Versuche) werden nun herausgefiltert.",
+                "Fix: Übersetzungen für alle Abo-Status vervollständigt."
             ]
         },
         {
@@ -541,13 +546,13 @@
     "privacyHosting": "Hosting",
     "privacyHostingText": "Wir hosten unsere Anwendung bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Der Anbieter ist zertifiziert nach dem EU-US Data Privacy Framework und bietet hierdurch eine Garantie, das europäische Datenschutzrecht einzuhalten. Die Daten werden in Frankfurt (Deutschland) verarbeitet. Vercel erhebt Logfiles mit IP-Adressen, um die Sicherheit und Stabilität des Dienstes zu gewährleisten.",
     "privacyDatabase": "Datenbank",
-    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Berlin) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
+    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Prenzlauer Allee 193, 10405 Berlin, Deutschland) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
     "privacyAuth": "Authentifizierung",
-    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google und GitHub. Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
+    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) und GitHub (GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, Niederlande). Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
     "privacyEmails": "E-Mail Versand",
-    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt. Wir haben mit Resend einen Auftragsverarbeitungsvertrag geschlossen.",
+    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt.",
     "privacyPayments": "Zahlungsabwicklung (Stripe)",
-    "privacyPaymentsText": "Wir nutzen Stripe für die Zahlungsabwicklung. Stripe verarbeitet Zahlungsdaten (z.B. Kreditkartendaten) in unserem Auftrag. Die Datenübertragung erfolgt verschlüsselt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung). Weitere Informationen finden Sie in der Datenschutzerklärung von Stripe: https://stripe.com/de/privacy.",
+    "privacyPaymentsText": "Wir nutzen Stripe (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland) für die Zahlungsabwicklung. Stripe verarbeitet Zahlungsdaten (z.B. Kreditkartendaten) in unserem Auftrag. Die Datenübertragung erfolgt verschlüsselt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung). Weitere Informationen finden Sie in der Datenschutzerklärung von Stripe: https://stripe.com/de/privacy.",
     "privacyRights": "Ihre Rechte",
     "privacyRightsText": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer gespeicherten Daten. Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen.",
     "disclaimerTitle": "Haftungsausschluss & Technische Hinweise",
@@ -733,6 +738,7 @@
         "manageSubscriptionDesc": "Dein Team ist PRO! Hier kannst du Rechnungen einsehen und Zahlungsdaten ändern.",
         "upgradeSuccessTitle": "🎉 Willkommen bei PRO!",
         "upgradeSuccessMessage": "Dein Team wurde erfolgreich auf PRO upgegradet. Viel Spaß mit den neuen Features!",
+        "period": "Zeitraum",
         "subscription": "Abo",
         "subscriptionStatus": "Abo-Status",
         "nextBillingDate": "Nächste Abrechnung",
@@ -750,6 +756,26 @@
         "cancelInfo": "Du kannst die Funktionen bis zum Ende der Laufzeit weiter nutzen.",
         "subscriptionCanceled": "Abo wird gekündigt",
         "subscriptionReactivated": "Kündigung zurückgenommen",
-        "managedByOther": "Das Abo wird von einem anderen Teammitglied verwaltet."
+        "managedByOther": "Das Abo wird von einem anderen Teammitglied verwaltet.",
+        "invoice": "Rechnung",
+        "amount": "Betrag",
+        "status": "Status",
+        "status_paid": "Bezahlt",
+        "status_open": "Offen",
+        "status_void": "Storniert",
+        "status_uncollectible": "Uneinbringlich",
+        "noInvoices": "Keine Rechnungen gefunden.",
+        "noPaymentMethod": "Keine Zahlungsmethode hinterlegt.",
+        "subscriptionHistory": "Abo-Historie",
+        "startsAt": "Startet am",
+        "endsAt": "Endet am",
+        "endsSoon": "Endet bald",
+        "status_active": "Aktiv",
+        "status_past_due": "Zahlung überfällig",
+        "status_canceled": "Gekündigt",
+        "status_trialing": "Probezeit",
+        "status_unpaid": "Unbezahlt",
+        "status_incomplete": "Unvollständig",
+        "status_incomplete_expired": "Abgelaufen"
     }
 }

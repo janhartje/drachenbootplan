@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowLeft, Trash2, AlertTriangle, Shield, ShieldAlert, UserMinus, CreditCard, Calendar, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Trash2, AlertTriangle, Shield, ShieldAlert, UserMinus } from 'lucide-react';
 import Header from '@/components/ui/Header';
 import Footer from '@/components/ui/Footer';
 import DragonLogo from '@/components/ui/DragonLogo';
@@ -15,42 +15,18 @@ import { HelpModal, AlertModal, ConfirmModal } from '@/components/ui/Modals';
 import PageTransition from '@/components/ui/PageTransition';
 import TeamSwitcher from '@/components/drachenboot/TeamSwitcher';
 import { UserMenu } from '@/components/auth/UserMenu';
+import { BillingContent, SubscriptionData } from '@/components/stripe/BillingContent';
 
-import { UpgradeView } from '@/components/drachenboot/pro/UpgradeView';
+
 import { Team } from '@/types';
 
 
-interface SubscriptionDetails {
-  hasSubscription: boolean;
-  plan: string;
-  isBillingUser?: boolean;
-  subscription?: {
-    id: string;
-    status: string;
-    cancelAtPeriodEnd: boolean;
-    currentPeriodEnd: number;
-    currentPeriodStart: number;
-    interval?: string;
-    amount: number;
-    currency?: string;
-    priceId?: string;
-    paymentMethod?: {
-      brand?: string;
-      last4?: string;
-      expMonth?: number;
-      expYear?: number;
-    } | null;
-  };
-}
-
-function SubscriptionTab({ team, t }: { team: Team; t: (key: string) => string }) {
+// Re-defined SubscriptionTab to use native BillingContent
+function SubscriptionTab({ team }: { team: Team }) {
   const teamId = team.id;
   const [loading, setLoading] = useState(true);
-  const [subData, setSubData] = useState<SubscriptionDetails | null>(null);
-  const [actionLoading, setActionLoading] = useState(false);
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [subData, setSubData] = useState<SubscriptionData | null>(null);
 
-  // Move fetchSubscription callback to useCallback or inside useEffect to avoid missing dependency warning
   useEffect(() => {
     const fetchSubscription = async () => {
         setLoading(true);
@@ -67,35 +43,6 @@ function SubscriptionTab({ team, t }: { team: Team; t: (key: string) => string }
     fetchSubscription();
   }, [teamId]);
 
-  const handleAction = async (action: 'cancel' | 'reactivate') => {
-    setActionLoading(true);
-    try {
-      await fetch('/api/stripe/update-subscription', {
-        method: 'POST',
-        body: JSON.stringify({ teamId, action })
-      });
-      // We need to re-fetch here effectively.
-      // Since it's inside useEffect, we can trigger a re-fetch by invalidating query or just calling logic again?
-      // Simple way: duplicate the fetch logic or extract it?
-      // Since we moved it inside useEffect, let's just reload the page or use a simple hack for now?
-      // Better: let's reload the window for simplicity or just properly extract fetchSubscription.
-      window.location.reload(); 
-    } catch (e) {
-      console.error('Action failed:', e);
-    }
-    setActionLoading(false);
-    setShowCancelConfirm(false);
-  };
-
-  const openPortal = async () => {
-    const res = await fetch('/api/stripe/create-portal-session', {
-      method: 'POST',
-      body: JSON.stringify({ teamId })
-    });
-    const data = await res.json();
-    if (data.url) window.location.href = data.url;
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -104,125 +51,10 @@ function SubscriptionTab({ team, t }: { team: Team; t: (key: string) => string }
     );
   }
 
-
-
-  if (!subData?.hasSubscription || !subData.subscription) {
-    return <UpgradeView team={team} />;
-  }
-
-  const sub = subData.subscription;
-  const nextBilling = new Date(sub.currentPeriodEnd * 1000).toLocaleDateString();
-  const amount = (sub.amount / 100).toFixed(2);
-  const interval = sub.interval === 'year' ? t('pro.perYear') : t('pro.perMonth');
-
-  return (
-    <div className="space-y-6">
-      {/* Status Card */}
-      <div className={`p-6 rounded-lg border ${
-        sub.cancelAtPeriodEnd 
-          ? 'bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800'
-          : 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800'
-      }`}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              sub.cancelAtPeriodEnd 
-                ? 'bg-amber-100 dark:bg-amber-900/30'
-                : 'bg-green-100 dark:bg-green-900/30'
-            }`}>
-              <CreditCard className={sub.cancelAtPeriodEnd ? 'text-amber-600' : 'text-green-600'} size={20} />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-200">PRO</h3>
-              <p className={`text-sm ${sub.cancelAtPeriodEnd ? 'text-amber-600' : 'text-green-600'}`}>
-                {sub.cancelAtPeriodEnd ? t('pro.canceledAtPeriodEnd') : 'Aktiv'}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-slate-800 dark:text-slate-200">€{amount}<span className="text-sm font-normal text-slate-500">{interval}</span></p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-          <Calendar size={16} />
-          <span>{t('pro.nextBillingDate')}: <strong>{nextBilling}</strong></span>
-        </div>
-      </div>
-
-      {/* Payment Method */}
-      {sub.paymentMethod && (
-        <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-          <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">{t('pro.paymentMethod')}</h4>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-6 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center text-xs font-bold uppercase">
-              {sub.paymentMethod.brand}
-            </div>
-            <span className="text-slate-700 dark:text-slate-300">•••• {sub.paymentMethod.last4}</span>
-            <span className="text-slate-500 text-sm">exp {sub.paymentMethod.expMonth}/{sub.paymentMethod.expYear}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Action Buttons - Only for billing user */}
-      {subData.isBillingUser ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <button
-            onClick={() => openPortal()}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-300 font-medium"
-          >
-            <CreditCard size={18} />
-            {t('pro.updatePaymentMethod')}
-          </button>
-          <button
-            onClick={() => openPortal()}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-700 dark:text-slate-300 font-medium"
-          >
-            <ExternalLink size={18} />
-            {t('pro.viewInvoices')}
-          </button>
-        </div>
-      ) : (
-        <div className="p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg text-center text-slate-500 dark:text-slate-400 text-sm">
-          {t('pro.managedByOther') || 'Das Abo wird von einem anderen Teammitglied verwaltet.'}
-        </div>
-      )}
-
-      {/* Cancel/Reactivate - Only for billing user */}
-      {subData.isBillingUser && (
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-          {sub.cancelAtPeriodEnd ? (
-            <button
-              onClick={() => handleAction('reactivate')}
-              disabled={actionLoading}
-              className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50"
-            >
-              {actionLoading ? '...' : t('pro.reactivateSubscription')}
-            </button>
-          ) : (
-            <button
-              onClick={() => setShowCancelConfirm(true)}
-              className="w-full py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium rounded-lg transition-colors border border-red-200 dark:border-red-900/30"
-            >
-              {t('pro.cancelSubscription')}
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Cancel Confirmation */}
-      <ConfirmModal
-        isOpen={showCancelConfirm}
-        title={t('pro.cancelSubscription')}
-        message={`${t('pro.confirmCancel')} ${t('pro.cancelInfo')}`}
-        confirmLabel={t('pro.cancelSubscription')}
-        isDestructive={true}
-        onCancel={() => setShowCancelConfirm(false)}
-        onConfirm={() => handleAction('cancel')}
-      />
-    </div>
-  );
+  // We now let BillingContent handle the "No Subscription" state (it will show UpgradeView)
+  return <BillingContent team={team} subscription={subData} />;
 }
+
 
 export default function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -518,7 +350,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
                 </div>
               </div>
             ) : activeTab === 'subscription' ? (
-              <SubscriptionTab team={team} t={t} />
+              <SubscriptionTab team={team} />
             ) : null}
           </div>
         </div>

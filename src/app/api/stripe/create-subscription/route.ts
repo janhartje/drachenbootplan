@@ -4,6 +4,9 @@ import { auth } from '@/auth';
 import prisma from '@/lib/prisma';
 import Stripe from 'stripe';
 
+// Type for Invoice with expanded payment_intent field
+type InvoiceWithPaymentIntent = Stripe.Invoice & { payment_intent?: Stripe.PaymentIntent | string | null };
+
 export async function POST(request: Request) {
   try {
     const session = await auth();
@@ -110,30 +113,57 @@ export async function POST(request: Request) {
         expand: ['data.latest_invoice.payment_intent'],
     });
 
-    let subscription: Stripe.Subscription | undefined;
+    // Helper to ensure we have an expanded invoice
+    const getExpandedInvoice = async (invId: string): Promise<InvoiceWithPaymentIntent | null> => {
+        try {
+            let inv = await stripe.invoices.retrieve(invId, { expand: ['payment_intent'] }) as InvoiceWithPaymentIntent;
+            console.log(`Invoice ${invId} status: ${inv.status}, has PI: ${!!inv.payment_intent}`);
+            
+            if (inv.status === 'draft') {
+                console.log(`Invoice ${invId} is in draft, finalizing...`);
+                inv = await stripe.invoices.finalizeInvoice(invId, { expand: ['payment_intent'] }) as InvoiceWithPaymentIntent;
+                console.log(`Finalized invoice ${invId}, status: ${inv.status}, has PI: ${!!inv.payment_intent}`);
+            }
+            return inv;
+        } catch (e) {
+            console.error('Failed to expand/finalize invoice:', invId, e);
+            return null;
+        }
+    };
 
-    // Find a suitable incomplete subscription
-    // If we find one, we should also check if it has the CORRECT price.
-    // If not, we might need to cancel it or update it. 
-    // For simplicity, if the price doesn't match, we cancel and create new.
-    
+    let subscription: Stripe.Subscription | undefined;
+    let paymentIntent: Stripe.PaymentIntent | null = null;
+
     for (const sub of existingSubscriptions.data) {
-        const inv = sub.latest_invoice as Stripe.Invoice;
-        const pi = inv?.payment_intent as Stripe.PaymentIntent;
+        // Ensure latest_invoice is an object and has payment_intent
+        let inv: InvoiceWithPaymentIntent | null = null;
+        if (typeof sub.latest_invoice === 'string') {
+            inv = await getExpandedInvoice(sub.latest_invoice);
+        } else if (sub.latest_invoice) {
+            inv = sub.latest_invoice as InvoiceWithPaymentIntent;
+            // If it's an object but PI is just an ID string, we must expand it
+            if (typeof inv.payment_intent === 'string') {
+                inv = await getExpandedInvoice(inv.id);
+            }
+        }
+
+        const pi = (inv && typeof inv.payment_intent === 'object' ? inv.payment_intent : null) as Stripe.PaymentIntent | null;
         const subPriceId = sub.items.data[0]?.price.id;
         
         if (subPriceId !== targetPriceId) {
-                console.log('Found incomplete subscription but with wrong price, cancelling:', sub.id);
-                try { await stripe.subscriptions.cancel(sub.id); } catch { /* ignore */ }
-                continue;
+            console.log('Found incomplete subscription but with wrong price, cancelling:', sub.id);
+            try { await stripe.subscriptions.cancel(sub.id); } catch { /* ignore */ }
+            continue;
         }
         
         if (inv && pi && pi.client_secret) {
-            console.log('Found valid reusable subscription:', sub.id);
+            console.log('Found valid reusable subscription:', sub.id, 'with PI:', pi.id);
             subscription = sub;
+            subscription.latest_invoice = inv; // Attach the expanded one
+            paymentIntent = pi;
             break;
         } else {
-            console.log('Found broken/stuck subscription, cancelling:', sub.id);
+            console.log('Found broken/stuck subscription (missing PI or secret), cancelling:', sub.id);
             try {
                 await stripe.subscriptions.cancel(sub.id);
             } catch (e) {
@@ -154,6 +184,7 @@ export async function POST(request: Request) {
             payment_behavior: 'default_incomplete',
             payment_settings: { 
                 save_default_payment_method: 'on_subscription',
+                payment_method_types: ['card'], // Explicitly set to force PI creation robustness
             },
             expand: ['latest_invoice.payment_intent'],
             metadata: {
@@ -162,99 +193,48 @@ export async function POST(request: Request) {
         });
         console.log('Subscription created:', subscription.id, 'Status:', subscription.status);
     }
+
+    let latestInvoice: InvoiceWithPaymentIntent | null = subscription.latest_invoice as InvoiceWithPaymentIntent;
     
     // Fetch price details to return to frontend
     const priceDetails = await stripe.prices.retrieve(targetPriceId);
 
-    let latestInvoice = subscription.latest_invoice as Stripe.Invoice;
-    let paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent | null;
-
-    // Retry fetching invoice if payment intent is missing/null
-    if (latestInvoice && !paymentIntent) {
-        console.log('Payment Intent missing in inv object, fetching invoice explicitly...');
-        latestInvoice = await stripe.invoices.retrieve(latestInvoice.id, {
-            expand: ['payment_intent'],
-        });
-        paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+    if (subscription && !paymentIntent) {
+        console.log('Missing Payment Intent. Analyzing subscription latest_invoice...');
+        const currentInvRef = subscription.latest_invoice;
         
-        console.log('Explicitly fetched invoice:', JSON.stringify(latestInvoice, null, 2));
-    }
-
-    console.log('Latest Invoice ID:', latestInvoice?.id);
-    
-    // If still no payment intent, maybe we need to finalize?
-    if (latestInvoice && latestInvoice.status !== 'open' && latestInvoice.status !== 'paid') {
-            console.log('Invoice status is:', latestInvoice.status, 'Attempting to finalize...');
-            // Note: You can't finalize if it's already open, but if it's draft, we can.
-            if (latestInvoice.status === 'draft') {
-                latestInvoice = await stripe.invoices.finalizeInvoice(latestInvoice.id, { expand: ['payment_intent'] });
-                paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+        if (typeof currentInvRef === 'string') {
+            latestInvoice = await getExpandedInvoice(currentInvRef);
+        } else if (currentInvRef) {
+            latestInvoice = currentInvRef as InvoiceWithPaymentIntent;
+            // Expansion check
+            if (!latestInvoice.payment_intent || typeof latestInvoice.payment_intent === 'string' || latestInvoice.status === 'draft') {
+                latestInvoice = await getExpandedInvoice(latestInvoice.id);
             }
-    }
-
-    if (latestInvoice && !paymentIntent) {
-        // Fallback: If for some reason the invoice has no payment intent, create one manually?
-        // Actually, subscription invoices usually have one automatically.
-        // If it's OPEN and has no payment intent, it might be that payment_settings aren't sticking.
-        console.log('Invoice is OPEN but has no Payment Intent. Attempting to create ad-hoc Payment Intent or update invoice?');
-        
-        // Try to update the invoice to force payment collection?
-        // Or just create a separate PaymentIntent for the amount?
-        // STRIPE QUIRK: Sometimes initial subscription invoices don't generate PIs if the amount is 0 or if there's a race?
-        // But amount is 5000.
-        
-        // Let's create a standalone PaymentIntent for this invoice?
-        // Risky if we duplicate.
-        // Better approach:
-        // If the invoice is open, we can try to pay it?
-        
-        // ULTIMATE FALLBACK:
-        // Use SetupIntent for future payments if this is just a setup? 
-        // No, we want to pay.
-        
-        // Let's create a PaymentIntent manually linked to the customer.
-        // Note: This won't technically pay the invoice automatically unless we handle webhooks to mark invoice paid.
-        // But for "subscription creation", usually we want the subscription's own PI.
-        
-        // Let's try to update the subscription to force incomplete?
-        console.log('Forcing creation of Payment Intent for Invoice:', latestInvoice.id);
-        
-        try {
-            // Cannot 'create' a PI for an existing invoice easily via API if not auto-generated.
-            // But we can finalize? It is already finalized.
-            
-            // Checking if we can retrieve it from the subscription directly?
-                const subRefetched = await stripe.subscriptions.retrieve(subscription.id, { expand: ['latest_invoice.payment_intent'] });
-                const inv = subRefetched.latest_invoice as Stripe.Invoice;
-                if (inv.payment_intent) {
-                    paymentIntent = inv.payment_intent as Stripe.PaymentIntent;
-                }
-        } catch (e) {
-            console.error('Error refetching:', e);
         }
-    }
-    
-    // Last ditch: create a SetupIntent if all else fails, just to get a client secret?
-    // No, that won't charge the card.
-    
-    // Correction:
-    // If the invoice is open and finalized but has no payment_intent, it implies "collection_method" might be 'send_invoice'?
-    // Let's check collection_method.
-    if (latestInvoice?.collection_method === 'send_invoice') {
-        // We need 'charge_automatically'
-        console.log('Collection method is send_invoice! Updating to charge_automatically...');
-        // We can't update finalized invoices easily.
-        // But we can update the subscription payment settings.
-    }
 
-    if (latestInvoice) {
-        // Handle case where payment_intent is a string
-        if (typeof paymentIntent === 'string') {
-             console.log('Payment intent is string ID, fetching object...');
-             paymentIntent = await stripe.paymentIntents.retrieve(paymentIntent);
+        if (latestInvoice && typeof latestInvoice.payment_intent === 'object') {
+            paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
         }
         
-        console.log('Final Payment Intent Status:', paymentIntent?.status);
+        // Final attempt if still missing: retrieve subscription afresh with full expansion
+        if (!paymentIntent) {
+            console.log('Still missing PI. Retrying full subscription expansion as final fallback...');
+            const finalSub = await stripe.subscriptions.retrieve(subscription.id, {
+                expand: ['latest_invoice.payment_intent']
+            });
+            latestInvoice = finalSub.latest_invoice as InvoiceWithPaymentIntent;
+            if (latestInvoice && typeof latestInvoice.payment_intent === 'object') {
+                paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+            } else if (latestInvoice && typeof latestInvoice.payment_intent === 'string') {
+                // Should not happen with expand, but Stripe...
+                paymentIntent = await stripe.paymentIntents.retrieve(latestInvoice.payment_intent);
+            }
+        }
+    }
+
+    if (paymentIntent) {
+        console.log('Final Payment Intent:', paymentIntent.id, 'Status:', paymentIntent.status);
     }
 
     if (!latestInvoice || !paymentIntent || !paymentIntent.client_secret) {

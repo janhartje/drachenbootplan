@@ -402,7 +402,7 @@ const TeamView: React.FC = () => {
                         {t('pro.upgradeDescription')}
                       </p>
                       <button
-                        onClick={() => router.push(`/app/teams/${currentTeam?.id}/upgrade`)}
+                        onClick={() => router.push(`/app/teams/${currentTeam?.id}?tab=subscription`)}
                         className="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-lg shadow-sm transition-all transform hover:scale-[1.02]"
                       >
                         {t('pro.upgradeButton')}

@@ -149,17 +149,22 @@
                 "Easy payment management via Stripe (Credit Card, SEPA, PayPal, etc.).",
                 "InfoCards: Important notices can now be permanently dismissed (saved to database).",
                 "Team Switching: Faster switching between teams and improved management.",
-                "Extended Payment Methods: Support for SEPA Direct Debit, Bancontact, iDEAL, and more."
+                "Extended Payment Methods: Support for SEPA Direct Debit, Bancontact, iDEAL, and more.",
+                "Subscription History: Overview of past subscriptions directly in team settings.",
+                "Team Attribution: The subscription status now shows which team the subscription belongs to."
             ],
             "technical": [
                 "Server-side persistence for InfoCard dismissal status.",
                 "Optimized Stripe webhooks for subscription synchronization.",
-                "Refactoring of navigation structure and header components."
+                "Refactoring of navigation structure and header components.",
+                "Billing view integrated into team settings (no more separate redirect)."
             ],
             "bugfixes": [
                 "Fix: Corrected subscription status display for canceled subscriptions.",
                 "Fix: URL updates when switching tabs on the team page.",
-                "Fix: Team switcher now behaves correctly on subpages."
+                "Fix: Team switcher now behaves correctly on subpages.",
+                "Fix: Irrelevant invoices (e.g., abandoned checkout attempts) are now filtered out.",
+                "Fix: Completed translations for all subscription statuses."
             ]
         },
         {
@@ -539,13 +544,13 @@
     "privacyHosting": "Hosting",
     "privacyHostingText": "We host our application with Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. The provider is certified under the EU-US Data Privacy Framework. Data is processed in Frankfurt (Germany). Vercel collects log files with IP addresses to ensure security and stability.",
     "privacyDatabase": "Database",
-    "privacyDatabaseText": "Our database is provided by Prisma (Prisma Data Services GmbH, Berlin) and is also hosted in Frankfurt. Your user data (name, email, team data) is stored here.",
+    "privacyDatabaseText": "Our database is provided by Prisma (Prisma Data Services GmbH, Prenzlauer Allee 193, 10405 Berlin, Germany) and is hosted in Frankfurt. Your user data (name, email, team data) is stored here.",
     "privacyAuth": "Authentication",
-    "privacyAuthText": "For login, we use NextAuth.js with Google and GitHub providers. When you log in via these services, we receive your email address, name, and profile picture. We use this data exclusively for identification and user management.",
+    "privacyAuthText": "For login, we use NextAuth.js with providers Google (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) and GitHub (GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, The Netherlands). When you log in via these services, we receive your email address, name, and profile picture. We use this data exclusively for identification and user management.",
     "privacyEmails": "Email Delivery",
-    "privacyEmailsText": "Transaction emails (e.g., invitations) are sent via Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Data processing takes place in Ireland. We have concluded a data processing agreement with Resend.",
+    "privacyEmailsText": "Transaction emails (e.g., invitations) are sent via Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Data processing takes place in Ireland.",
     "privacyPayments": "Payment Processing (Stripe)",
-    "privacyPaymentsText": "We use Stripe for payment processing. Stripe processes payment data (e.g., credit card information) on our behalf. Data transmission is encrypted. The legal basis is Art. 6 (1) (b) GDPR (performance of a contract). For more information, please see Stripe's privacy policy: https://stripe.com/privacy.",
+    "privacyPaymentsText": "We use Stripe (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Ireland) for payment processing. Stripe processes payment data (e.g., credit card information) on our behalf. Data transmission is encrypted. The legal basis is Art. 6 (1) (b) GDPR (performance of a contract). For more information, please see Stripe's privacy policy: https://stripe.com/privacy.",
     "privacyRights": "Your Rights",
     "privacyRightsText": "You have the right to access, rectification, deletion, and restriction of processing of your stored data. You can object to the processing of your data at any time.",
     "disclaimerTitle": "Disclaimer & Technical Notices",
@@ -747,6 +752,26 @@
         "cancelInfo": "You can continue using the features until the end of the current period.",
         "subscriptionCanceled": "Subscription will be canceled",
         "subscriptionReactivated": "Cancellation reverted",
-        "managedByOther": "This subscription is managed by another team member."
+        "managedByOther": "This subscription is managed by another team member.",
+        "invoice": "Invoice",
+        "amount": "Amount",
+        "status": "Status",
+        "status_paid": "Paid",
+        "status_open": "Open",
+        "status_void": "Void",
+        "status_uncollectible": "Uncollectible",
+        "noInvoices": "No invoices found.",
+        "noPaymentMethod": "No payment method saved.",
+        "subscriptionHistory": "Subscription History",
+        "startsAt": "Starts at",
+        "endsAt": "Ends at",
+        "endsSoon": "Ends soon",
+        "status_active": "Active",
+        "status_past_due": "Past Due",
+        "status_canceled": "Canceled",
+        "status_trialing": "Trialing",
+        "status_unpaid": "Unpaid",
+        "status_incomplete": "Incomplete",
+        "status_incomplete_expired": "Expired"
     }
 }

@@ -652,5 +652,14 @@
     "import": "Import",
     "supportedFormats": "Supports .xlsx, .xls, .csv",
     "paddlerTemplateColumns": "Name | Weight | Side | Skills | Email",
-    "eventTemplateColumns": "Title | Date | Time | Type | BoatSize | Comment"
+    "eventTemplateColumns": "Title | Date | Time | Type | BoatSize | Comment",
+    "errorNotFoundTitle": "Page not found",
+    "errorNotFoundMessage": "The page you are looking for does not exist or has been moved.",
+    "errorGenericTitle": "An error occurred",
+    "errorGenericMessage": "An unexpected error occurred.",
+    "errorTryAgain": "Try again",
+    "errorHome": "Home",
+    "errorGlobalTitle": "Critical Error",
+    "errorGlobalMessage": "A critical error occurred and the application could not be loaded.",
+    "errorReload": "Reload"
 }

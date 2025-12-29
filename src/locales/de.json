@@ -654,5 +654,14 @@
     "import": "Importieren",
     "supportedFormats": "Unterstützt .xlsx, .xls, .csv",
     "paddlerTemplateColumns": "Name | Gewicht | Seite | Skills | Email",
-    "eventTemplateColumns": "Titel | Datum | Zeit | Typ | Bootsgröße | Kommentar"
+    "eventTemplateColumns": "Titel | Datum | Zeit | Typ | Bootsgröße | Kommentar",
+    "errorNotFoundTitle": "Seite nicht gefunden",
+    "errorNotFoundMessage": "Die gesuchte Seite existiert leider nicht oder wurde verschoben.",
+    "errorGenericTitle": "Ein Fehler ist aufgetreten",
+    "errorGenericMessage": "Es ist ein unerwarteter Fehler aufgetreten.",
+    "errorTryAgain": "Erneut versuchen",
+    "errorHome": "Startseite",
+    "errorGlobalTitle": "Kritischer Fehler",
+    "errorGlobalMessage": "Ein kritischer Fehler ist aufgetreten und die Anwendung konnte nicht geladen werden.",
+    "errorReload": "Neu laden"
 }

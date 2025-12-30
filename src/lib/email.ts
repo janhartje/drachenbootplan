@@ -43,18 +43,18 @@ export const sendEmail = async ({
       },
     });
 
-    // Process the queue immediately (fire-and-forget)
-    // This runs in the same environment, so no cross-deployment issues
-    processMailQueue().catch(err => {
-      console.warn('Failed to process mail queue immediately:', err);
+    // Process the queue immediately and wait for completion
+    // This ensures the DB update happens before the function terminates
+    try {
+      await processMailQueue();
+    } catch (err) {
+      console.warn('Failed to process mail queue:', err);
       // Email is still in queue, will be picked up by cron job
-    });
+    }
 
     return { success: true };
   } catch (error) {
     console.error('Exception queuing email:', error);
-    // Log exception in SentEmail for visibility that it failed to even queue (db down?)
-    // This is a critical failure if DB is down.
     return { success: false, error };
   }
 };

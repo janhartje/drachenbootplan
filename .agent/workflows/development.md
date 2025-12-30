@@ -39,3 +39,8 @@ Für Datenbank-Änderungen gilt zwingend der [Datenbank-Workflow](file:///Users/
 
 ## 8. Lokalisation (i18n)
 Texte dürfen niemals hardcodiert werden. Alle User-sichtbaren Texte müssen in `src/locales/de.json` und `src/locales/en.json` hinterlegt werden.
+
+## 9. Git & GitHub
+- **Pull Requests**: Beim Pushen zu GitHub muss geprüft werden, ob bereits ein offener PR für den aktuellen Branch existiert. Falls nicht, muss automatisch ein neuer PR erstellt werden (`gh pr create`).
+- **Issue-Verknüpfung**: Vor dem Erstellen oder Aktualisieren eines PRs müssen die offenen Issues im Repository durchsucht werden (`gh issue list`). Issues, die durch die Änderungen gelöst werden, müssen im PR-Body mit `Closes #<issue-number>` oder `Fixes #<issue-number>` verknüpft werden.
+- **Commit-Nachrichten**: Commit-Nachrichten müssen dem Conventional Commits Format folgen (wird durch Commitlint erzwungen).

@@ -154,7 +154,8 @@
                 "Branding on Exports: Automatic Drachenboot Manager watermark on exports (optional for PRO).",
                 "InfoCards: Important notices can now be permanently dismissed.",
                 "Team Switching: Faster switching between teams and improved management.",
-                "Refined Aesthetics: Brand new PRO badge with shimmer effect."
+                "Refined Aesthetics: Brand new PRO badge with shimmer effect.",
+                "UI Optimization: The squad usage (e.g. 4/25) is now displayed directly in the overview."
             ],
             "technical": [
                 "Centralized theme management for consistent color display.",

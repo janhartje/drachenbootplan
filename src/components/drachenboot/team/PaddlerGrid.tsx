@@ -35,7 +35,7 @@ const PaddlerGrid: React.FC<PaddlerGridProps> = ({ paddlers, editingId, onEdit, 
   return (
     <div id="tour-paddler-grid" className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 h-full">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 text-sm uppercase tracking-wide"><Users size={16} /> {t('squad')} ({paddlers.length})</h3>
+        <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2 text-sm uppercase tracking-wide"><Users size={16} /> {t('squad')} ({paddlers.length}{currentTeam?.plan !== 'PRO' && currentTeam?.maxMembers ? ` / ${currentTeam.maxMembers}` : ''})</h3>
         {headerAction}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

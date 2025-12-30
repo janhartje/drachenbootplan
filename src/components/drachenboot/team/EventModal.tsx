@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Calendar, Plus, Save } from 'lucide-react';
 import { FormInput } from '@/components/ui/FormInput';
 import { useLanguage } from '@/context/LanguageContext';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
+import { useDrachenboot } from '@/context/DrachenbootContext';
 
 import { Event } from '@/types';
 
@@ -15,6 +17,8 @@ interface EventModalProps {
 
 export const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onCreate, onUpdate, initialData }) => {
   const { t } = useLanguage();
+  const { currentTeam } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(''); // Stores YYYY-MM-DDTHH:mm
   const [comment, setComment] = useState('');
@@ -83,7 +87,7 @@ export const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onCreat
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-10">
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Calendar className="text-blue-600 dark:text-blue-400" />
+            <Calendar className={theme?.text || 'text-blue-600 dark:text-blue-400'} />
             {initialData ? t('editEvent') || 'Termin bearbeiten' : t('newTermin')}
           </h2>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
@@ -121,7 +125,7 @@ export const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onCreat
           <div>
             <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">{t('comment') || 'Kommentar'}</label>
             <textarea
-              className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"
+              className={`w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-sm focus:outline-none focus:ring-2 ${theme ? theme.ringBorder.replace('border-', 'ring-').replace('group-hover:', '') : 'focus:ring-blue-500'} dark:text-white resize-none`}
               rows={2}
               placeholder={t('commentPlaceholder') || 'Infos zum Training...'}
               value={comment}
@@ -172,7 +176,7 @@ export const EventModal: React.FC<EventModalProps> = ({ isOpen, onClose, onCreat
               disabled={!isFormValid}
               className={`px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm transition-all flex items-center gap-2
                 ${isFormValid 
-                  ? (initialData ? 'bg-orange-500 hover:bg-orange-600' : 'bg-blue-600 hover:bg-blue-700')
+                  ? (initialData ? 'bg-orange-500 hover:bg-orange-600' : (theme?.button || 'bg-blue-600 hover:bg-blue-700'))
                   : 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed opacity-70'
                 }`}
             >

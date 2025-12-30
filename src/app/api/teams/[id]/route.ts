@@ -27,7 +27,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, website, icon, instagram, facebook, twitter, email } = body;
+    const { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark } = body;
 
     // Check payload size (approximate)
     const payloadSize = JSON.stringify(body).length;
@@ -37,11 +37,15 @@ export async function PUT(
 
     const team = await prisma.team.update({
       where: { id },
-      data: { name, website, icon, instagram, facebook, twitter, email },
+      data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark },
     });
     return NextResponse.json(team);
-  } catch {
-    return NextResponse.json({ error: 'Failed to update team' }, { status: 500 });
+  } catch (error) {
+    console.error('Error updating team:', error);
+    return NextResponse.json({ 
+      error: 'Failed to update team',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 

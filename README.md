@@ -20,6 +20,8 @@ Der **Drachenboot Manager** ist eine Progressive Web App (PWA) zur Verwaltung vo
 *   **Dark Mode**: Automatische Anpassung an das System-Theme.
 *   **Hilfe & Support**: Integriertes Hilfe-Center mit Anleitungen, FAQs und direktem Kontakt zum Entwickler.
 *   **Erweiterte Mitgliederverwaltung**: Status-Tracking (Ausstehend), einfache Rollenvergabe und Verwaltungsoptionen.
+*   **Team Branding**: Personalisierung des Teams mit Akzentfarben (10 Auswahlmöglichkeiten) und individuellem Logo-Ring (PRO).
+*   **PRO Features**: Unbegrenzte Mitglieder, iCal-Integration, PDF/Bild-Export ohne Wasserzeichen und erweiterte Branding-Optionen.
 *   **Admin Dashboard**: Umfassende Statistiken zu Nutzern, Teams und Events inkl. Wachstumscharts und System-Metriken (nur für Administratoren).
 
 ### 🔒 Rollen & Berechtigungen
@@ -95,6 +97,21 @@ Für die lokale Entwicklung wird Docker für die PostgreSQL-Datenbank verwendet:
 *   `npm run db:down` - Stoppt die Datenbank
 *   `npm run db:reset` - Setzt die Datenbank zurück (löscht alle Daten!)
 *   `npm run db:studio` - Öffnet Prisma Studio (Web-UI zur Datenbank-Inspektion)
+
+#### Database Seeding (Testdaten)
+
+Um die Datenbank mit initialen Testdaten (Nutzern, PRO-Teams, Paddlern) zu füllen:
+
+1.  **SEED_EMAILS konfigurieren:**
+    Füge in deiner `.env` die E-Mail-Adressen hinzu, für die Testdaten generiert werden sollen:
+    ```bash
+    SEED_EMAILS="jan@janhartje.com,reg@janhartje.com"
+    ```
+2.  **Seed ausführen:**
+    ```bash
+    npx prisma db seed
+    ```
+    *Hinweis: Wenn du `npm run db:reset` ausführst, wird der Seed automatisch im Anschluss ausgeführt.*
 
 #### Produktion (Vercel)
 

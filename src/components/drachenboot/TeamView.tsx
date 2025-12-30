@@ -26,6 +26,9 @@ import LoadingSkeleton from '../ui/LoadingScreens';
 import PageTransition from '../ui/PageTransition';
 import WelcomeView from './WelcomeView';
 import { ImportModal } from './team/ImportModal';
+import { ProBadge } from './pro/ProBadge';
+
+import { THEME_MAP } from '@/constants/themes';
 
 const TeamView: React.FC = () => {
   const router = useRouter();
@@ -332,19 +335,26 @@ const TeamView: React.FC = () => {
             title={t('appTitle')}
             subtitle={t('teamManager')}
             badge={
-              currentTeam?.plan === 'PRO' ? (
-                <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-0.5 rounded border border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800/50">PRO</span>
-              ) : (
+              currentTeam?.plan === 'PRO' && currentTeam?.showProBadge !== false ? (
+                <ProBadge color={currentTeam.primaryColor} />
+              ) : currentTeam?.plan === 'PRO' ? null : (
                 <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-0.5 rounded border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">FREE</span>
               )
             }
             logo={
               <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-                {currentTeam?.icon ? (
-                  <img src={currentTeam.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                  <DragonLogo className="w-10 h-10" />
-                )}
+                 <div className="relative group">
+                    {currentTeam?.plan === 'PRO' && currentTeam?.showProRing !== false && (
+                      <div className={`absolute -inset-[3px] bg-gradient-to-tr ${THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]?.ring || THEME_MAP.amber.ring} rounded-full animate-shine opacity-90 shadow-[0_0_12px_rgba(251,191,36,0.2)] dark:shadow-[0_0_15px_rgba(251,191,36,0.1)]`}></div>
+                    )}
+                    <div className={`relative rounded-full ${currentTeam?.plan === 'PRO' && currentTeam?.showProRing !== false ? 'p-[2px] bg-white dark:bg-slate-900 shadow-inner' : ''}`}>
+                      {currentTeam?.icon ? (
+                        <img src={currentTeam.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <DragonLogo className={`w-10 h-10 ${currentTeam?.plan === 'PRO' ? (THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]?.text || THEME_MAP.amber.text) : ''}`} />
+                      )}
+                    </div>
+                 </div>
               </Link>
             }
             showHelp={true}
@@ -403,7 +413,11 @@ const TeamView: React.FC = () => {
                       </p>
                       <button
                         onClick={() => router.push(`/app/teams/${currentTeam?.id}?tab=subscription`)}
-                        className="w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-lg shadow-sm transition-all transform hover:scale-[1.02]"
+                        className={`w-full py-2 bg-gradient-to-r text-white font-bold rounded-lg shadow-sm transition-all transform hover:scale-[1.02] ${
+                          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+                            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+                            : 'from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
+                        }`}
                       >
                         {t('pro.upgradeButton')}
                       </button>
@@ -421,26 +435,38 @@ const TeamView: React.FC = () => {
                   t={t}
                   headerAction={
                     <div className="flex gap-2 flex-wrap justify-end">
-                      <button 
-                        onClick={() => setShowImport(true)}
-                        className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
-                      >
-                         <FileUp size={16} />
-                         {t('import') || 'Import'}
-                      </button>
-
                        <button 
-                          id="tour-new-event"
-                         onClick={() => setShowEventModal(true)}
-                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
+                         onClick={() => setShowImport(true)}
+                         className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors ${
+                           currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]
+                             ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' 
+                             : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+                         }`}
                        >
-                          <Calendar size={16} />
-                          {t('newTermin')}
+                          <FileUp size={16} />
+                          {t('import') || 'Import'}
                        </button>
+
+                        <button 
+                           id="tour-new-event"
+                          onClick={() => setShowEventModal(true)}
+                          className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+                            currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+                              ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                        >
+                           <Calendar size={16} />
+                           {t('newTermin')}
+                        </button>
                       <button 
                         id="tour-paddler-form"
                         onClick={() => setEditingPaddlerId('new')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
+                        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+                          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+                            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        }`}
                       >
                         <Plus size={16} />
                         {t('addPaddler')}

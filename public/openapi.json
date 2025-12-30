@@ -263,11 +263,29 @@
                                     "name": {
                                         "type": "string",
                                         "description": "New team name"
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "primaryColor": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "showProRing": {
+                                        "type": "boolean"
+                                    },
+                                    "showProBadge": {
+                                        "type": "boolean"
+                                    },
+                                    "showWatermark": {
+                                        "type": "boolean"
                                     }
-                                },
-                                "required": [
-                                    "name"
-                                ]
+                                }
                             }
                         }
                     }
@@ -2216,6 +2234,19 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Last update timestamp"
+                    },
+                    "primaryColor": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "showProRing": {
+                        "type": "boolean"
+                    },
+                    "showProBadge": {
+                        "type": "boolean"
+                    },
+                    "showWatermark": {
+                        "type": "boolean"
                     }
                 },
                 "required": [

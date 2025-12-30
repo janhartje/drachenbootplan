@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface ConfirmModalProps {
   confirmLabel?: string;
   cancelLabel?: string;
   isDestructive?: boolean;
+  primaryColor?: string;
 }
 
 const ConfirmModal: React.FC<ConfirmModalProps> = ({
@@ -21,14 +23,16 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
   confirmLabel,
   cancelLabel,
-  isDestructive = false
+  isDestructive = false,
+  primaryColor
 }) => {
   const { t } = useLanguage();
+  const theme = primaryColor ? THEME_MAP[primaryColor as ThemeKey] : null;
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
           <h2 className="font-bold text-lg text-slate-800 dark:text-white">{title}</h2>
@@ -50,10 +54,10 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </button>
           <button 
             onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition-colors ${
+            className={`px-4 py-2 text-sm font-bold text-white rounded-lg shadow-sm transition-all active:scale-95 ${
               isDestructive 
-                ? 'bg-red-600 hover:bg-red-700' 
-                : 'bg-blue-600 hover:bg-blue-700'
+                ? 'bg-red-600 hover:bg-red-700 active:bg-red-800' 
+                : (theme?.button || 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800')
             }`}
           >
             {confirmLabel || t('confirm')}

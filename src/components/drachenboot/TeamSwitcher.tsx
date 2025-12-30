@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { ChevronDown, Plus, Users, Check, Settings, CreditCard, Sparkles } from 'lucide-react';
 import { CreateTeamModal } from '../ui/modals/CreateTeamModal';
 import { useSession } from 'next-auth/react';
+import { ProBadge } from './pro/ProBadge';
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
@@ -102,7 +103,10 @@ const TeamSwitcher: React.FC = () => {
                         : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                     }`}
                   >
-                    <span className="truncate text-base sm:text-sm">{team.name}</span>
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span className="truncate text-base sm:text-sm">{team.name}</span>
+                      {team.plan === 'PRO' && team.showProBadge !== false && <ProBadge size="sm" color={team.primaryColor} />}
+                    </div>
                     {currentTeam?.id === team.id && <Check size={18} className="sm:w-4 sm:h-4" />}
                   </button>
                 ))}

@@ -5,6 +5,7 @@ import { FormInput } from '@/components/ui/FormInput';
 import { WeightInput } from '@/components/ui/WeightInput';
 import { SkillSelector, SkillsState } from '@/components/ui/SkillSelector';
 import { linkPaddlerToAccount } from '@/app/actions/team';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 
 interface PaddlerFormProps {
@@ -28,7 +29,8 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
   const [linkError, setLinkError] = useState<string | null>(null);
 
   const [touched, setTouched] = useState(false);
-  const { refetchPaddlers } = useDrachenboot();
+  const { currentTeam, refetchPaddlers } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
 
   useEffect(() => {
     if (paddlerToEdit) {
@@ -132,7 +134,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
                 onClick={() => setActiveTab('general')}
                 className={`pb-2 px-1 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === 'general'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    ? `border-b-2 ${theme ? theme.ringBorder.replace('group-hover:', '') : 'border-blue-500'} ${theme?.text || 'text-blue-600 dark:text-blue-400'}`
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
              >
@@ -143,7 +145,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
                 onClick={() => setActiveTab('preferences')}
                 className={`pb-2 px-1 text-sm font-medium transition-colors border-b-2 ${
                   activeTab === 'preferences'
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                    ? `border-b-2 ${theme ? theme.ringBorder.replace('group-hover:', '') : 'border-blue-500'} ${theme?.text || 'text-blue-600 dark:text-blue-400'}`
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400'
                 }`}
              >
@@ -210,7 +212,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
                   disabled={!linkEmail.trim() || isLinking}
                   className={`h-10 px-4 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all ${
                     linkEmail.trim() && !isLinking
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      ? `${theme?.button || 'bg-blue-600 hover:bg-blue-700'} text-white`
                       : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
                   }`}
                 >
@@ -254,7 +256,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
               onClick={() => handleSkillChange('stroke')}
               className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full ${
                 skills.stroke
-                  ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
+                  ? `${theme?.buttonGhost.split(' ').slice(0, 2).join(' ') || 'bg-blue-50 border-blue-200'} ${theme?.text || 'text-blue-700 dark:text-blue-300'}`
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
               }`}
             >
@@ -270,7 +272,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
               onClick={() => handleSkillChange('steer_preferred')}
               className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full ${
                 skills.steer_preferred
-                  ? 'bg-purple-50 border-purple-200 text-purple-700 dark:bg-purple-900/20 dark:border-purple-800 dark:text-purple-300'
+                  ? `${theme ? theme.buttonGhost.split(' ').slice(0, 2).join(' ').replace('blue', 'purple').replace('blue', 'purple') : 'bg-purple-50 border-purple-200'} ${theme?.text.replace('blue', 'purple').replace('blue', 'purple') || 'text-purple-700 dark:text-purple-300'}`
                   : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
               }`}
             >
@@ -291,7 +293,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
             type="submit" 
             className={`w-full sm:w-auto h-9 px-6 py-2 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all
               ${isFormValid 
-                ? (paddlerToEdit ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white') 
+                ? (paddlerToEdit ? 'bg-orange-500 hover:bg-orange-600 text-white' : (theme?.button || 'bg-blue-600 hover:bg-blue-700') + ' text-white') 
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-70'
               }`}
           >

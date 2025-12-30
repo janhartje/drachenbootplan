@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, User, Mail } from 'lucide-react';
 import PaddlerForm from './PaddlerForm';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 import { Paddler } from '@/types';
 import { FormInput } from '@/components/ui/FormInput';
 import { inviteMember } from '@/app/actions/team';
@@ -23,6 +24,7 @@ const PaddlerModal: React.FC<PaddlerModalProps> = ({ isOpen, onClose, paddlerToE
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSuccess, setInviteSuccess] = useState(false);
   const { currentTeam, refetchPaddlers } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
 
   if (!isOpen) return null;
 
@@ -123,7 +125,7 @@ const PaddlerModal: React.FC<PaddlerModalProps> = ({ isOpen, onClose, paddlerToE
               onClick={() => setActiveTab('create')}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                 activeTab === 'create'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-t border-x border-slate-200 dark:border-slate-700'
+                  ? `bg-white dark:bg-slate-900 ${theme?.text || 'text-blue-600 dark:text-blue-400'} border-t border-x border-slate-200 dark:border-slate-700`
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
             >
@@ -134,7 +136,7 @@ const PaddlerModal: React.FC<PaddlerModalProps> = ({ isOpen, onClose, paddlerToE
               onClick={() => setActiveTab('invite')}
               className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                 activeTab === 'invite'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-t border-x border-slate-200 dark:border-slate-700'
+                  ? `bg-white dark:bg-slate-900 ${theme?.text || 'text-blue-600 dark:text-blue-400'} border-t border-x border-slate-200 dark:border-slate-700`
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
             >
@@ -208,7 +210,7 @@ const PaddlerModal: React.FC<PaddlerModalProps> = ({ isOpen, onClose, paddlerToE
                     inviteSuccess
                       ? 'bg-green-500 text-white'
                       : inviteEmail.trim() && !inviteLoading
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                        ? `${theme?.button || 'bg-blue-600 hover:bg-blue-700'} text-white`
                         : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-70'
                   }`}
                 >

@@ -143,28 +143,32 @@
     "changelogData": [
         {
             "version": "3.0.0",
-            "date": "December 2025",
+            "date": "January 2026",
             "features": [
                 "PRO Subscription: Unlock unlimited members, exports, and more.",
+                "Team Branding: Choose your team color from 10 different accent colors.",
                 "Easy payment management via Stripe (Credit Card, SEPA, PayPal, etc.).",
-                "InfoCards: Important notices can now be permanently dismissed (saved to database).",
+                "Premium Logo Ring: Give your icon an exclusive golden shimmer (PRO).",
+                "Dynamic Design: Accent colors are now applied app-wide in planners, modals, and lists.",
+                "Personalized Boat: Your team logo is now displayed at the boat tip in the planner.",
+                "Branding on Exports: Automatic Drachenboot Manager watermark on exports (optional for PRO).",
+                "InfoCards: Important notices can now be permanently dismissed.",
                 "Team Switching: Faster switching between teams and improved management.",
-                "Extended Payment Methods: Support for SEPA Direct Debit, Bancontact, iDEAL, and more.",
-                "Subscription History: Overview of past subscriptions directly in team settings.",
-                "Team Attribution: The subscription status now shows which team the subscription belongs to."
+                "Refined Aesthetics: Brand new PRO badge with shimmer effect."
             ],
             "technical": [
+                "Centralized theme management for consistent color display.",
                 "Server-side persistence for InfoCard dismissal status.",
                 "Optimized Stripe webhooks for subscription synchronization.",
-                "Refactoring of navigation structure and header components.",
-                "Billing view integrated into team settings (no more separate redirect)."
+                "Enhanced logo logic in the boat visualizer.",
+                "Refactoring of navigation structure and billing integration."
             ],
             "bugfixes": [
+                "Fix: Ensured consistent coloring of 'Plan' buttons and event badges.",
+                "Fix: Correct display of account links in the member list.",
                 "Fix: Corrected subscription status display for canceled subscriptions.",
-                "Fix: URL updates when switching tabs on the team page.",
                 "Fix: Team switcher now behaves correctly on subpages.",
-                "Fix: Irrelevant invoices (e.g., abandoned checkout attempts) are now filtered out.",
-                "Fix: Completed translations for all subscription statuses."
+                "Fix: Stability improvements for database synchronization (Prisma Sync)."
             ]
         },
         {
@@ -772,6 +776,46 @@
         "status_trialing": "Trialing",
         "status_unpaid": "Unpaid",
         "status_incomplete": "Incomplete",
-        "status_incomplete_expired": "Expired"
+        "status_incomplete_expired": "Expired",
+        "socialMedia": "Social Media",
+        "instagramPlaceholder": "Instagram Username/URL",
+        "facebookPlaceholder": "Facebook URL",
+        "twitterPlaceholder": "Twitter/X Handle",
+        "contactEmail": "Contact Email",
+        "proCustomization": "PRO Customization",
+        "website": "Website",
+        "icon": "Logo",
+        "remove": "Remove",
+        "imageTooLarge": "Image too large (max 5MB)",
+        "imageFormats": "Max. 5MB. Formats: JPG, PNG, GIF, WebP.",
+        "accentColor": "Accent Color",
+        "showProBadge": "Show PRO Badge",
+        "showProBadgeDesc": "Displays the PRO badge in the header and team switcher.",
+        "showPremiumRing": "Show Premium Logo Ring",
+        "showPremiumRingDesc": "Show a shimmering golden ring around your team logo.",
+        "showWatermark": "Show branding on exports",
+        "showWatermarkDesc": "Shows \"Created with Drachenboot Manager\" on image exports. Can be disabled for PRO teams.",
+        "themes": {
+            "amber": "Amber",
+            "blue": "Ocean",
+            "rose": "Rose",
+            "emerald": "Emerald",
+            "violet": "Violet",
+            "slate": "Slate",
+            "teal": "Teal",
+            "indigo": "Indigo",
+            "orange": "Orange",
+            "zinc": "Zinc"
+        },
+        "helpCategoryPro": "PRO Features",
+        "helpCategoryProDesc": "Everything about PRO membership and exclusive features.",
+        "helpProFeatures": "Exclusive PRO Features",
+        "helpProFeaturesDesc": "As a PRO team, you have access to the following features:",
+        "helpProFeature1": "Unlimited Members: Manage as many paddlers as you want without restrictions.",
+        "helpProFeature2": "PDF & Image Export: Save your boat lineups in high quality for printing or sharing.",
+        "helpProFeature3": "Team Customization: Choose your own accent color and activate the premium logo ring.",
+        "helpProFeature4": "iCal Integration: Sync your events directly with your personal calendar (Outlook, Google, Apple).",
+        "helpProBilling": "Subscription & Billing",
+        "helpProBillingDesc": "You can manage your subscription anytime in the team settings. There you will also find your invoices and can update your payment method."
     }
 }

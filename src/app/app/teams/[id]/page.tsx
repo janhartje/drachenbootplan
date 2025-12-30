@@ -16,6 +16,40 @@ import PageTransition from '@/components/ui/PageTransition';
 import TeamSwitcher from '@/components/drachenboot/TeamSwitcher';
 import { UserMenu } from '@/components/auth/UserMenu';
 import { BillingContent, SubscriptionData } from '@/components/stripe/BillingContent';
+import { ProBadge } from '@/components/drachenboot/pro/ProBadge';
+
+const THEME_MAP = {
+  amber: {
+    text: 'text-amber-600 dark:text-amber-500',
+    ring: 'from-amber-500 via-yellow-200 to-amber-600',
+    tab: 'border-amber-600 text-amber-600 dark:border-amber-400 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-900/10'
+  },
+  blue: {
+    text: 'text-blue-600 dark:text-blue-500',
+    ring: 'from-blue-500 via-cyan-200 to-blue-600',
+    tab: 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+  },
+  rose: {
+    text: 'text-rose-600 dark:text-rose-500',
+    ring: 'from-rose-500 via-pink-200 to-rose-600',
+    tab: 'border-rose-600 text-rose-600 dark:border-rose-400 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-900/10'
+  },
+  emerald: {
+    text: 'text-emerald-600 dark:text-emerald-500',
+    ring: 'from-emerald-500 via-teal-200 to-emerald-600',
+    tab: 'border-emerald-600 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10'
+  },
+  violet: {
+    text: 'text-violet-600 dark:text-violet-500',
+    ring: 'from-violet-500 via-purple-200 to-violet-600',
+    tab: 'border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-900/10'
+  },
+  slate: {
+    text: 'text-slate-700 dark:text-slate-300',
+    ring: 'from-slate-600 via-slate-200 to-slate-700',
+    tab: 'border-slate-700 text-slate-700 dark:border-slate-300 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50'
+  }
+};
 
 
 import { Team } from '@/types';
@@ -164,9 +198,21 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
           title={t('editTeam') || 'Edit Team'}
           logo={
             <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-              <DragonLogo className="w-10 h-10" />
+               <div className="relative group">
+                  {team?.plan === 'PRO' && team?.showProRing !== false && (
+                    <div className={`absolute -inset-[3px] bg-gradient-to-tr ${THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.ring || THEME_MAP.amber.ring} rounded-full animate-shine opacity-90 shadow-[0_0_12px_rgba(251,191,36,0.2)] dark:shadow-[0_0_15px_rgba(251,191,36,0.1)]`}></div>
+                  )}
+                  <div className={`relative rounded-full ${team?.plan === 'PRO' && team?.showProRing !== false ? 'p-[2px] bg-white dark:bg-slate-900 shadow-inner' : ''}`}>
+                    {team?.icon ? (
+                      <img src={team.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <DragonLogo className={`w-10 h-10 ${team?.plan === 'PRO' ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.text || THEME_MAP.amber.text) : ''}`} />
+                    )}
+                  </div>
+               </div>
             </Link>
           }
+          badge={team?.plan === 'PRO' && <ProBadge color={team.primaryColor} />}
           leftAction={
             <button 
               onClick={() => router.push('/app')} 
@@ -194,7 +240,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
               }}
               className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === 'general'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
@@ -206,7 +252,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
               }}
               className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === 'members'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
@@ -218,7 +264,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
               }}
               className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === 'subscription'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >

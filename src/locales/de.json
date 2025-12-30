@@ -143,28 +143,32 @@
     "changelogData": [
         {
             "version": "3.0.0",
-            "date": "Dezember 2025",
+            "date": "Januar 2026",
             "features": [
                 "PRO Mitgliedschaft: Schalte unbegrenzte Mitglieder, Exporte und mehr frei.",
+                "Team-Branding: Wähle aus 10 verschiedenen Akzentfarben deine Teamfarbe aus.",
                 "Einfache Zahlungsverwaltung via Stripe (Kreditkarte, SEPA, PayPal, etc.).",
+                "Premium Logo-Ring: Verleihe deinem Icon einen exklusiven goldenen Schimmer (PRO).",
+                "Dynamisches Design: Akzentfarben werden jetzt app-weit in Planer, Modalen und Listen angewendet.",
+                "Personalisiertes Boot: Dein Team-Logo wird nun (optional rund) an der Bootsspitze im Planer angezeigt.",
+                "Branding auf Exports: Automatische Drachenboot Manager Werbung auf Bild-Exports (für PRO-Teams ausschaltbar).",
                 "InfoCards: Wichtige Hinweise können nun dauerhaft ausgeblendet werden (gespeichert in Datenbank).",
                 "Team-Wechsel: Schnellerer Wechsel zwischen Teams und verbesserte Verwaltung.",
-                "Erweiterte Zahlungsarten: Support für SEPA Lastschrift, Bancontact, iDEAL und mehr.",
-                "Abo-Historie: Übersicht vergangener Abonnements direkt in den Team-Einstellungen.",
-                "Team-Zuordnung: Der Abo-Status zeigt jetzt an, für welches Team das Abo gilt."
+                "Refined Aesthetics: Brandneuer PRO-Badge mit Schimmer-Effekt und animierten Details."
             ],
             "technical": [
+                "Zentralisiertes Theme-Management für konsistente Farbdarstellung über alle Komponenten.",
                 "Server-Side Persistenz für InfoCard-Status.",
                 "Optimierte Stripe Webhooks für Abo-Synchronisation.",
-                "Refactoring der Navigationsstruktur und Header-Komponenten.",
-                "Billing-Ansicht in Team-Einstellungen integriert (kein separater Redirect mehr)."
+                "Erweiterte Logo-Logik im Bootsplaner mit Unterstützung für Custom Icons und Brand-Icons am Heck.",
+                "Refactoring der Navigationsstruktur und Billing-Integration."
             ],
             "bugfixes": [
+                "Fix: Konsistente Farbgebung der 'Planen'-Buttons und Event-Badges.",
+                "Fix: Korrekte Darstellung der Account-Verknüpfungen in der Mitgliederliste.",
                 "Fix: Anzeige des Abo-Status bei gekündigten Abos korrigiert.",
-                "Fix: URL-Updates beim Tab-Wechsel auf der Team-Seite.",
                 "Fix: Team-Switcher verhält sich nun korrekt auf Unterseiten.",
-                "Fix: Irrelevante Rechnungen (z.B. abgebrochene Checkout-Versuche) werden nun herausgefiltert.",
-                "Fix: Übersetzungen für alle Abo-Status vervollständigt."
+                "Fix: Stabilitätsverbesserungen bei der Datenbank-Synchronisation (Prisma Sync)."
             ]
         },
         {
@@ -776,6 +780,46 @@
         "status_trialing": "Probezeit",
         "status_unpaid": "Unbezahlt",
         "status_incomplete": "Unvollständig",
-        "status_incomplete_expired": "Abgelaufen"
+        "status_incomplete_expired": "Abgelaufen",
+        "socialMedia": "Social Media",
+        "instagramPlaceholder": "Instagram Nutzername/URL",
+        "facebookPlaceholder": "Facebook URL",
+        "twitterPlaceholder": "Twitter/X Handle",
+        "contactEmail": "Kontakt E-Mail",
+        "proCustomization": "PRO Anpassung",
+        "website": "Webseite",
+        "icon": "Logo",
+        "remove": "Entfernen",
+        "imageTooLarge": "Bild zu groß (max 5MB)",
+        "imageFormats": "Max. 5MB. Formate: JPG, PNG, GIF, WebP.",
+        "accentColor": "Akzentfarbe",
+        "showProBadge": "PRO-Badge anzeigen",
+        "showProBadgeDesc": "Zeigt das PRO-Badge in der Kopfzeile und im Team-Switcher an.",
+        "showPremiumRing": "Premium Logo Ring anzeigen",
+        "showPremiumRingDesc": "Zeigt einen schimmernden goldenen Ring um dein Team-Logo.",
+        "showWatermark": "Branding auf Exports anzeigen",
+        "showWatermarkDesc": "Zeigt \"Erstellt mit Drachenboot Manager\" auf Bild-Exports an. Kann für PRO-Teams deaktiviert werden.",
+        "themes": {
+            "amber": "Bernstein",
+            "blue": "Ozeanblau",
+            "rose": "Rosé",
+            "emerald": "Smaragd",
+            "violet": "Violett",
+            "slate": "Schiefer",
+            "teal": "Blaugrün",
+            "indigo": "Indigo",
+            "orange": "Orange",
+            "zinc": "Zink"
+        },
+        "helpCategoryPro": "PRO Funktionen",
+        "helpCategoryProDesc": "Alles über die PRO-Mitgliedschaft und exklusive Features.",
+        "helpProFeatures": "Exklusive PRO-Features",
+        "helpProFeaturesDesc": "Als PRO-Team stehen dir folgende Funktionen zur Verfügung:",
+        "helpProFeature1": "Unbegrenzte Mitgliederzahl: Verwalte beliebig viele Paddler ohne Einschränkungen.",
+        "helpProFeature2": "PDF & Bild Export: Speichere deine Bootsaufstellungen in hoher Qualität für den Druck oder zum Teilen.",
+        "helpProFeature3": "Team-Individualisierung: Wähle eine eigene Akzentfarbe und aktiviere den Premium Logo Ring.",
+        "helpProFeature4": "iCal Integration: Synchronisiere deine Termine direkt mit deinem persönlichen Kalender (Outlook, Google, Apple).",
+        "helpProBilling": "Abo & Abrechnung",
+        "helpProBillingDesc": "Du kannst dein Abo jederzeit in den Team-Einstellungen verwalten. Dort findest du auch deine Rechnungen und kannst deine Zahlungsmethode aktualisieren."
     }
 }

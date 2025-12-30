@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Info, X, PlayCircle, ExternalLink } from 'lucide-react';
+import { Info, X, PlayCircle, ExternalLink, Sparkles } from 'lucide-react';
 import { useTour } from '@/context/TourContext';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -119,6 +119,18 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
               <li>{t('helpImport1')}</li>
               <li>{t('helpImport2')}</li>
               <li>{t('helpImport3')}</li>
+            </ul>
+          </section>
+          
+          <section className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4">
+            <h3 className="font-bold text-amber-700 dark:text-amber-400 mb-2 flex items-center gap-2">
+              <Sparkles size={16} /> {t('pro.helpProFeatures')}
+            </h3>
+            <ul className="list-disc list-inside space-y-1 text-amber-800/80 dark:text-amber-300/80 text-sm ml-1">
+              <li>{t('pro.helpProFeature1')}</li>
+              <li>{t('pro.helpProFeature2')}</li>
+              <li>{t('pro.helpProFeature3')}</li>
+              <li>{t('pro.helpProFeature4')}</li>
             </ul>
           </section>
         </div>

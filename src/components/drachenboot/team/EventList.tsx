@@ -3,6 +3,7 @@ import { Calendar, ChevronRight, Check, HelpCircle, X, Trash2, Pencil } from 'lu
 import { Event, Paddler } from '@/types';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 
 interface EventListProps {
   events: Event[];
@@ -15,7 +16,8 @@ interface EventListProps {
 }
 
 const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, onEdit, onDelete, onUpdateAttendance, t }) => {
-  const { userRole, currentPaddler } = useDrachenboot();
+  const { userRole, currentPaddler, currentTeam } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
   const { language } = useLanguage();
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
@@ -53,7 +55,11 @@ const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, o
                   )}
                 </div>
               </div>
-              <div className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase ${evt.type === 'regatta' ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200' : 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200'}`}>
+              <div className={`text-[10px] px-2 py-1 rounded-full font-bold uppercase ${
+                evt.type === 'regatta' 
+                  ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200' 
+                  : theme ? theme.buttonGhost.split(' ').slice(0, 2).join(' ') : 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-200'
+              }`}>
                 {evt.type === 'regatta' ? t('regatta') : t('training')}
               </div>
             </div>
@@ -63,7 +69,7 @@ const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, o
                 {userRole === 'CAPTAIN' && (
                 <button 
                   onClick={() => onEdit(evt)}
-                  className="p-1 text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                  className={`p-1 text-slate-400 ${theme?.text.replace('text-', 'hover:text-') || 'hover:text-blue-500'} hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors`}
                   title={t('edit') || 'Bearbeiten'}
                 >
                   <Pencil size={16} />
@@ -79,7 +85,13 @@ const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, o
                   <Trash2 size={16} />
                 </button>
                 )}
-                <button onClick={() => onPlan(evt.id)} className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-1">{userRole === 'CAPTAIN' ? t('plan') : t('viewPlan')} <ChevronRight size={16} /></button>
+                <button 
+                  onClick={() => onPlan(evt.id)} 
+                  className={`text-sm px-4 py-2 rounded-lg flex items-center gap-1 transition-all text-white ${theme?.button || 'bg-blue-600 hover:bg-blue-700'}`}
+                >
+                  {userRole === 'CAPTAIN' ? t('plan') : t('viewPlan')} 
+                  <ChevronRight size={16} />
+                </button>
               </div>
             </div>
             <div className="mt-2 max-h-60 overflow-y-auto space-y-1 pt-2">

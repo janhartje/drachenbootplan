@@ -30,7 +30,7 @@ const AlertModal: React.FC<AlertModalProps> = ({
 
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between p-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">

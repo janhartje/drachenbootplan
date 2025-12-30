@@ -9,6 +9,10 @@ export interface Team {
   email?: string;
   plan?: string;
   maxMembers?: number;
+  primaryColor?: string;
+  showProRing?: boolean;
+  showProBadge?: boolean;
+  showWatermark?: boolean;
 }
 
 export interface Paddler {

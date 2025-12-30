@@ -162,6 +162,12 @@ model Team {
   stripeCustomerId   String?
   billingUserId      String?  // User who purchased/manages the subscription
   maxMembers         Int      @default(25)
+
+  // PRO Customization
+  primaryColor       String?  @default("amber")
+  showProRing        Boolean  @default(true)
+  showProBadge       Boolean  @default(true)
+  showWatermark      Boolean  @default(true)
 }
 
 model EmailQueue {

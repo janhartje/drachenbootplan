@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { useLanguage } from '@/context/LanguageContext';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
+import { useDrachenboot } from '@/context/DrachenbootContext';
 import { Upload, FileUp, AlertCircle, CheckCircle, X, Download } from 'lucide-react';
 import { normalizeHeader } from '@/utils/importUtils';
 
@@ -20,6 +22,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   onImportEvents 
 }) => {
   const { t } = useLanguage();
+  const { currentTeam } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
   const [activeTab, setActiveTab] = useState<ImportType>('paddler');
   const [isDragOver, setIsDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -252,7 +256,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
           <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <FileUp className="text-blue-600 dark:text-blue-400" />
+            <FileUp className={theme?.text || 'text-blue-600 dark:text-blue-400'} />
             {t('importData') || 'Import Data'}
           </h2>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
@@ -266,7 +270,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             onClick={() => { setActiveTab('paddler'); setFile(null); setPreviewData([]); setError(null); }}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               activeTab === 'paddler' 
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
+                ? `bg-white dark:bg-slate-900 ${theme?.text || 'text-blue-600 dark:text-blue-400'} border-b-2 ${theme ? theme.ringBorder.replace('group-hover:', '') : 'border-blue-600 dark:border-blue-400'}` 
                 : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900'
             }`}
           >
@@ -276,7 +280,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
             onClick={() => { setActiveTab('event'); setFile(null); setPreviewData([]); setError(null); }}
             className={`flex-1 py-3 text-sm font-medium transition-colors ${
               activeTab === 'event' 
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
+                ? `bg-white dark:bg-slate-900 ${theme?.text || 'text-blue-600 dark:text-blue-400'} border-b-2 ${theme ? theme.ringBorder.replace('group-hover:', '') : 'border-blue-600 dark:border-blue-400'}` 
                 : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900'
             }`}
           >
@@ -310,8 +314,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-all duration-200 cursor-pointer ${
                 isDragOver 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]' 
-                  : 'border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-slate-50 dark:hover:bg-slate-900/50'
+                  ? `${theme?.ringBorder.replace('group-hover:', '') || 'border-blue-500'} ${theme ? theme.buttonGhost.split(' ')[0].replace('hover:', '') : 'bg-blue-50 dark:bg-blue-900/20'} scale-[1.02]` 
+                  : `border-slate-300 dark:border-slate-700 ${theme?.ringBorder || 'hover:border-blue-400 dark:hover:border-blue-600'} hover:bg-slate-50 dark:hover:bg-slate-900/50`
               }`}
             >
               <input 
@@ -322,7 +326,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                 id="file-upload"
               />
               <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center w-full h-full">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
+                <div className={`w-16 h-16 ${theme ? theme.buttonGhost.split(' ')[0].replace('hover:', '') : 'bg-blue-100 dark:bg-blue-900/30'} ${theme?.text || 'text-blue-600 dark:text-blue-400'} rounded-full flex items-center justify-center mb-4`}>
                   <Upload size={32} />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-1">
@@ -338,7 +342,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
                     <p className="font-semibold text-slate-700 dark:text-slate-300">{t('preview') || 'Expected Format'}:</p>
                     <button 
                       onClick={(e) => { e.preventDefault(); handleDownloadTemplate(); }}
-                      className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                      className={`${theme?.text || 'text-blue-600 dark:text-blue-400'} hover:underline flex items-center gap-1`}
                     >
                       <Download size={12} />
                       {t('downloadTemplate') || 'Template'}
@@ -439,7 +443,7 @@ export const ImportModal: React.FC<ImportModalProps> = ({
           <button 
             onClick={handleImport}
             disabled={!file || !previewData.length || isProcessing}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all flex items-center gap-2"
+            className={`px-4 py-2 text-sm font-medium text-white ${theme?.button || 'bg-blue-600 hover:bg-blue-700'} disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all flex items-center gap-2`}
           >
             {isProcessing ? (
               <>

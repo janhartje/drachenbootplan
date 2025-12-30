@@ -14,9 +14,11 @@ interface PaddlerGridProps {
 
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useSession } from 'next-auth/react';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 
 const PaddlerGrid: React.FC<PaddlerGridProps> = ({ paddlers, editingId, onEdit, onDelete, t, headerAction }) => {
-  const { userRole } = useDrachenboot();
+  const { userRole, currentTeam } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
   const { data: session } = useSession();
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | string | null>(null);
 
@@ -67,7 +69,7 @@ const PaddlerGrid: React.FC<PaddlerGridProps> = ({ paddlers, editingId, onEdit, 
                       {p.name}
                       {p.userId && (
                         <span title={`${t('linkedAccount')}${p.user?.email ? `: ${p.user.email}` : ''}`}>
-                          <LinkIcon size={14} className="text-blue-500" />
+                          <LinkIcon size={14} className={theme?.text || 'text-blue-500'} />
                         </span>
                       )}
                     </>

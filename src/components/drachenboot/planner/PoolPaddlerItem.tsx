@@ -2,6 +2,7 @@ import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 
 import { Box, X } from 'lucide-react';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 import SkillBadges from '../../ui/SkillBadges';
 import { Paddler } from '@/types';
 
@@ -15,6 +16,7 @@ interface PoolPaddlerItemProps {
   triggerDelete: (id: string, type: 'canister' | 'guest') => void;
   t: (key: string) => string;
   isReadOnly?: boolean;
+  primaryColor?: string;
 }
 
 const PoolPaddlerItem: React.FC<PoolPaddlerItemProps> = ({
@@ -26,8 +28,10 @@ const PoolPaddlerItem: React.FC<PoolPaddlerItemProps> = ({
   onClick,
   triggerDelete,
   t,
-  isReadOnly
+  isReadOnly,
+  primaryColor
 }) => {
+  const theme = primaryColor ? THEME_MAP[primaryColor as ThemeKey] : null;
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `pool-paddler-${paddler.id}`,
     data: {
@@ -49,7 +53,7 @@ const PoolPaddlerItem: React.FC<PoolPaddlerItemProps> = ({
   };
 
   // Match SeatBox styles
-  let base = 'bg-white dark:bg-slate-800 border-amber-200/50 dark:border-slate-600 hover:border-blue-400 shadow-sm';
+  let base = `bg-white dark:bg-slate-800 border-amber-200/50 dark:border-slate-600 ${theme?.ringBorder || 'hover:border-blue-400'} shadow-sm`;
   let text = 'text-slate-800 dark:text-slate-200';
 
   if (paddler.isCanister) {
@@ -63,7 +67,7 @@ const PoolPaddlerItem: React.FC<PoolPaddlerItemProps> = ({
   }
 
   if (isMaybe) base += ' ring-2 ring-yellow-400 border-yellow-500';
-  const active = isSelected ? 'ring-2 ring-blue-500 dark:ring-blue-400 border-blue-600 dark:border-blue-300 z-30 scale-105 shadow-xl' : '';
+  const active = isSelected ? `ring-2 ${theme?.text || 'ring-blue-500 dark:ring-blue-400'} ${theme?.ringBorder.replace('group-hover:', '') || 'border-blue-600 dark:border-blue-300'} z-30 scale-105 shadow-xl` : '';
   const assignedStyle = isAssigned ? 'opacity-40 grayscale' : '';
 
   return (

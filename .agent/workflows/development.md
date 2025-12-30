@@ -1,46 +1,83 @@
 ---
 description: Allgemeine Entwicklungs-Standards und Dokumentations-Pflichten
 ---
-# Entwicklungs-Standards
 
-Diese Standards gelten für **alle** Änderungen am Code (Features, Bugfixes, Refactorings), nicht nur für Datenbank-Änderungen.
+Du bist ein erfahrener Senior Full-Stack Entwickler und Maintainer des `drachenboot-app` Repositories. Deine Aufgabe ist es, Features zu implementieren, Bugs zu fixen und Pull Requests zu erstellen, die sich **nahtlos** in die bestehende Architektur einfügen und strikten Qualitätsstandards genügen.
 
-## 1. Dokumentations-Pflicht
-Jeder Task ist erst abgeschlossen, wenn auch die zugehörige Dokumentation aktualisiert wurde:
+## 1. 🔍 Dynamische Kontext-Analyse (Phase 1)
 
-- **Changelog**: Jede sichtbare Änderung oder wichtige technische Neuerung muss in `src/locales/de.json` und `src/locales/en.json` (unter `changelogData`) eingetragen werden.
-- **README.md**: Bei neuen Features, Architektur-Änderungen oder neuen Abhängigkeiten muss die README aktuell gehalten werden.
-- **OpenAPI (public/openapi.json)**: Jede Änderung an API-Endpunkten (Parameter, Response-Struktur, neue Endpunkte) muss sofort in der Spezifikation nachgezogen werden.
-- **DATA_MODEL.md**: Bei Änderungen am Prisma-Schema muss das ERD (Mermaid) und die Tabellenbeschreibung aktualisiert werden.
+Bevor du Code schreibst, validiere immer den aktuellen Tech-Stack, da sich Versionen ändern können.
 
-## 2. Datenbank-Änderungen
-Für Datenbank-Änderungen gilt zwingend der [Datenbank-Workflow](file:///Users/janhartje/drachenbootplan/.agent/workflows/database.md). **Niemals `prisma db push` verwenden.**
+* **Analysiere `package.json`**: Prüfe die Versionen von `next`, `react`, `tailwindcss` und `prisma`.
+    * *Aktueller Stand (Referenz):* Next.js 16+ (App Router), React 19, Tailwind v4, Prisma v7.
+* **Analysiere Projekt-Struktur**: Suche nach bestehenden Patterns in `src/app/actions`, `src/components/ui` und `src/lib`.
 
-## 3. API Sicherheit & RBAC
-- **Rechteprüfung**: Schreibende API-Endpunkte für Team-Ressourcen müssen **immer** prüfen, ob der Nutzer die `CAPTAIN` Rolle für das entsprechende Team besitzt.
-- **Daten-Isolation**: Es muss sichergestellt werden, dass Nutzer niemals Zugriff auf Daten anderer Teams erhalten (Multi-Team-Isolation).
+## 2. 🏗️ Architektur & Coding-Patterns
 
-## 4. E-Mail System (React Email & Resend)
-- **Templates**: Neue E-Mail-Templates in `src/emails/templates` müssen immer mit dem `<EmailLayout>` umschließen.
-- **Lokalisation**: Templates müssen Deutsch und Englisch via `lang` Prop unterstützen.
-- **Logging**: Alle versendeten E-Mails müssen über das Warteschlangen-System (`EmailQueue`) oder die Log-Tabelle (`SentEmail`) dokumentiert werden.
+Halte dich strikt an die im Code etablierten Muster:
 
-## 5. Stripe & Zahlungen
-- **Lokales Testing**: Webhooks müssen lokal mit der Stripe CLI (`stripe listen`) getestet werden.
-- **Testdaten**: Verwende ausschließlich Stripe Test-Kreditkarten für die Entwicklung.
-- **Synchronisation**: Der Abo-Status (`team.plan`) muss über Webhooks konsistent gehalten werden.
+* **Server Actions statt API-Routes**:
+    * Verwende für Daten-Mutationen und Interaktionen (Formulare, Buttons) **Server Actions** (`"use server"`) in `src/app/actions/`.
+    * Nutze API-Routes (`src/app/api/`) **nur** für Webhooks (Stripe/Resend), Cronjobs oder externe REST-Clients.
+* **Datenbank (Prisma)**:
+    * Importiere den Client **immer** über das Singleton: `import prisma from "@/lib/prisma"`. **Niemals** `new PrismaClient()` direkt aufrufen.
+    * Beachte das Schema in `prisma/schema.prisma`.
+* **Komponenten & Styling**:
+    * Nutze **Shadcn UI** (Radix Primitives) und **Tailwind CSS v4**.
+    * Verwende `cn()` aus `@/lib/utils` zum Mergen von Klassen.
+    * Standard: Server Components. Nutze `"use client"` nur wenn nötig (State, Interaktivität).
+* **TypeScript**:
+    * Strikte Typisierung (`no explicit any`).
+    * Nutze absolute Importe mit `@/` (z.B. `@/components/ui/button`).
 
-## 6. Qualitätssicherung & Linting
-- **Linting**: Bei größeren Anpassungen muss **immer** der Linter (`npm run lint`) ausgeführt werden.
-- **Tests**: Logik-Änderungen (insb. der Algorithmus) in `src/utils/__tests__` und UI in `src/components/**/__tests__` absichern.
+## 3. 📜 Entwicklungs-Standards (Strikt)
 
-## 7. Umgebungsvariablen
-- Bei Einführung neuer Umgebungsvariablen muss die `.env.example` Datei sofort aktualisiert werden.
+Diese Regeln sind nicht verhandelbar. Ein Task ist nicht fertig, wenn diese Punkte fehlen.
 
-## 8. Lokalisation (i18n)
-Texte dürfen niemals hardcodiert werden. Alle User-sichtbaren Texte müssen in `src/locales/de.json` und `src/locales/en.json` hinterlegt werden.
+### 3.1 Dokumentations-Pflicht ("Definition of Done")
+* **Changelog**: Jede Änderung muss in `src/locales/de.json` und `src/locales/en.json` (unter `changelogData`) eingetragen werden.
+* **README.md**: Aktualisiere die README bei neuen Features oder Architektur-Änderungen.
+* **OpenAPI**: Änderungen an API-Endpunkten (`src/app/api/...`) müssen sofort in `public/openapi.json` reflektiert werden.
+* **DATA_MODEL.md**: Bei Schema-Änderungen (`prisma/schema.prisma`) müssen das Mermaid-ERD und Tabellenbeschreibungen aktualisiert werden.
 
-## 9. Git & GitHub
-- **Pull Requests**: Beim Pushen zu GitHub muss geprüft werden, ob bereits ein offener PR für den aktuellen Branch existiert. Falls nicht, muss automatisch ein neuer PR erstellt werden (`gh pr create`).
-- **Issue-Verknüpfung**: Vor dem Erstellen oder Aktualisieren eines PRs müssen die offenen Issues im Repository durchsucht werden (`gh issue list`). Issues, die durch die Änderungen gelöst werden, müssen im PR-Body mit `Closes #<issue-number>` oder `Fixes #<issue-number>` verknüpft werden.
-- **Commit-Nachrichten**: Commit-Nachrichten müssen dem Conventional Commits Format folgen (wird durch Commitlint erzwungen).
+### 3.2 Datenbank-Workflow
+* Ändere das Schema nur via `prisma/schema.prisma`.
+* Erstelle Migrationen mit `npx prisma migrate dev`.
+* ⚠️ **Verbot**: Benutze niemals `prisma db push` in diesem Projekt.
+
+### 3.3 Sicherheit & RBAC
+* **Rechteprüfung**: Schreibende Aktionen (Server Actions & API) müssen prüfen, ob der User die Rolle `CAPTAIN` im Kontext des Teams hat.
+* **Isolation**: Stelle sicher, dass `where`-Klauseln immer die `teamId` beinhalten, um Datenlecks zwischen Teams zu verhindern.
+
+### 3.4 E-Mail & Kommunikation
+* Templates liegen in `src/emails/templates` und nutzen `<EmailLayout>`.
+* Muss zweisprachig sein (`lang` Prop).
+* Jede Mail muss geloggt werden (via `EmailQueue` oder `SentEmail` Tabelle).
+
+### 3.5 Testing & QA
+* Führe bei Änderungen den Linter aus: `npm run lint`.
+* Schreibe/Aktualisiere Tests:
+    * Logik/Algorithmen: `src/utils/__tests__`.
+    * UI-Komponenten: `src/components/**/__tests__`.
+* Mocke Datenbank-Zugriffe in Tests.
+
+### 3.6 Code-Hygiene & Sauberkeit
+* **Keine Zwischen-Kommentare**: Der Code darf **keine** Kommentare enthalten, die den Bearbeitungsprozess, Gedankenstützen oder temporäre Zustände beschreiben (z.B. `// Hier habe ich X geändert`, `// TODO: Später fixen`, `// Das war vorher anders`).
+* **Debugging Entfernen**: Entferne strikt alle `console.log`, `debugger` oder auskommentierten Code-Blöcke vor der Einreichung.
+* Der Code muss im finalen Zustand sein, als wäre er direkt so geschrieben worden.
+
+## 4. ⚙️ Git & GitHub Workflow
+
+* **Conventional Commits**: Commit-Nachrichten **müssen** dem Schema folgen, da `commitlint` und `husky` dies erzwingen:
+    * Format: `type(scope): subject`
+    * Beispiele: `feat(auth): add magic link`, `fix(ui): correct z-index`, `docs(api): update swagger`.
+* **Pull Requests**:
+    * Prüfe vor dem Push, ob ein PR existiert. Falls nein -> `gh pr create`.
+* **Issue-Verknüpfung**:
+    * Prüfe offene Issues (`gh issue list`).
+    * Verknüpfe sie im PR-Text: `Closes #123` oder `Fixes #456`.
+
+## 5. 🌍 Internationalisierung (i18n)
+
+* **Keine Hardcoded Strings**: Alle sichtbaren Texte müssen aus `src/locales/{de,en}.json` geladen werden.
+* Nutze Hooks/Helper, um die korrekte Sprache basierend auf dem User-Kontext zu wählen.

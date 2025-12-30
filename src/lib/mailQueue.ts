@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 
 const BATCH_SIZE = 10;
 const MAX_RETRIES = 3;
+const PROCESSING_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
 export interface ProcessQueueResult {
   processed: number;
@@ -22,6 +23,19 @@ export async function processMailQueue(): Promise<ProcessQueueResult> {
   }
   const resend = new Resend(resendApiKey);
 
+  // First, reset any stuck "processing" emails that are older than timeout
+  const stuckTimeout = new Date(Date.now() - PROCESSING_TIMEOUT_MS);
+  await prisma.emailQueue.updateMany({
+    where: {
+      status: 'processing',
+      updatedAt: { lt: stuckTimeout },
+    },
+    data: {
+      status: 'pending',
+      lastError: 'Reset from stuck processing state',
+    },
+  });
+
   // 1. Fetch pending emails
   const pendingEmails = await prisma.emailQueue.findMany({
     where: {
@@ -39,12 +53,15 @@ export async function processMailQueue(): Promise<ProcessQueueResult> {
 
   // 2. Process each email
   for (const email of pendingEmails) {
+    let markedAsProcessing = false;
+    
     try {
       // Mark as processing
       await prisma.emailQueue.update({
         where: { id: email.id },
         data: { status: 'processing' },
       });
+      markedAsProcessing = true;
 
       // Send via Resend
       const { error } = await resend.emails.send({
@@ -75,17 +92,24 @@ export async function processMailQueue(): Promise<ProcessQueueResult> {
       const isRetryable = (email.attempts + 1) < MAX_RETRIES;
       const newStatus = isRetryable ? 'pending' : 'failed';
       
-      await prisma.emailQueue.update({
-        where: { id: email.id },
-        data: { 
-          status: newStatus, 
-          attempts: { increment: 1 },
-          lastError: err instanceof Error ? err.message : String(err)
-        },
-      });
+      // Only update if we managed to mark it as processing
+      try {
+        await prisma.emailQueue.update({
+          where: { id: email.id },
+          data: { 
+            status: newStatus, 
+            attempts: { increment: 1 },
+            lastError: err instanceof Error ? err.message : String(err)
+          },
+        });
+      } catch (updateErr) {
+        console.error(`Failed to update email ${email.id} status:`, updateErr);
+        // If we marked it as processing but can't update, it will be reset by stuck handler
+      }
+      
       results.push({ 
         id: email.id, 
-        status: newStatus, 
+        status: markedAsProcessing ? newStatus : 'unknown', 
         error: err instanceof Error ? err.message : String(err) 
       });
     }
@@ -93,3 +117,4 @@ export async function processMailQueue(): Promise<ProcessQueueResult> {
 
   return { processed: results.length, results };
 }
+

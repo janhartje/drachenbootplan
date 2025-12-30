@@ -1,6 +1,7 @@
 import { render } from '@react-email/render';
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
+import { getBaseUrl } from '@/utils/url';
 
 
 interface SendEmailParams {
@@ -46,7 +47,7 @@ export const sendEmail = async ({
     // usage of fetch here might fail if the base url is not available or if network issues
     // but the email is in the queue safe and sound
     try {
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const baseUrl = getBaseUrl();
         fetch(`${baseUrl}/api/cron/mail-queue`, { method: 'GET' }).catch(err => {
             console.warn('Failed to trigger mail queue processor optimistically', err);
         });

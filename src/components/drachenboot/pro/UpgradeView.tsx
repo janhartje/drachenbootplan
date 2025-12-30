@@ -24,16 +24,21 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   const [clientSecret, setClientSecret] = useState('');
   const [priceDetails, setPriceDetails] = useState<{ amount: number; currency: string; interval: string } | null>(null);
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('year');
+  const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(false);
+  const fetchLock = React.useRef(false);
 
   useEffect(() => {
     // Create Subscription on mount or when interval changes
     
-    // We fetch immediately. The loading state is implicit by clientSecret being empty if we reset it.
-    // To avoid "setState in effect" warning, we can just fetch and update.
-    // But we want to show loading spinner.
     const fetchData = async () => {
+        if (fetchLock.current) return;
+        fetchLock.current = true;
+
         setClientSecret('');
         setPriceDetails(null);
+        setError(null);
+        setIsInitializing(true);
         
         try {
             const res = await fetch('/api/stripe/create-subscription', {
@@ -42,17 +47,28 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
               body: JSON.stringify({ teamId: team.id, interval: billingInterval }),
             });
             const data = await res.json();
-             // ... rest of logic
+            
+            if (!res.ok) {
+                setError(data.error || 'Failed to initialize subscription');
+                setIsInitializing(false);
+                return;
+            }
+
             if (data.clientSecret) {
                   setClientSecret(data.clientSecret);
                   if (data.price) {
                       setPriceDetails(data.price);
                   }
             } else {
+                  setError('No payment session received');
                   console.error('Failed to init subscription', data.error);
             }
         } catch (e) {
+            setError('Connection error. Please check your internet.');
             console.error('Fetch error:', e);
+        } finally {
+            setIsInitializing(false);
+            fetchLock.current = false;
         }
     };
     fetchData();
@@ -198,15 +214,31 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                         )}
 
                         {/* Stripe Form */}
-                        {clientSecret ? (
+                        {error ? (
+                            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg text-center">
+                                <p className="text-red-700 dark:text-red-400 text-sm mb-2">{error}</p>
+                                {isInitializing && <p className="text-[10px] text-slate-500 mb-4 uppercase tracking-widest animate-pulse">Retrying...</p>}
+                                <button 
+                                    onClick={() => {
+                                        setBillingInterval(billingInterval); // Trigger re-fetch
+                                        setError(null);
+                                    }}
+                                    disabled={isInitializing}
+                                    className="text-xs font-bold text-red-600 dark:text-red-500 underline uppercase tracking-wider disabled:opacity-50"
+                                >
+                                    {t('common.retry') || 'Retry'}
+                                </button>
+                            </div>
+                        ) : clientSecret ? (
                             <div className="w-full">
                                 <Elements options={options} stripe={stripePromise}>
                                     <CheckoutForm teamId={team.id} returnUrl={`${window.location.origin}/app/teams/${team.id}?tab=subscription&upgrade_success=true`} />
                                 </Elements>
                             </div>
                         ) : (
-                            <div className="flex items-center justify-center h-32 w-full">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                            <div className="flex flex-col items-center justify-center h-32 w-full gap-3">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
+                                <span className="text-xs text-slate-400 animate-pulse">{t('pro.initializingCheckout') || 'Preparing secure checkout...'}</span>
                             </div>
                         )}
                         

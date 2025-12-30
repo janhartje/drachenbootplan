@@ -59,9 +59,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Price for ${interval} interval not found` }, { status: 404 });
     }
     
+    console.log(`Selected Price: ${selectedPrice.id}, Amount: ${selectedPrice.unit_amount}, Currency: ${selectedPrice.currency}, Interval: ${selectedPrice.recurring?.interval}`);
+    
     const targetPriceId = selectedPrice.id;
-    console.log(`Selected Price ID for ${interval}:`, targetPriceId);
-
     const team = membership.team;
     let customerId = team.stripeCustomerId;
 
@@ -102,10 +102,7 @@ export async function POST(request: Request) {
         });
     }
 
-    console.log('Creating subscription for team:', teamId, 'with price:', targetPriceId);
-    
     // Check for existing incomplete subscription
-    console.log('Checking for existing subscriptions for customer:', customerId);
     const existingSubscriptions = await stripe.subscriptions.list({
         customer: customerId,
         status: 'incomplete', 
@@ -157,13 +154,11 @@ export async function POST(request: Request) {
         }
         
         if (inv && pi && pi.client_secret) {
-            console.log('Found valid reusable subscription:', sub.id, 'with PI:', pi.id);
             subscription = sub;
             subscription.latest_invoice = inv; // Attach the expanded one
             paymentIntent = pi;
             break;
         } else {
-            console.log('Found broken/stuck subscription (missing PI or secret), cancelling:', sub.id);
             try {
                 await stripe.subscriptions.cancel(sub.id);
             } catch (e) {
@@ -172,10 +167,7 @@ export async function POST(request: Request) {
         }
     }
 
-    if (subscription) {
-        console.log('Reusing existing incomplete subscription:', subscription.id);
-    } else {
-        console.log('No reusable valid subscription found. Creating new one.');
+    if (!subscription) {
         // Create Subscription
         // Restore explicit payment settings as defaults failed
         subscription = await stripe.subscriptions.create({
@@ -184,57 +176,56 @@ export async function POST(request: Request) {
             payment_behavior: 'default_incomplete',
             payment_settings: { 
                 save_default_payment_method: 'on_subscription',
-                payment_method_types: ['card'], // Explicitly set to force PI creation robustness
             },
             expand: ['latest_invoice.payment_intent'],
             metadata: {
                 teamId: team.id,
             },
         });
-        console.log('Subscription created:', subscription.id, 'Status:', subscription.status);
     }
 
     let latestInvoice: InvoiceWithPaymentIntent | null = subscription.latest_invoice as InvoiceWithPaymentIntent;
-    
-    // Fetch price details to return to frontend
     const priceDetails = await stripe.prices.retrieve(targetPriceId);
 
-    if (subscription && !paymentIntent) {
-        console.log('Missing Payment Intent. Analyzing subscription latest_invoice...');
-        const currentInvRef = subscription.latest_invoice;
-        
-        if (typeof currentInvRef === 'string') {
-            latestInvoice = await getExpandedInvoice(currentInvRef);
-        } else if (currentInvRef) {
-            latestInvoice = currentInvRef as InvoiceWithPaymentIntent;
-            // Expansion check
-            if (!latestInvoice.payment_intent || typeof latestInvoice.payment_intent === 'string' || latestInvoice.status === 'draft') {
-                latestInvoice = await getExpandedInvoice(latestInvoice.id);
-            }
-        }
+    // ROBUST PI LOOKUP: Sometimes Stripe takes a second to attach the PI to the invoice
+    let attempts = 0;
+    const maxAttempts = 3;
 
-        if (latestInvoice && typeof latestInvoice.payment_intent === 'object') {
-            paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
+    while (attempts < maxAttempts && !paymentIntent) {
+        if (attempts > 0) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
         }
         
-        // Final attempt if still missing: retrieve subscription afresh with full expansion
-        if (!paymentIntent) {
-            console.log('Still missing PI. Retrying full subscription expansion as final fallback...');
-            const finalSub = await stripe.subscriptions.retrieve(subscription.id, {
-                expand: ['latest_invoice.payment_intent']
-            });
-            latestInvoice = finalSub.latest_invoice as InvoiceWithPaymentIntent;
-            if (latestInvoice && typeof latestInvoice.payment_intent === 'object') {
+        const currentInvRef = subscription.latest_invoice;
+        const activeInvoiceId = typeof currentInvRef === 'string' ? currentInvRef : currentInvRef?.id;
+        
+        if (activeInvoiceId) {
+            latestInvoice = await getExpandedInvoice(activeInvoiceId);
+            if (latestInvoice && typeof latestInvoice.payment_intent === 'object' && latestInvoice.payment_intent !== null) {
                 paymentIntent = latestInvoice.payment_intent as Stripe.PaymentIntent;
             } else if (latestInvoice && typeof latestInvoice.payment_intent === 'string') {
-                // Should not happen with expand, but Stripe...
                 paymentIntent = await stripe.paymentIntents.retrieve(latestInvoice.payment_intent);
             }
         }
-    }
 
-    if (paymentIntent) {
-        console.log('Final Payment Intent:', paymentIntent.id, 'Status:', paymentIntent.status);
+        // Final fallback: if no PI on invoice, search for the most recent PI for this customer
+        if (!paymentIntent) {
+            const recentPIs = await stripe.paymentIntents.list({
+                customer: customerId,
+                limit: 3,
+            });
+            
+            const now = Math.floor(Date.now() / 1000);
+            const foundPI = recentPIs.data.find(pi => 
+                pi.status === 'requires_payment_method' && 
+                (now - pi.created) < 30
+            );
+
+            if (foundPI) {
+                paymentIntent = foundPI;
+            }
+        }
+        attempts++;
     }
 
     if (!latestInvoice || !paymentIntent || !paymentIntent.client_secret) {
@@ -245,7 +236,19 @@ export async function POST(request: Request) {
             hasIntent: !!paymentIntent, 
             hasSecret: !!paymentIntent?.client_secret 
          });
-         return NextResponse.json({ error: 'Failed to create payment intent. Please contact support.' }, { status: 500 });
+         const errorDetails = {
+                hasInvoice: !!latestInvoice,
+                hasIntent: !!paymentIntent,
+                invoiceStatus: latestInvoice?.status,
+                priceId: targetPriceId,
+                amount: selectedPrice.unit_amount,
+                currency: selectedPrice.currency
+         };
+         console.error('Missing invoicing details:', errorDetails);
+         return NextResponse.json({ 
+            error: 'Failed to create payment intent. Please contact support.',
+            details: errorDetails
+         }, { status: 500 });
     }
 
     return NextResponse.json({ 

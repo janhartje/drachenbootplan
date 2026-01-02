@@ -228,7 +228,7 @@ const PaddlerModal: React.FC<PaddlerModalProps> = ({ isOpen, onClose, paddlerToE
                 </button>
                 <button
                   type="submit"
-                  disabled={inviteLoading || !inviteEmail.trim() || inviteSuccess || (currentTeam?.plan !== 'PRO' && currentTeam?.maxMembers && paddlers?.length >= currentTeam.maxMembers)}
+                  disabled={inviteLoading || !inviteEmail.trim() || inviteSuccess || (currentTeam?.plan !== 'PRO' && !!currentTeam?.maxMembers && paddlers?.length >= currentTeam.maxMembers)}
                   className={`w-full sm:w-auto h-9 px-6 py-2 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all ${
                     inviteSuccess
                       ? 'bg-green-500 text-white'

@@ -182,6 +182,16 @@ Tests werden automatisch bei jedem Push und Pull Request auf den `main` Branch v
 - **Unit Tests**: `src/utils/__tests__` (Algorithmus-Logik)
 - **Component Tests**: `src/components/**/__tests__` (UI-Komponenten wie `SeatBox`, `Stats`, `Header`)
 
+### Test User (Automated Testing)
+
+For automated testing (e.g. E2E tests) or local development without email magic links, a **Test User** is available.
+
+*   **Email**: `test@drachenboot.de`
+*   **Password**: `testuser123` (or set via `TEST_USER_PASSWORD` env var)
+*   **Provider**: `credentials`
+
+**Note:** This login method is **only available** in `development` and `test` environments (Node.env). It creates the user in the database if it doesn't exist.
+
 ## 📚 Documentation
 
 *   [API Documentation (OpenAPI)](http://localhost:3000/docs) - Interactive Swagger UI

@@ -101,8 +101,15 @@ Wenn du die Anwendung lokal entwickelst (localhost:3000), verwende einfach die l
 {
   "mcpServers": {
     "drachenboot": {
-      "command": "/Users/janhartje/.nvm/versions/node/v25.2.1/bin/npx",
-      "args": ["-y", "@mcpwizard/sse-bridge", "http://localhost:3000/api/mcp"],
+      "command": "/Users/janhartje/.nvm/versions/node/v25.2.1/bin/node",
+      "args": [
+        "/Users/janhartje/.nvm/versions/node/v25.2.1/lib/node_modules/npm/bin/npm-cli.js",
+        "exec",
+        "--yes",
+        "@mcpwizard/sse-bridge",
+        "--", 
+        "http://localhost:3000/api/mcp"
+      ],
       "env": {
         "DRACHENBOOT_API_KEY": "Füge hier deinen generierten Key ein"
       }

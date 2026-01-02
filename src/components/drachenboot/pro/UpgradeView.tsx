@@ -112,7 +112,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   };
 
   const benefits = [
-    'item1', 'item2', 'item3', 'item4', 'item5'
+    'item1', 'item2', 'item3', 'item4', 'item5', 'item6'
   ];
 
   const formatCurrency = (amount: number, currency: string) => {

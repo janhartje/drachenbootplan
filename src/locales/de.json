@@ -150,7 +150,8 @@
             "version": "3.2.0",
             "date": "Januar 2026",
             "features": [
-                "MCP Dokumentation: Umfassende Anleitung für die Gemini-Integration hinzugefügt."
+                "MCP Dokumentation: Umfassende Anleitung für die Gemini-Integration hinzugefügt.",
+                "MCP Server als PRO-Benefit: KI-Integration jetzt auf der Upgrade-Seite beworben."
             ],
             "technical": [
                 "MCP SSE Transport: Verbesserte Stabilität und Session-Management.",
@@ -776,7 +777,8 @@
             "item2": "Export ohne Wasserzeichen",
             "item3": "iCal Kalender Integration",
             "item4": "Bevorzugter Support",
-            "item5": "Unterstütze die Weiterentwicklung"
+            "item5": "Unterstütze die Weiterentwicklung",
+            "item6": "MCP Server für KI-Integration"
         },
         "manageSubscription": "Abo verwalten",
         "manageSubscriptionDesc": "Dein Team ist PRO! Hier kannst du Rechnungen einsehen und Zahlungsdaten ändern.",

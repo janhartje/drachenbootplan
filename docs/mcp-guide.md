@@ -107,12 +107,11 @@ Wenn du die Anwendung lokal entwickelst (localhost:3000), verwende einfach die l
         "exec",
         "--yes",
         "@mcpwizard/sse-bridge",
-        "--", 
+        "--",
+        "--header",
+        "X-API-KEY: dbm_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
         "http://localhost:3000/api/mcp"
-      ],
-      "env": {
-        "DRACHENBOOT_API_KEY": "Füge hier deinen generierten Key ein"
-      }
+      ]
     }
   }
 }

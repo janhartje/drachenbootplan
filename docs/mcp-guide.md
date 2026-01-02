@@ -97,7 +97,49 @@ Wenn du die Anwendung lokal entwickelst (localhost:3000), verwende einfach die l
     }
   }
 }
+```json
+{
+  "mcpServers": {
+    "drachenboot": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/http-client", "http://localhost:3000/api/mcp"],
+      "env": {
+        "DRACHENBOOT_API_KEY": "Füge hier deinen generierten Key ein"
+      }
+    }
+  }
+}
 ```
+
+### Integration mit Gemini (Antigravity)
+
+Für die Nutzung mit dem Gemini Agent oder Antigravity kann eine `settings.json` im Ordner `.gemini/` im Root-Verzeichnis des Projekts erstellt werden.
+
+1. Erstelle die Datei `.gemini/settings.json`:
+   ```json
+   {
+     "mcpServers": {
+       "drachenboot": {
+         "url": "http://localhost:3000/api/mcp",
+         "headers": {
+           "X-API-KEY": "dbm_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+         }
+       }
+     }
+   }
+   ```
+
+> [!WARNING]
+> **API Key Sicherheit & Environment Variablen**
+> 
+> Standardmäßige JSON-Konfigurationsdateien unterstützen **keine** Environment-Variablen (wie `${ENV_VAR}`).
+> Da der API Key im Klartext in der Datei steht, **muss** der Ordner `.gemini/` in deiner `.gitignore` Datei eingetragen werden, um versehentliches Committen des Keys zu verhindern.
+>
+> Füge dies zu `.gitignore` hinzu:
+> ```
+> .gemini/
+> ```
+
 
 ## Verwendung
 

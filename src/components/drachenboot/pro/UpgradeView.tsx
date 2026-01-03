@@ -61,8 +61,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
         const data = await response.json();
         setClientSecret(data.clientSecret);
         
-        // Initial Price Check
-        await updatePricePreview(billingInterval);
+        // Price check is now handled by an effect triggered by clientSecret
 
     } catch (err: unknown) {
         if ((err as Error).name === 'AbortError') return;
@@ -74,7 +73,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   }, [team.id]);
 
   // 2. Update Price Preview (Dry Run)
-  const updatePricePreview = async (interval: 'month' | 'year', code?: string) => {
+  const updatePricePreview = React.useCallback(async (interval: 'month' | 'year', code?: string) => {
     try {
         const response = await fetch('/api/stripe/preview-price', {
             method: 'POST',
@@ -106,7 +105,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
         console.error('Preview error:', err);
         throw err;
     }
-  };
+  }, [team.id]);
 
   // 3. Finalize Subscription (Called after SetupIntent success)
   const finalizeSubscription = async (paymentMethodId: string) => {
@@ -145,13 +144,13 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
     };
   }, [team.id, initializeSetup, refreshTrigger]);
 
-  // Update price when interval changes
+  // Update price when interval changes or when clientSecret is first set
   useEffect(() => {
       if (clientSecret) {
           setPriceDetails(null); // Trigger loading skeleton
           updatePricePreview(billingInterval);
       }
-  }, [billingInterval]);
+  }, [billingInterval, clientSecret, updatePricePreview]);
 
   const appearance = {
     theme: isDarkMode ? 'night' as const : 'stripe' as const,

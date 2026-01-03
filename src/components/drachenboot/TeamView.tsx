@@ -82,7 +82,7 @@ const TeamView: React.FC = () => {
       // Clean URL without reload
       window.history.replaceState({}, '', '/app');
     }
-  }, [searchParams]);
+  }, [searchParams, refetchTeams]);
 
   const handleCreateEvent = (title: string, date: string, type: 'training' | 'regatta', boatSize: 'standard' | 'small', comment?: string) => {
     createEvent(title, date, type, boatSize, comment);

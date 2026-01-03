@@ -70,7 +70,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
     } finally {
         if (abortControllerRef.current === controller) setIsInitializing(false);
     }
-  }, [team.id]);
+  }, [team.id, t]);
 
   // 2. Update Price Preview (Dry Run)
   const updatePricePreview = React.useCallback(async (interval: 'month' | 'year', code?: string) => {
@@ -105,7 +105,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
         console.error('Preview error:', err);
         throw err;
     }
-  }, [team.id]);
+  }, [team.id, t]);
 
   // 3. Finalize Subscription (Called after SetupIntent success)
   const finalizeSubscription = async (paymentMethodId: string) => {

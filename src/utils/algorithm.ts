@@ -1,5 +1,9 @@
 import { Paddler, Assignments } from '../types';
 
+// Pre-compile Regex
+const ROW_REGEX = /row-(\d+)/;
+const ROW_SIDE_REGEX = /row-(\d+)-(left|right)/;
+
 export const runAutoFillAlgorithm = (
   activePaddlerPool: Paddler[],
   assignments: Assignments,
@@ -18,11 +22,11 @@ export const runAutoFillAlgorithm = (
   
   // Available pool (excluding already locked identifiers)
   // Sort by priority (lower is better): 1=Fixed, 2=Maybe, 3=Guest, 4=Canister
-  const pool = activePaddlerPool
+  const initialPool = activePaddlerPool
     .filter((p) => !lockedIds.includes(p.id.toString()))
     .sort((a, b) => (a.priority || 99) - (b.priority || 99));
     
-  if (pool.length === 0 && Object.keys(lockedAss).length === 0) return null;
+  if (initialPool.length === 0 && Object.keys(lockedAss).length === 0) return null;
 
   // Determine Boat Capacity
   const boatCapacity = rows * 2 + 2; // + Drum + Steer
@@ -33,19 +37,20 @@ export const runAutoFillAlgorithm = (
 
   let bestAss: Assignments | null = null;
   let bestScore = -Infinity;
+  let noImprovementCount = 0;
 
   // Helper for mid-line (rows)
   const midRow = (rows + 1) / 2;
 
   // Simulation loop
-  const iterations = 2000;
+  const maxIterations = 500; // Reduced from 2000
 
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < maxIterations; i++) {
     const currAss: Assignments = { ...lockedAss };
     
     // Copy pool for this run
     // Slight shuffle while maintaining priority structure
-    let currPool = [...pool].sort((a, b) => {
+    let currPool = [...initialPool].sort((a, b) => {
         // Weight priority difference
         const prioDiff = (a.priority || 99) - (b.priority || 99);
         if (prioDiff !== 0) {
@@ -161,7 +166,7 @@ export const runAutoFillAlgorithm = (
     
     // Add currently locked/assigned rows
     Object.keys(currAss).forEach(key => {
-        const match = key.match(/row-(\d+)/);
+        const match = key.match(ROW_REGEX);
         if (match) occupiedRows.add(parseInt(match[1]));
     });
 
@@ -322,7 +327,7 @@ export const runAutoFillAlgorithm = (
        if (sid === 'drummer') ff += pad.weight;
        else if (sid === 'steer') fb += pad.weight;
        else if (sid.includes('row')) {
-          const match = sid.match(/row-(\d+)-(left|right)/);
+          const match = sid.match(ROW_SIDE_REGEX);
           if (match) {
              const row = parseInt(match[1]);
              const side = match[2];
@@ -398,6 +403,14 @@ export const runAutoFillAlgorithm = (
     if (score > bestScore) {
        bestScore = score;
        bestAss = currAss;
+       noImprovementCount = 0;
+    } else {
+        noImprovementCount++;
+    }
+
+    // Adaptive Stopping
+    if (noImprovementCount > 100) {
+        break;
     }
   }
 

@@ -331,8 +331,16 @@ maxMembers         Int      @default(25)      // Mitglieder-Limit
 
 #### Wichtige Events (Webhooks)
 
-- `invoice.payment_succeeded` → Team wird auf PRO upgegradet
-- `customer.subscription.deleted` → Team wird auf FREE zurückgesetzt
+- `charge.refunded`
+- `checkout.session.completed`
+- `customer.updated`
+- `customer.subscription.created`
+- `customer.subscription.deleted`
+- `customer.subscription.trial_will_end`
+- `customer.subscription.updated`
+- `invoice.payment_action_required`
+- `invoice.payment_failed`
+- `invoice.payment_succeeded`
 
 ### MCP Server (PRO)
 

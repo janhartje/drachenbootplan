@@ -147,6 +147,19 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.3.0",
+            "date": "January 2026",
+            "features": [
+                "Automatic email notifications for failed payments",
+                "Warning email before trial expiration",
+                "Link to Stripe Customer Portal for subscription management"
+            ],
+            "technical": [
+                "Refactoring of Stripe webhook handlers for better maintainability"
+            ],
+            "bugfixes": []
+        },
+        {
             "version": "3.2.0",
             "date": "January 2026",
             "features": [
@@ -622,6 +635,14 @@
     "checkEmail": "Check your email",
     "emailSentBody": "We sent you a login link. Click the link in the email to sign in.",
     "emailNotReceived": "Didn't receive it? Check your spam folder.",
+    "emailPaymentFailedSubject": "Payment Failed - Dragonboat Manager",
+    "emailPaymentFailedTitle": "Action Required",
+    "emailPaymentFailedBody": "We were unable to process your latest payment for the PRO subscription. Please update your payment details to verify your subscription.",
+    "emailPaymentFailedAction": "Update Payment Details",
+    "emailTrialEndingSubject": "Your trial is ending soon",
+    "emailTrialEndingTitle": "Trial Ending Soon",
+    "emailTrialEndingBody": "We hope you are enjoying Dragonboat Manager PRO! Your trial period is coming to an end. Your subscription will automatically renew unless canceled.",
+    "emailTrialEndingAction": "Manage Subscription",
     "orDivider": "or",
     "welcomeTitle": "Welcome to Dragonboat Manager!",
     "welcomeSubtitle": "Plan trainings, manage your team, and find the perfect boat lineup – all in one place.",

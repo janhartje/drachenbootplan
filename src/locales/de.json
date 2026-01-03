@@ -147,6 +147,19 @@
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
         {
+            "version": "3.3.0",
+            "date": "Januar 2026",
+            "features": [
+                "Automatische E-Mail-Benachrichtigungen bei fehlgeschlagenen Zahlungen",
+                "Warn-E-Mail vor Ablauf der Testphase",
+                "Link zum Stripe-Kundenportal für Abo-Verwaltung"
+            ],
+            "technical": [
+                "Refactoring der Stripe Webhook-Handler für bessere Wartbarkeit"
+            ],
+            "bugfixes": []
+        },
+        {
             "version": "3.2.0",
             "date": "Januar 2026",
             "features": [
@@ -623,6 +636,14 @@
     "checkEmail": "Check deine E-Mails",
     "emailSentBody": "Wir haben dir einen Login-Link gesendet. Klicke auf den Link in der E-Mail, um dich anzumelden.",
     "emailNotReceived": "Nicht erhalten? Schau auch im Spam-Ordner nach.",
+    "emailPaymentFailedSubject": "Zahlung fehlgeschlagen - Drachenboot Manager",
+    "emailPaymentFailedTitle": "Zahlung erforderlich",
+    "emailPaymentFailedBody": "Wir konnten deine letzte Zahlung für das PRO-Abo leider nicht abbuchen. Bitte aktualisiere deine Zahlungsdaten, um weiterhin alle Vorteile nutzen zu können.",
+    "emailPaymentFailedAction": "Zahlungsdaten aktualisieren",
+    "emailTrialEndingSubject": "Deine Testphase endet bald",
+    "emailTrialEndingTitle": "Testphase endet bald",
+    "emailTrialEndingBody": "Wir hoffen, dir gefällt Drachenboot Manager PRO! Deine Testphase endet in Kürze. Dein Abo wird automatisch verlängert, sofern du nicht kündigst.",
+    "emailTrialEndingAction": "Abo verwalten",
     "orDivider": "oder",
     "welcomeTitle": "Willkommen beim Drachenboot Manager!",
     "welcomeSubtitle": "Plane Trainings, verwalte dein Team und finde die perfekte Bootsbesetzung – alles an einem Ort.",

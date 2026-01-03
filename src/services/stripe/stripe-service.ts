@@ -428,9 +428,11 @@ export async function getSubscriptionPreview(
 
   // Use createPreview (cast to any as types are missing/outdated)
 
-  const upcomingInvoice = await stripe.invoices.retrieveUpcoming({
+  const upcomingInvoice = await stripe.invoices.createPreview({
     customer: customerId,
-    subscription_items: [{ price: targetPrice.id }],
+    subscription_details: {
+      items: [{ price: targetPrice.id }],
+    },
     discounts: promotionCodeId ? [{ promotion_code: promotionCodeId }] : undefined,
   });
 

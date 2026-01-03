@@ -94,7 +94,7 @@ const EventList: React.FC<EventListProps> = ({ events, sortedPaddlers, onPlan, o
                 </button>
               </div>
             </div>
-            <div className="mt-2 max-h-60 overflow-y-auto space-y-1 pt-2">
+            <div className="mt-2 max-h-60 overflow-y-auto space-y-1 pt-2 scrollbar-thin">
               {sortedPaddlers.map((p) => {
                 const status = evt.attendance[p.id];
                 const canEdit = userRole === 'CAPTAIN' || (currentPaddler && currentPaddler.id === p.id);

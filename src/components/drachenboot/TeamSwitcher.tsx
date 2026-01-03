@@ -83,7 +83,7 @@ const TeamSwitcher: React.FC = () => {
               <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-2 py-1 uppercase tracking-wider">
                 <span>{t('teams') || 'Teams'}</span>
               </div>
-              <div className="max-h-60 overflow-y-auto mt-1">
+              <div className="max-h-60 overflow-y-auto mt-1 scrollbar-thin">
                 {teams.map((team) => (
                   <button
                     key={team.id}

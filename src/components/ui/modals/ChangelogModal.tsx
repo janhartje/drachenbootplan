@@ -44,7 +44,7 @@ const ChangelogModal: React.FC<ChangelogModalProps> = ({ onClose }) => {
           </button>
         </div>
         
-        <div className="p-4 overflow-y-auto space-y-2">
+        <div className="p-4 overflow-y-auto space-y-2 scrollbar-thin">
           {versions.map((v) => {
             const isExpanded = expandedVersions.has(v.version);
             const hasFeatures = v.features.length > 0;

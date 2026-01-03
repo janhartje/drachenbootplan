@@ -147,6 +147,15 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.3.5",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Corrected scrollbar styling in dark mode (team list and modals)."
+            ]
+        },
+        {
             "version": "3.3.4",
             "date": "January 2026",
             "features": [],

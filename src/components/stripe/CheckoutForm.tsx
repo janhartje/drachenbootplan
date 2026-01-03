@@ -43,87 +43,78 @@ export const CheckoutForm = ({
 
     setIsLoading(true);
 
-    const { error, setupIntent } = await stripe.confirmSetup({
-      elements,
-      confirmParams: {
-        return_url: returnUrl || `${window.location.origin}/app?upgrade_success=true&teamId=${teamId}`,
-      },
-      redirect: 'if_required', // Avoid redirect if possible
-    });
+    // 1. Submit Elements (validates input)
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+        console.error('Stripe submit error:', submitError);
+        setMessage(submitError.message || t('pro.stripe.errors.default'));
+        setIsLoading(false);
+        return;
+    }
 
-    if (error) {
-      // Display the actual error message from Stripe
-      console.error('Stripe setup error:', error);
-      
-      // Try to translate based on decline_code, then error code, then type
-      const errorCode = error.decline_code || error.code || error.type;
-      const translatedMessage = t(`pro.stripe.errors.${errorCode}`);
-      
-      if (translatedMessage !== `pro.stripe.errors.${errorCode}`) {
-        setMessage(translatedMessage);
-      } else {
-        // Fallback: If no translation for specific code, use the one from Stripe 
-        // but only if it exists, otherwise our generic default
-        setMessage(error.message || t('pro.stripe.errors.default'));
-      }
-    } else if (setupIntent && setupIntent.status === 'succeeded') {
-        // SUCCESS: Valid card setup!
-        // Now call the parent to create the subscription
-        if (onSuccess && typeof setupIntent.payment_method === 'string') {
-            try {
-                // 1. Create Subscription
-                const subResult = await onSuccess(setupIntent.payment_method);
+    // 2. Create Subscription on Backend
+    // This returns the clientSecret for the PaymentIntent (or SetupIntent if Trial)
+    if (onSuccess) {
+        try {
+            const subResult = await onSuccess(''); // No PM ID needed yet, Elements will handle it
+            
+            if (subResult && subResult.clientSecret) {
+                const secret = subResult.clientSecret as string;
                 
-                // 2. Handle Potential SCA (3D Secure)
-                // 2. Handle Potential SCA (3D Secure)
-                if (subResult && subResult.clientSecret) {
-                    const secret = subResult.clientSecret as string;
-
-                    
-                    let confirmError;
-                    
-                    if (secret.startsWith('pi_')) {
-                        // PaymentIntent
-                         const result = await stripe.confirmCardPayment(secret);
-                         confirmError = result.error;
-                    } else if (secret.startsWith('seti_')) {
-                        // SetupIntent (e.g. Trial)
-                         const result = await stripe.confirmCardSetup(secret);
-                         confirmError = result.error;
-                    } else {
-                        // Fallback or unknown
-                        console.warn('Unknown secret format, attempting confirmCardPayment');
-                        const result = await stripe.confirmCardPayment(secret);
-                        confirmError = result.error;
-                    }
-                    
-                    if (confirmError) {
-                         const errorCode = confirmError.decline_code || confirmError.code || confirmError.type;
-                         const translatedMessage = t(`pro.stripe.errors.${errorCode}`);
-                         
-                         if (translatedMessage !== `pro.stripe.errors.${errorCode}`) {
-                             setMessage(translatedMessage);
-                         } else {
-                             setMessage(confirmError.message || t('pro.stripe.errors.default'));
-                         }
-                         setIsLoading(false);
-                         return; // Stop here
-                    }
+                // 3. Confirm the Intent directly using Elements
+                // This handles 3DS challenge exactly once "directly there"
+                let result;
+                if (secret.startsWith('pi_')) {
+                    result = await stripe.confirmPayment({
+                        elements,
+                        clientSecret: secret,
+                        confirmParams: {
+                            return_url: returnUrl || `${window.location.origin}/app?upgrade_success=true&teamId=${teamId}`,
+                        },
+                    });
+                } else if (secret.startsWith('seti_')) {
+                    result = await stripe.confirmSetup({
+                        elements,
+                        clientSecret: secret,
+                        confirmParams: {
+                            return_url: returnUrl || `${window.location.origin}/app?upgrade_success=true&teamId=${teamId}`,
+                        },
+                    });
+                } else {
+                    // Fallback
+                    result = await stripe.confirmPayment({
+                        elements,
+                        clientSecret: secret,
+                        confirmParams: {
+                            return_url: returnUrl || `${window.location.origin}/app?upgrade_success=true&teamId=${teamId}`,
+                        },
+                    });
                 }
-                
-                // 3. Final Success Redirect
+
+                if (result.error) {
+                     const errorCode = result.error.decline_code || result.error.code || result.error.type;
+                     const translatedMessage = t(`pro.stripe.errors.${errorCode}`);
+                     
+                     if (translatedMessage !== `pro.stripe.errors.${errorCode}`) {
+                         setMessage(translatedMessage);
+                     } else {
+                         setMessage(result.error.message || t('pro.stripe.errors.default'));
+                     }
+                     setIsLoading(false);
+                     return;
+                }
+            } else {
+                // No secret returned? If status is active, just redirect
                 window.location.href = returnUrl || `${window.location.origin}/app?upgrade_success=true&teamId=${teamId}`;
-                
-            } catch (err) {
-                 // Error already handled/set in parent mostly, but we catch here to stop loading
-                 console.error('Subscription creation error:', err);
-                 // Parent `onSuccess` sets parent error state, but we might want to set local message too?
-                 // For now, parent error display is enough, just stop loading.
             }
-        } else {
-            console.error('Missing payment method ID');
-            setMessage('Interner Fehler: Zahlungsmethode nicht gefunden.');
+            
+        } catch (err) {
+             console.error('Subscription creation/confirmation error:', err);
+             // Error state usually set in parent
         }
+    } else {
+        console.error('Missing onSuccess callback');
+        setMessage('Interner Fehler: Konfiguration fehlt.');
     }
 
     setIsLoading(false);

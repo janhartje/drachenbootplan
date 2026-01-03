@@ -22,55 +22,16 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   const { t, language } = useLanguage();
   const { isDarkMode } = useDrachenboot();
   const [billingInterval, setBillingInterval] = useState<'month' | 'year'>('year');
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState('');
   const [priceDetails, setPriceDetails] = useState<{ amount: number; currency: string; interval: string } | null>(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);   
-
   
   // Use a ref to access the latest promoCode without triggering re-renders of hooks
   const promoCodeRef = React.useRef(promoCode);
-  useEffect(() => {
-    promoCodeRef.current = promoCode;
-  }, [promoCode]);
 
-  // Use AbortController to handle request cancellation
-  const abortControllerRef = React.useRef<AbortController | null>(null);
+  // No more manual initializeSetup. The Payment Element will use Deferred Intent mode.
 
-  // 1. Initialize Setup Intent (Standard for saving card)
-  const initializeSetup = React.useCallback(async () => {
-    if (abortControllerRef.current) abortControllerRef.current.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-    
-    setIsInitializing(true);
-    setError(null);
-    
-    try {
-
-        const response = await fetch('/api/stripe/create-setup-intent', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ teamId: team.id }),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) throw new Error(t('pro.errors.failedToStartCheckout'));
-        const data = await response.json();
-        setClientSecret(data.clientSecret);
-        
-        // Price check is now handled by an effect triggered by clientSecret
-
-    } catch (err: unknown) {
-        if ((err as Error).name === 'AbortError') return;
-        console.error('Setup error:', err);
-        setError(err instanceof Error ? err.message : t('pro.errors.failedToStartCheckout'));
-    } finally {
-        if (abortControllerRef.current === controller) setIsInitializing(false);
-    }
-  }, [team.id, t]);
 
   // 2. Update Price Preview (Dry Run)
   const updatePricePreview = React.useCallback(async (interval: 'month' | 'year', code?: string) => {
@@ -135,22 +96,17 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   };
 
   useEffect(() => {
-    if (team.id) {
-        setClientSecret(null); // Clear old secret immediately
-        initializeSetup(); 
-    }
-    return () => {
-        if (abortControllerRef.current) abortControllerRef.current.abort();
+    const init = async () => {
+        setIsInitializing(true);
+        try {
+            await updatePricePreview(billingInterval);
+        } finally {
+            setIsInitializing(false);
+        }
     };
-  }, [team.id, initializeSetup, refreshTrigger]);
+    init();
+  }, [billingInterval, updatePricePreview]);
 
-  // Update price when interval changes or when clientSecret is first set
-  useEffect(() => {
-      if (clientSecret) {
-          setPriceDetails(null); // Trigger loading skeleton
-          updatePricePreview(billingInterval);
-      }
-  }, [billingInterval, clientSecret, updatePricePreview]);
 
   const appearance = {
     theme: isDarkMode ? 'night' as const : 'stripe' as const,
@@ -181,7 +137,9 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   };
   
   const options = {
-    clientSecret: clientSecret ?? undefined,
+    mode: 'subscription' as const,
+    amount: priceDetails?.amount ?? (billingInterval === 'year' ? 5000 : 500),
+    currency: priceDetails?.currency.toLowerCase() ?? 'eur',
     appearance: {
         ...appearance,
         labels: 'floating' as const,
@@ -310,7 +268,6 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                                 <p className="text-red-700 dark:text-red-400 text-sm mb-2">{error}</p>
                                 <button 
                                     onClick={() => {
-                                        setRefreshTrigger(prev => prev + 1); // Trigger re-init
                                         setError(null);
                                     }}
                                     className="text-xs font-bold text-red-600 dark:text-red-500 underline uppercase tracking-wider"
@@ -320,28 +277,20 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                             </div>
                         )}
                         
-                        {clientSecret ? (
-                            <div className="w-full">
-                                {/* Use Setup Mode -> Key ensures fresh mount only if secret *changes* (which it shouldn't for price updates) */}
-                                <Elements options={options} stripe={stripePromise} key={clientSecret}>
-                                    <CheckoutForm 
-                                      teamId={team.id} 
-                                      returnUrl={`${window.location.origin}/app/teams/${team.id}?tab=subscription&upgrade_success=true`}
-                                      promoCode={promoCode}
-                                      setPromoCode={setPromoCode}
-                                      onApplyPromo={handleApplyPromo}
-                                      isApplyingPromo={isInitializing} // Loading state for promo button
-                                      priceDetails={priceDetails}
-                                      onSuccess={finalizeSubscription} // Pass callback for subscription creation
-                                    />
-                                </Elements>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center h-32 w-full gap-3">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-                                <span className="text-xs text-slate-400 animate-pulse">{t('pro.initializingCheckout') || 'Preparing secure checkout...'}</span>
-                            </div>
-                        )}
+                        <div className="w-full">
+                            <Elements options={options} stripe={stripePromise}>
+                                <CheckoutForm 
+                                    teamId={team.id} 
+                                    returnUrl={`${window.location.origin}/app/teams/${team.id}?tab=subscription&upgrade_success=true`}
+                                    promoCode={promoCode}
+                                    setPromoCode={setPromoCode}
+                                    onApplyPromo={handleApplyPromo}
+                                    isApplyingPromo={isInitializing} // Loading state for promo button
+                                    priceDetails={priceDetails}
+                                    onSuccess={finalizeSubscription} // Pass callback for subscription creation
+                                />
+                            </Elements>
+                        </div>
                         
                         <div className="mt-4 flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase tracking-wide">
                              <span className="flex items-center gap-1">🔒 {t('pro.securePayment') || 'SSL Encrypted & Secure Payment'}</span>

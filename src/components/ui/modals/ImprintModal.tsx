@@ -15,7 +15,7 @@ const ImprintModal: React.FC<ImprintModalProps> = ({ onClose }) => {
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('imprintTitle')}</h2>
         <button onClick={onClose}><X size={20} className="text-slate-500" /></button>
       </div>
-      <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-700 dark:text-slate-300">
+      <div className="p-6 overflow-y-auto space-y-6 text-sm text-slate-700 dark:text-slate-300 scrollbar-thin">
         <section>
           <h3 className="font-bold text-slate-900 dark:text-white mb-2 text-base">{t('imprintLegal')}</h3>
           <p className="text-sm">{"Jan Hartje"}<br />{"Hamburger Allee 6"}<br />{"30161 Hannover"}</p>

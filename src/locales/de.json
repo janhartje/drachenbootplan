@@ -147,6 +147,15 @@
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
         {
+            "version": "3.3.5",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Scrollbalken im Darkmode korrigiert (Teams-Liste und Modale)."
+            ]
+        },
+        {
             "version": "3.3.4",
             "date": "Januar 2026",
             "features": [],

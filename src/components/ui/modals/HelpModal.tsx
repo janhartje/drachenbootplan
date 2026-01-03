@@ -183,7 +183,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         <button onClick={onClose}><X size={20} className="text-slate-500" /></button>
       </div>
       
-      <div className="p-6 overflow-y-auto text-sm">
+      <div className="p-6 overflow-y-auto text-sm scrollbar-thin">
         {renderContent()}
         
         {pathname?.includes('/planner') && (

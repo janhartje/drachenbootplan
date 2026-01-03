@@ -28,6 +28,12 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   const [promoCode, setPromoCode] = useState('');
   const [priceDetails, setPriceDetails] = useState<{ amount: number; currency: string; interval: string } | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);   
+  
+  // Use a ref to access the latest promoCode without triggering re-renders of hooks
+  const promoCodeRef = React.useRef(promoCode);
+  useEffect(() => {
+    promoCodeRef.current = promoCode;
+  }, [promoCode]);
 
   // Moved createSubscription out of useEffect to be accessible by handlers
   const createSubscription = React.useCallback(async (confirm = false) => {
@@ -43,7 +49,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
             body: JSON.stringify({
                 teamId: team.id,
                 interval: billingInterval,
-                promotionCode: promoCode || undefined, // Send if present
+                promotionCode: promoCodeRef.current || undefined, // Use ref to avoid dependency loop
                 confirm, 
             }),
         });
@@ -89,7 +95,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
     } finally {
         setIsInitializing(false);
     }
-  }, [billingInterval, promoCode, team.id]); // Added dependencies for createSubscription
+  }, [billingInterval, team.id]); // Removed promoCode from dependencies
 
   useEffect(() => {
     // Create Subscription on mount or when interval changes

@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# gemini / antigravity
+.gemini/
+
 # dependencies
 /node_modules
 /.pnp
@@ -41,3 +44,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .env*.local
+
+# pwa
+public/sw.js
+public/workbox-*.js
+public/sw.js.map
+public/workbox-*.js.map

@@ -41,6 +41,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Invalid theme value' }, { status: 400 });
     }
 
+
     // Validate language
     if (language && !['de', 'en'].includes(language)) {
       return NextResponse.json({ error: 'Invalid language value' }, { status: 400 });

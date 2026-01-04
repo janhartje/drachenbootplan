@@ -143,6 +143,225 @@
                 }
             }
         },
+        "/api/mcp": {
+            "post": {
+                "summary": "Execute MCP Tool",
+                "description": "Executes a Model Context Protocol tool. Requires Valid API Key.",
+                "tags": [
+                    "MCP"
+                ],
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "tool": {
+                                        "type": "string",
+                                        "description": "Name of the tool to execute"
+                                    },
+                                    "arguments": {
+                                        "type": "object",
+                                        "description": "Tool arguments"
+                                    },
+                                    "apiKey": {
+                                        "type": "string",
+                                        "description": "Valid API Key"
+                                    }
+                                },
+                                "required": [
+                                    "tool",
+                                    "apiKey"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tool executed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "result": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid API Key"
+                    }
+                }
+            },
+            "get": {
+                "summary": "List MCP Tools",
+                "description": "Returns a list of available MCP tools.",
+                "tags": [
+                    "MCP"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of tools",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "tools": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams/{id}/api-keys": {
+            "get": {
+                "summary": "List API Keys",
+                "description": "Lists all API keys for a team. Requires CAPTAIN role.",
+                "tags": [
+                    "API Keys"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of API keys",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ApiKey"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create API Key",
+                "description": "Creates a new API Key. Requires CAPTAIN role.",
+                "tags": [
+                    "API Keys"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "API Key created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "key": {
+                                            "type": "string"
+                                        },
+                                        "record": {
+                                            "$ref": "#/components/schemas/ApiKey"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/teams/{id}/api-keys/{keyId}": {
+            "delete": {
+                "summary": "Revoke API Key",
+                "tags": [
+                    "API Keys"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "keyId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Key revoked"
+                    }
+                }
+            }
+        },
         "/api/teams": {
             "get": {
                 "summary": "Get All Teams",
@@ -263,11 +482,29 @@
                                     "name": {
                                         "type": "string",
                                         "description": "New team name"
+                                    },
+                                    "website": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "primaryColor": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "showProRing": {
+                                        "type": "boolean"
+                                    },
+                                    "showProBadge": {
+                                        "type": "boolean"
+                                    },
+                                    "showWatermark": {
+                                        "type": "boolean"
                                     }
-                                },
-                                "required": [
-                                    "name"
-                                ]
+                                }
                             }
                         }
                     }
@@ -458,7 +695,7 @@
                         }
                     },
                     "403": {
-                        "description": "Forbidden - Requires CAPTAIN role",
+                        "description": "Forbidden - Requires CAPTAIN role or Team Limit reached",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -685,6 +922,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/PaddlerFull"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Requires CAPTAIN role or Team Limit reached",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
                                 }
                             }
                         }
@@ -1651,148 +1898,6 @@
                 }
             }
         },
-        "/api/autofill": {
-            "post": {
-                "summary": "Auto-fill Boat",
-                "description": "Calculates an optimal boat seating plan using the Magic AI algorithm.",
-                "tags": [
-                    "Planner"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "eventId": {
-                                        "type": "string"
-                                    },
-                                    "assignments": {
-                                        "type": "object",
-                                        "additionalProperties": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "lockedSeats": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string"
-                                        }
-                                    },
-                                    "targetTrim": {
-                                        "type": "number"
-                                    }
-                                },
-                                "required": [
-                                    "eventId"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Assignments calculated",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "assignments": {
-                                            "type": "object",
-                                            "additionalProperties": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Unauthorized - Captain only"
-                    },
-                    "404": {
-                        "description": "Event not found"
-                    },
-                    "500": {
-                        "description": "Internal error"
-                    }
-                }
-            }
-        },
-        "/api/events": {
-            "get": {
-                "summary": "Get Events",
-                "description": "Fetches all events for the teams the user is a member of.",
-                "tags": [
-                    "Events"
-                ],
-                "parameters": [
-                    {
-                        "name": "teamId",
-                        "in": "query",
-                        "schema": {
-                            "type": "string"
-                        },
-                        "description": "Filter by Team ID"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of events",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EventFull"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "500": {
-                        "description": "Failed to fetch events"
-                    }
-                }
-            },
-            "post": {
-                "summary": "Create Event",
-                "description": "Creates a new event. Requires Captain role.",
-                "tags": [
-                    "Events"
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/EventInput"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Event created"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "500": {
-                        "description": "Failed to create event"
-                    }
-                }
-            }
-        },
         "/api/user/preferences": {
             "get": {
                 "summary": "Get User Preferences",
@@ -1869,6 +1974,756 @@
                     }
                 }
             }
+        },
+        "/api/stripe/setup-intent": {
+            "post": {
+                "summary": "Create Setup Intent",
+                "description": "Creates a Stripe SetupIntent for setting up a new payment method. Creates a Stripe customer if one doesn't exist for the team.",
+                "tags": [
+                    "Billing"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "teamId": {
+                                        "type": "string",
+                                        "description": "Team ID to setup payment for"
+                                    }
+                                },
+                                "required": [
+                                    "teamId"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Setup intent created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "clientSecret": {
+                                            "type": "string",
+                                            "description": "Client secret for Stripe Elements"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Team ID is required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permissions - must be captain or billing user",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stripe/invoices": {
+            "get": {
+                "summary": "Get Team Invoices",
+                "description": "Retrieves the list of invoices for a team's Stripe customer. Billing user or captain required.",
+                "tags": [
+                    "Billing"
+                ],
+                "parameters": [
+                    {
+                        "name": "teamId",
+                        "in": "query",
+                        "required": true,
+                        "description": "Team ID to fetch invoices for",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of invoices",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "invoices": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "date": {
+                                                        "type": "integer",
+                                                        "description": "Unix timestamp"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer",
+                                                        "description": "Amount in cents"
+                                                    },
+                                                    "currency": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "invoicePdf": {
+                                                        "type": "string",
+                                                        "nullable": true,
+                                                        "description": "URL to download PDF"
+                                                    },
+                                                    "number": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Team ID is required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Insufficient permissions - must be billing user or captain",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stripe/subscription-details": {
+            "get": {
+                "summary": "Get Subscription Details",
+                "description": "Retrieves detailed subscription information for a team including payment method, billing period, and subscription history.",
+                "tags": [
+                    "Billing"
+                ],
+                "parameters": [
+                    {
+                        "name": "teamId",
+                        "in": "query",
+                        "required": true,
+                        "description": "Team ID to fetch subscription for",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Subscription details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "hasSubscription": {
+                                            "type": "boolean"
+                                        },
+                                        "plan": {
+                                            "type": "string",
+                                            "description": "Current plan (FREE, PRO)"
+                                        },
+                                        "isBillingUser": {
+                                            "type": "boolean"
+                                        },
+                                        "isCustomer": {
+                                            "type": "boolean"
+                                        },
+                                        "subscription": {
+                                            "type": "object",
+                                            "nullable": true,
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "status": {
+                                                    "type": "string"
+                                                },
+                                                "cancelAtPeriodEnd": {
+                                                    "type": "boolean"
+                                                },
+                                                "currentPeriodEnd": {
+                                                    "type": "integer"
+                                                },
+                                                "currentPeriodStart": {
+                                                    "type": "integer"
+                                                },
+                                                "interval": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "month",
+                                                        "year"
+                                                    ]
+                                                },
+                                                "amount": {
+                                                    "type": "integer"
+                                                },
+                                                "currency": {
+                                                    "type": "string"
+                                                },
+                                                "priceId": {
+                                                    "type": "string"
+                                                },
+                                                "paymentMethod": {
+                                                    "type": "object",
+                                                    "nullable": true,
+                                                    "properties": {
+                                                        "brand": {
+                                                            "type": "string"
+                                                        },
+                                                        "last4": {
+                                                            "type": "string"
+                                                        },
+                                                        "expMonth": {
+                                                            "type": "integer"
+                                                        },
+                                                        "expYear": {
+                                                            "type": "integer"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "history": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "currentPeriodStart": {
+                                                        "type": "integer"
+                                                    },
+                                                    "currentPeriodEnd": {
+                                                        "type": "integer"
+                                                    },
+                                                    "cancelAtPeriodEnd": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "interval": {
+                                                        "type": "string"
+                                                    },
+                                                    "amount": {
+                                                        "type": "integer"
+                                                    },
+                                                    "currency": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Team ID is required",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Not authorized or team not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/stripe/update-subscription": {
+            "post": {
+                "summary": "Update Subscription",
+                "description": "Cancels or reactivates a subscription. Only the billing user can perform this action.",
+                "tags": [
+                    "Billing"
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "teamId": {
+                                        "type": "string",
+                                        "description": "Team ID"
+                                    },
+                                    "action": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cancel",
+                                            "reactivate"
+                                        ],
+                                        "description": "Action to perform"
+                                    }
+                                },
+                                "required": [
+                                    "teamId",
+                                    "action"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Action performed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid action or no subscription found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Only the billing admin can manage the subscription",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/paddlers": {
+            "get": {
+                "summary": "List Paddlers",
+                "description": "Lists paddlers for a specific team. Supports parallel fetching.",
+                "tags": [
+                    "Paddlers"
+                ],
+                "parameters": [
+                    {
+                        "name": "teamId",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of paddlers",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Paddler"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Paddler",
+                "description": "Creates a new paddler. Authenticated users only.",
+                "tags": [
+                    "Paddlers"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "teamId": {
+                                        "type": "string"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "weight": {
+                                        "type": "number"
+                                    },
+                                    "skills": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "isGuest": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "teamId",
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Paddler created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Paddler"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events": {
+            "get": {
+                "summary": "List Events",
+                "description": "Lists events for a team.",
+                "tags": [
+                    "Events"
+                ],
+                "parameters": [
+                    {
+                        "name": "teamId",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of events",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Event"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "summary": "Create Event",
+                "tags": [
+                    "Events"
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "teamId": {
+                                        "type": "string"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    },
+                                    "boatSize": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Event created"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/assignments": {
+            "get": {
+                "summary": "Get Assignments",
+                "tags": [
+                    "Assignments"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of assignments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Assignment"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "summary": "Update Assignment",
+                "tags": [
+                    "Assignments"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "seatId": {
+                                        "type": "string"
+                                    },
+                                    "paddlerId": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "isCanister": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "required": [
+                                    "seatId"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Assignment updated"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/attendance": {
+            "post": {
+                "summary": "Set Attendance",
+                "tags": [
+                    "Attendance"
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "paddlerId": {
+                                        "type": "string"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "yes",
+                                            "no",
+                                            "maybe"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "paddlerId",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Attendance updated"
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -1893,6 +2748,19 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "Last update timestamp"
+                    },
+                    "primaryColor": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "showProRing": {
+                        "type": "boolean"
+                    },
+                    "showProBadge": {
+                        "type": "boolean"
+                    },
+                    "showWatermark": {
+                        "type": "boolean"
                     }
                 },
                 "required": [
@@ -2232,6 +3100,26 @@
                     "status"
                 ]
             },
+            "ApiKey": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "lastUsed": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "createdAt": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                }
+            },
             "Assignment": {
                 "type": "object",
                 "properties": {
@@ -2362,6 +3250,10 @@
         {
             "name": "Planner",
             "description": "Boat planning and assignment operations"
+        },
+        {
+            "name": "Billing",
+            "description": "Subscription and payment management via Stripe"
         }
     ]
 }

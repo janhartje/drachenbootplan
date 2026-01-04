@@ -23,6 +23,10 @@ erDiagram
         string name
         datetime createdAt
         datetime updatedAt
+        string primaryColor
+        boolean showProRing
+        boolean showProBadge
+        boolean showWatermark
     }
     
     Paddler {
@@ -123,6 +127,10 @@ Repräsentiert ein Drachenboot-Team. Jedes Team hat seine eigenen Paddler und Ev
 | `name` | string | Name des Teams |
 | `createdAt` | datetime | Erstellungszeitpunkt |
 | `updatedAt` | datetime | Letztes Update |
+| `primaryColor` | string? | Team-Akzentfarbe (PRO) |
+| `showProRing` | boolean | Logo-Ring anzeigen (PRO) |
+| `showProBadge` | boolean | PRO-Badge anzeigen (PRO) |
+| `showWatermark` | boolean | Branding auf Exports (PRO) |
 
 **Beziehungen:**
 - Hat viele `Paddler`

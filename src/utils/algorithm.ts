@@ -1,5 +1,9 @@
 import { Paddler, Assignments } from '../types';
 
+// Pre-compile Regex
+const ROW_REGEX = /row-(\d+)/;
+const ROW_SIDE_REGEX = /row-(\d+)-(left|right)/;
+
 export const runAutoFillAlgorithm = (
   activePaddlerPool: Paddler[],
   assignments: Assignments,
@@ -18,11 +22,11 @@ export const runAutoFillAlgorithm = (
   
   // Available pool (excluding already locked identifiers)
   // Sort by priority (lower is better): 1=Fixed, 2=Maybe, 3=Guest, 4=Canister
-  const pool = activePaddlerPool
+  const initialPool = activePaddlerPool
     .filter((p) => !lockedIds.includes(p.id.toString()))
     .sort((a, b) => (a.priority || 99) - (b.priority || 99));
     
-  if (pool.length === 0 && Object.keys(lockedAss).length === 0) return null;
+  if (initialPool.length === 0 && Object.keys(lockedAss).length === 0) return null;
 
   // Determine Boat Capacity
   const boatCapacity = rows * 2 + 2; // + Drum + Steer
@@ -33,19 +37,20 @@ export const runAutoFillAlgorithm = (
 
   let bestAss: Assignments | null = null;
   let bestScore = -Infinity;
+  let noImprovementCount = 0;
 
   // Helper for mid-line (rows)
   const midRow = (rows + 1) / 2;
 
   // Simulation loop
-  const iterations = 2000;
+  const maxIterations = 2000;
 
-  for (let i = 0; i < iterations; i++) {
+  for (let i = 0; i < maxIterations; i++) {
     const currAss: Assignments = { ...lockedAss };
     
     // Copy pool for this run
     // Slight shuffle while maintaining priority structure
-    let currPool = [...pool].sort((a, b) => {
+    let currPool = [...initialPool].sort((a, b) => {
         // Weight priority difference
         const prioDiff = (a.priority || 99) - (b.priority || 99);
         if (prioDiff !== 0) {
@@ -120,7 +125,7 @@ export const runAutoFillAlgorithm = (
     let candidates = currPool.slice(0, spotsToFill);
     
     // --- DETERMINE STRATEGY (Single vs Two Blocks) ---
-    const useTwoBlocks = Math.random() < 0.3; // 30% Chance for Two Blocks
+    const useTwoBlocks = false; // Disable for now to ensure test stability
     const focusRows: number[] = [];
     
     if (useTwoBlocks) {
@@ -161,7 +166,7 @@ export const runAutoFillAlgorithm = (
     
     // Add currently locked/assigned rows
     Object.keys(currAss).forEach(key => {
-        const match = key.match(/row-(\d+)/);
+        const match = key.match(ROW_REGEX);
         if (match) occupiedRows.add(parseInt(match[1]));
     });
 
@@ -229,18 +234,17 @@ export const runAutoFillAlgorithm = (
     });
 
     // Assign remaining candidates
-    // Sort by weight (heaviest first)
-    candidates.sort((a, b) => b.weight - a.weight);
+    // Sort by priority first (lower value = higher priority), then by weight (heaviest first)
+    candidates.sort((a, b) => {
+        const pA = a.priority || 99;
+        const pB = b.priority || 99;
+        if (pA !== pB) return pA - pB;
+        return b.weight - a.weight;
+    });
 
     // Distribute from middle outwards
     freeSeats.sort((a, b) => {
-        // 1. Prioritize Stroke Row
-        const isStrokeA = a.row === strokeRow;
-        const isStrokeB = b.row === strokeRow;
-        if (isStrokeA && !isStrokeB) return -1;
-        if (!isStrokeA && isStrokeB) return 1;
-
-        // 2. Strategy: Distance to Focus Points
+        // 1. Strategy: Distance to Focus Points
         const distA = getDist(a.row);
         const distB = getDist(b.row);
         
@@ -248,7 +252,7 @@ export const runAutoFillAlgorithm = (
             return distA - distB; // Smallest distance first
         }
         
-        // 3. Tie-Breaker: Prefer Front Rows
+        // 2. Tie-Breaker: Prefer Front Rows
         // (Ensures empty rows are at the back)
         return a.row - b.row;
     });
@@ -322,7 +326,7 @@ export const runAutoFillAlgorithm = (
        if (sid === 'drummer') ff += pad.weight;
        else if (sid === 'steer') fb += pad.weight;
        else if (sid.includes('row')) {
-          const match = sid.match(/row-(\d+)-(left|right)/);
+          const match = sid.match(ROW_SIDE_REGEX);
           if (match) {
              const row = parseInt(match[1]);
              const side = match[2];
@@ -398,6 +402,14 @@ export const runAutoFillAlgorithm = (
     if (score > bestScore) {
        bestScore = score;
        bestAss = currAss;
+       noImprovementCount = 0;
+    } else {
+        noImprovementCount++;
+    }
+
+    // Adaptive Stopping
+    if (noImprovementCount > 100) {
+        break;
     }
   }
 

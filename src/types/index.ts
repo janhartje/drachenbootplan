@@ -1,3 +1,7 @@
+// Enum-like type definitions
+export type BoatSize = 'standard' | 'small';
+export const BOAT_SIZES = ['standard', 'small'] as const;
+
 export interface Team {
   id: string;
   name: string;
@@ -7,6 +11,12 @@ export interface Team {
   facebook?: string;
   twitter?: string;
   email?: string;
+  plan?: string;
+  maxMembers?: number;
+  primaryColor?: string;
+  showProRing?: boolean;
+  showProBadge?: boolean;
+  showWatermark?: boolean;
 }
 
 export interface Paddler {
@@ -34,7 +44,7 @@ export interface Event {
   date: string; // ISO date string YYYY-MM-DDTHH:mm:ss
   comment?: string;
   type: 'training' | 'regatta';
-  boatSize: 'standard' | 'small';
+  boatSize: BoatSize;
   canisterCount: number;
   attendance: Record<string, 'yes' | 'no' | 'maybe'>; // map paddlerId -> status
   guests?: Paddler[];

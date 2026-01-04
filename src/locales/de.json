@@ -15,12 +15,20 @@
     "comment": "Kommentar",
     "commentPlaceholder": "Infos zum Training...",
     "changelog": "Versionshistorie",
+    "teamLimitReached": "Team-Limit erreicht",
+    "teamLimitReachedDesc": "Du hast das Limit von {max} Mitgliedern erreicht. Upgrade auf PRO für unbegrenzte Mitglieder.",
+    "guestHint": "Hinweis: Gäste können weiterhin für einzelne Termine hinzugefügt werden.",
+    "teamLimitExceeded": "Import überschreitet Limit",
+    "importLimitWarning": "Dieser Import würde die Gesamtanzahl auf {total} erhöhen und das Limit von {max} überschreiten.",
     "cancel": "Abbruch",
     "editPaddler": "Paddler bearbeiten",
     "newMember": "Neues Mitglied",
     "name": "Name",
     "weight": "Gewicht",
     "skills": "Skills",
+    "actions": "Aktionen",
+    "page": "Seite",
+    "of": "von",
     "tabGeneral": "Allgemein",
     "tabPreferences": "Auto-Besetzung",
     "left": "Links",
@@ -30,6 +38,11 @@
     "regatta": "Regatta",
     "training": "Training",
     "promises": "Zusagen",
+    "attend": "Zusagen",
+    "decline": "Absagen",
+    "unsure": "Unsicher",
+    "participants": "Teilnehmer",
+    "yourStatus": "Dein Status",
     "plan": "Planen",
     "viewPlan": "Plan",
     "squad": "Kader",
@@ -141,6 +154,169 @@
     "clTechnical": "Technische Änderungen",
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
+        {
+            "version": "3.4.0",
+            "date": "Januar 2026",
+            "features": [
+                "Großes UI-Redesign: Neue Core-Komponenten für ein konsistentes, modernes Design.",
+                "Responsive Paddler-Ansicht: Tabelle auf Desktop, Karten auf Mobile.",
+                "Paddler-Paginierung: Übersichtliche Darstellung mit 15 Paddlern pro Seite.",
+                "Neu gestaltete Event-Karten: Kompakte Ansicht mit ausklappbaren Details.",
+                "Verbesserte Teilnehmer-Ansicht: Normale Paddler sehen nur beantwortete Teilnehmer."
+            ],
+            "technical": [
+                "Neue wiederverwendbare UI-Komponenten: Badge, Card, Divider, IconButton, Modal, SegmentedControl, Toggle.",
+                "Responsive Loading-Skeletons passen sich der aktuellen Ansicht an.",
+                "Datenbank-Cleanup: Veraltetes paddlerView-Feld entfernt.",
+                "I18n: Event-Attendance-Strings vollständig lokalisiert."
+            ],
+            "bugfixes": [
+                "Fix: Überlappung von Skill-Badges und Action-Buttons in Paddler-Karten behoben.",
+                "Fix: Konsistente Abstände bei Paginierungs-Indikatoren.",
+                "Fix: Einheitliche Darstellung der Event-Buttons.",
+                "Fix: Skeleton-Layout entspricht nun der tatsächlichen Ansicht.",
+                "Fix: Verbessertes Styling des Gast-Hinzufügen-Modals."
+            ]
+        },
+        {
+            "version": "3.3.5",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Scrollbalken im Darkmode korrigiert (Teams-Liste und Modale)."
+            ]
+        },
+        {
+            "version": "3.3.4",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "DrachenbootContext: refetchTeams hinzugefügt und fetchTeams für zuverlässigere Datenaktualisierung optimiert."
+            ],
+            "bugfixes": [
+                "Fix: Pro-Status wird nun beim Wechsel zur Startseite oder nach dem Upgrade zuverlässig aktualisiert."
+            ]
+        },
+        {
+            "version": "3.3.3",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "I18n: Lokalisierung von Stripe-Fehlermeldungen und Upgrade-Prozess verbessert."
+            ],
+            "bugfixes": [
+                "Fix: Fehlende Übersetzung für Kreditkarten-Ablehnungen hinzugefügt."
+            ]
+        },
+        {
+            "version": "3.3.2",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "Code Quality: Refactoring der Stripe-Integration und Bereinigung von Code-Altlasten.",
+                "Stripe: Korrektur der Invoice-Preview-Methode für bessere Stabilität."
+            ],
+            "bugfixes": [
+                "Fix: Linting-Fehler und Typ-Probleme im Stripe-Service behoben."
+            ]
+        },
+        {
+            "version": "3.3.1",
+            "date": "Januar 2026",
+            "features": [
+                "Gutscheincodes: Volle Unterstützung für Promotion Codes beim Pro-Upgrade.",
+                "Bessere Abo-Übersicht: Detaillierter Status und klare Anzeige des Gültigkeitszeitraums.",
+                "Optimierte Zahlungsverwaltung: Verbessertes Formular zum Aktualisieren der Zahlungsmethode."
+            ],
+            "technical": [
+                "Datenbank-Optimierung: Eindeutige Verknüpfung von Stripe-Kunden-IDs.",
+                "UI-Verbesserung: Lokalisierung des Stripe-Checkout-Elements."
+            ],
+            "bugfixes": [
+                "Fix: Zeiträume in der Abo-Historie werden nun korrekt für aktive und kündigende Abos angezeigt.",
+                "Fix: Promotion-Codes werden nicht mehr während des Tippens automatisch abgesendet."
+            ]
+        },
+        {
+            "version": "3.3.0",
+            "date": "Januar 2026",
+            "features": [
+                "Automatische E-Mail-Benachrichtigungen bei fehlgeschlagenen Zahlungen",
+                "Warn-E-Mail vor Ablauf der Testphase",
+                "Link zum Stripe-Kundenportal für Abo-Verwaltung"
+            ],
+            "technical": [
+                "Refactoring der Stripe Webhook-Handler für bessere Wartbarkeit"
+            ],
+            "bugfixes": []
+        },
+        {
+            "version": "3.2.0",
+            "date": "Januar 2026",
+            "features": [
+                "MCP Dokumentation: Umfassende Anleitung für die Gemini-Integration hinzugefügt.",
+                "MCP Server als PRO-Benefit: KI-Integration jetzt auf der Upgrade-Seite beworben."
+            ],
+            "technical": [
+                "MCP SSE Transport: Verbesserte Stabilität und Session-Management.",
+                "Build Fixes: Prerendering-Fehler für Fehlerseiten behoben.",
+                "Linter-Konfiguration: Explizite Ignores für bessere Build-Stabilität."
+            ],
+            "bugfixes": [
+                "Fix: Hooks in statisch gerenderten Seiten korrigiert (not-found, global-error)."
+            ]
+        },
+        {
+            "version": "3.1.0",
+            "date": "Januar 2026",
+            "features": [
+                "MCP Integration: Spezifische Tools für Event-Management und Kanister-Handling.",
+                "API Keys: Neue Verwaltung für API-Schlüssel pro Team.",
+                "Erweiterte Event-API: Verbesserte Endpunkte für Assignments und Guests."
+            ],
+            "technical": [
+                "Datenbank-Schema für API Keys erweitert.",
+                "Refactoring der API-Authentifizierung (Unified Auth Context).",
+                "OpenAPI Spec Fixes und Updates."
+            ],
+            "bugfixes": [
+                "Fix: Syntax-Fehler in OpenAPI JSON behoben."
+            ]
+        },
+        {
+            "version": "3.0.0",
+            "date": "Januar 2026",
+            "features": [
+                "PRO Mitgliedschaft: Schalte unbegrenzte Mitglieder, Exporte und mehr frei.",
+                "Team-Branding: Wähle aus 10 verschiedenen Akzentfarben deine Teamfarbe aus.",
+                "Einfache Zahlungsverwaltung via Stripe (Kreditkarte, SEPA, PayPal, etc.).",
+                "Premium Logo-Ring: Verleihe deinem Icon einen exklusiven goldenen Schimmer (PRO).",
+                "Dynamisches Design: Akzentfarben werden jetzt app-weit in Planer, Modalen und Listen angewendet.",
+                "Personalisiertes Boot: Dein Team-Logo wird nun (optional rund) an der Bootsspitze im Planer angezeigt.",
+                "Branding auf Exports: Automatische Drachenboot Manager Werbung auf Bild-Exports (für PRO-Teams ausgeschaltet).",
+                "InfoCards: Wichtige Hinweise können nun dauerhaft ausgeblendet werden (gespeichert in Datenbank).",
+                "Team-Wechsel: Schnellerer Wechsel zwischen Teams und verbesserte Verwaltung.",
+                "UI Optimierung: Die Auslastung des Kaders (z.B. 4/25) wird nun direkt in der Übersicht angezeigt.",
+                "Team-Limit: Limits werden nun in allen Dialogen (Hinzufügen, Import, Einladen) konsistent durchgesetzt.",
+                "Import: Der Import-Dialog zeigt nun eine präzise Warnung, wenn das Limit überschritten würde.",
+                "UX: Fehler beim Schließen von Dialogen werden nun automatisch zurückgesetzt."
+            ],
+            "technical": [
+                "Zentralisiertes Theme-Management für konsistente Farbdarstellung über alle Komponenten.",
+                "Server-Side Persistenz für InfoCard-Status.",
+                "Optimierte Stripe Webhooks für Abo-Synchronisation.",
+                "Erweiterte Logo-Logik im Bootsplaner mit Unterstützung für Custom Icons und Brand-Icons am Heck.",
+                "Refactoring der Navigationsstruktur und Billing-Integration."
+            ],
+            "bugfixes": [
+                "Fix: Konsistente Farbgebung der 'Planen'-Buttons und Event-Badges.",
+                "Fix: Korrekte Darstellung der Account-Verknüpfungen in der Mitgliederliste.",
+                "Fix: Anzeige des Abo-Status bei gekündigten Abos korrigiert.",
+                "Fix: Team-Switcher verhält sich nun korrekt auf Unterseiten.",
+                "Fix: Stabilitätsverbesserungen bei der Datenbank-Synchronisation (Prisma Sync)."
+            ]
+        },
         {
             "version": "2.8.0",
             "date": "Dezember 2025",
@@ -435,7 +611,10 @@
     "installPWA": "App installieren",
     "create": "Erstellen",
     "createTeam": "Team erstellen",
-    "teamName": "Team Name",
+    "createNewTeam": "Neues Team erstellen",
+    "upgradeTeam": "Team upgraden",
+    "forTeam": "für",
+    "teamName": "Teamname",
     "selectTeam": "Team wählen",
     "teams": "Teams",
     "manageTeams": "Teams verwalten",
@@ -517,11 +696,13 @@
     "privacyHosting": "Hosting",
     "privacyHostingText": "Wir hosten unsere Anwendung bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Der Anbieter ist zertifiziert nach dem EU-US Data Privacy Framework und bietet hierdurch eine Garantie, das europäische Datenschutzrecht einzuhalten. Die Daten werden in Frankfurt (Deutschland) verarbeitet. Vercel erhebt Logfiles mit IP-Adressen, um die Sicherheit und Stabilität des Dienstes zu gewährleisten.",
     "privacyDatabase": "Datenbank",
-    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Berlin) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
+    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Prenzlauer Allee 193, 10405 Berlin, Deutschland) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
     "privacyAuth": "Authentifizierung",
-    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google und GitHub. Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
+    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) und GitHub (GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, Niederlande). Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
     "privacyEmails": "E-Mail Versand",
-    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt. Wir haben mit Resend einen Auftragsverarbeitungsvertrag geschlossen.",
+    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt.",
+    "privacyPayments": "Zahlungsabwicklung (Stripe)",
+    "privacyPaymentsText": "Wir nutzen Stripe (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland) für die Zahlungsabwicklung. Stripe verarbeitet Zahlungsdaten (z.B. Kreditkartendaten) in unserem Auftrag. Die Datenübertragung erfolgt verschlüsselt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung). Weitere Informationen finden Sie in der Datenschutzerklärung von Stripe: https://stripe.com/de/privacy.",
     "privacyRights": "Ihre Rechte",
     "privacyRightsText": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer gespeicherten Daten. Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen.",
     "disclaimerTitle": "Haftungsausschluss & Technische Hinweise",
@@ -547,6 +728,14 @@
     "checkEmail": "Check deine E-Mails",
     "emailSentBody": "Wir haben dir einen Login-Link gesendet. Klicke auf den Link in der E-Mail, um dich anzumelden.",
     "emailNotReceived": "Nicht erhalten? Schau auch im Spam-Ordner nach.",
+    "emailPaymentFailedSubject": "Zahlung fehlgeschlagen - Drachenboot Manager",
+    "emailPaymentFailedTitle": "Zahlung erforderlich",
+    "emailPaymentFailedBody": "Wir konnten deine letzte Zahlung für das PRO-Abo leider nicht abbuchen. Bitte aktualisiere deine Zahlungsdaten, um weiterhin alle Vorteile nutzen zu können.",
+    "emailPaymentFailedAction": "Zahlungsdaten aktualisieren",
+    "emailTrialEndingSubject": "Deine Testphase endet bald",
+    "emailTrialEndingTitle": "Testphase endet bald",
+    "emailTrialEndingBody": "Wir hoffen, dir gefällt Drachenboot Manager PRO! Deine Testphase endet in Kürze. Dein Abo wird automatisch verlängert, sofern du nicht kündigst.",
+    "emailTrialEndingAction": "Abo verwalten",
     "orDivider": "oder",
     "welcomeTitle": "Willkommen beim Drachenboot Manager!",
     "welcomeSubtitle": "Plane Trainings, verwalte dein Team und finde die perfekte Bootsbesetzung – alles an einem Ort.",
@@ -567,6 +756,7 @@
     "emailOptional": "E-Mail (optional)",
     "inviteEmailHint": "Falls angegeben, wird eine Einladungs-E-Mail versendet",
     "addMember": "Mitglied hinzufügen",
+    "invite": "Einladen",
     "inviteMember": "Einladen",
     "email": "E-Mail",
     "inviteDescription": "Die Person wird zum Team hinzugefügt. Falls sie noch keinen Account hat, kann sie sich registrieren und ist dann automatisch Teil des Teams.",
@@ -659,6 +849,7 @@
     "onlyCaptainsCanEditTeam": "Nur Team-Kapitäne können Teameinstellungen ändern und Mitglieder verwalten.",
     "backToDashboard": "Zurück zum Dashboard",
     "importData": "Daten importieren",
+    "importType": "Import-Typ",
     "paddlers": "Paddler",
     "events": "Termine",
     "dragDropOrClick": "Klicken zum Hochladen oder Drag & Drop",
@@ -680,5 +871,176 @@
     "errorHome": "Startseite",
     "errorGlobalTitle": "Kritischer Fehler",
     "errorGlobalMessage": "Ein kritischer Fehler ist aufgetreten und die Anwendung konnte nicht geladen werden.",
-    "errorReload": "Neu laden"
+    "errorReload": "Neu laden",
+    "pro": {
+        "upgradeTitle": "Upgrade auf PRO",
+        "upgradeDescription": "Erhalte unbegrenzte Mitglieder, iCal Integration und werbefreie Exporte.",
+        "upgradeButton": "Jetzt upgraden",
+        "unlockFeaturesTitle": "Pro-Features freischalten",
+        "unlockFeaturesDescription": "Erhalte unbegrenzte Mitglieder, Import/Export Funktionen und bevorzugten Support.",
+        "billingAddress": "Rechnungsadresse",
+        "payNow": "Jetzt bezahlen",
+        "processing": "Verarbeite...",
+        "priceLabel": "Preis",
+        "intervalYearly": "Jährlich",
+        "freeUpgradeTitle": "Upgrade bereit",
+        "freeUpgradeDescription": "Dein Gutschein deckt 100% der Kosten ab. Keine Zahlungsmethode erforderlich.",
+        "activateNow": "Jetzt aktivieren",
+        "loading": "Lädt...",
+        "initializingCheckout": "Checkout wird vorbereitet...",
+        "intervalMonthly": "Monatlich",
+        "productName": "Drachenboot Manager PRO",
+        "promotionCode": "Gutscheincode",
+        "enterPromoCode": "Gutschein eingeben",
+        "discountApplied": "Rabatt angewendet",
+        "invalidCode": "Ungültiger Code",
+        "benefits": {
+            "title": "Warum Pro?",
+            "item1": "Unbegrenzte Mitgliederzahl",
+            "item2": "Export ohne Wasserzeichen",
+            "item3": "iCal Kalender Integration",
+            "item4": "Bevorzugter Support",
+            "item5": "Unterstütze die Weiterentwicklung",
+            "item6": "MCP Server für KI-Integration"
+        },
+        "manageSubscription": "Abo verwalten",
+        "manageSubscriptionDesc": "Dein Team ist PRO! Hier kannst du Rechnungen einsehen und Zahlungsdaten ändern.",
+        "upgradeSuccessTitle": "🎉 Willkommen bei PRO!",
+        "upgradeSuccessMessage": "Dein Team wurde erfolgreich auf PRO upgegradet. Viel Spaß mit den neuen Features!",
+        "period": "Zeitraum",
+        "subscription": "Abo",
+        "subscriptionStatus": "Abo-Status",
+        "nextBillingDate": "Nächste Abrechnung",
+        "validUntil": "Gültig bis",
+        "status_canceled_pending": "Kündigung vorgemerkt",
+        "cancelSubscription": "Abo kündigen",
+        "reactivateSubscription": "Kündigung zurücknehmen",
+        "viewInvoices": "Rechnungen anzeigen",
+        "updatePaymentMethod": "Zahlungsmethode ändern",
+        "canceledAtPeriodEnd": "Wird zum Ende der Laufzeit gekündigt",
+        "perMonth": "/Monat",
+        "perYear": "/Jahr",
+        "paymentMethod": "Zahlungsmethode",
+        "noSubscription": "Kein aktives Abo",
+        "noSubscriptionDesc": "Dieses Team hat aktuell kein aktives PRO-Abo.",
+        "confirmCancel": "Bist du sicher, dass du das Abo kündigen möchtest?",
+        "cancelInfo": "Du kannst die Funktionen bis zum Ende der Laufzeit weiter nutzen.",
+        "subscriptionCanceled": "Abo wird gekündigt",
+        "subscriptionReactivated": "Kündigung zurückgenommen",
+        "managedByOther": "Das Abo wird von einem anderen Teammitglied verwaltet.",
+        "invoice": "Rechnung",
+        "amount": "Betrag",
+        "status": "Status",
+        "status_paid": "Bezahlt",
+        "status_open": "Offen",
+        "status_void": "Storniert",
+        "status_uncollectible": "Uneinbringlich",
+        "noInvoices": "Keine Rechnungen gefunden.",
+        "noPaymentMethod": "Keine Zahlungsmethode hinterlegt.",
+        "subscriptionHistory": "Abo-Historie",
+        "startsAt": "Startet am",
+        "endsAt": "Endet am",
+        "endsSoon": "Endet bald",
+        "status_active": "Aktiv",
+        "status_past_due": "Zahlung überfällig",
+        "status_canceled": "Gekündigt",
+        "status_trialing": "Probezeit",
+        "status_unpaid": "Unbezahlt",
+        "status_incomplete": "Unvollständig",
+        "status_incomplete_expired": "Abgelaufen",
+        "socialMedia": "Social Media",
+        "instagramPlaceholder": "Instagram Nutzername/URL",
+        "facebookPlaceholder": "Facebook URL",
+        "twitterPlaceholder": "Twitter/X Handle",
+        "contactEmail": "Kontakt E-Mail",
+        "proCustomization": "PRO Anpassung",
+        "website": "Webseite",
+        "icon": "Logo",
+        "remove": "Entfernen",
+        "imageTooLarge": "Bild zu groß (max 5MB)",
+        "imageFormats": "Max. 5MB. Formate: JPG, PNG, GIF, WebP.",
+        "accentColor": "Akzentfarbe",
+        "showProBadge": "PRO-Badge anzeigen",
+        "showProBadgeDesc": "Zeigt das PRO-Badge in der Kopfzeile und im Team-Switcher an.",
+        "showPremiumRing": "Premium Logo Ring anzeigen",
+        "showPremiumRingDesc": "Zeigt einen schimmernden goldenen Ring um dein Team-Logo.",
+        "showWatermark": "Branding auf Exports anzeigen",
+        "showWatermarkDesc": "Zeigt \"Erstellt mit Drachenboot Manager\" auf Bild-Exports an. Kann für PRO-Teams deaktiviert werden.",
+        "themes": {
+            "amber": "Bernstein",
+            "blue": "Ozeanblau",
+            "rose": "Rosé",
+            "emerald": "Smaragd",
+            "violet": "Violett",
+            "slate": "Schiefer",
+            "teal": "Blaugrün",
+            "indigo": "Indigo",
+            "orange": "Orange",
+            "zinc": "Zink"
+        },
+        "helpCategoryPro": "PRO Funktionen",
+        "helpCategoryProDesc": "Alles über die PRO-Mitgliedschaft und exklusive Features.",
+        "helpProFeatures": "Exklusive PRO-Features",
+        "helpProFeaturesDesc": "Als PRO-Team stehen dir folgende Funktionen zur Verfügung:",
+        "helpProFeature1": "Unbegrenzte Mitgliederzahl: Verwalte beliebig viele Paddler ohne Einschränkungen.",
+        "helpProFeature2": "PDF & Bild Export: Speichere deine Bootsaufstellungen in hoher Qualität für den Druck oder zum Teilen.",
+        "helpProFeature3": "Team-Individualisierung: Wähle eine eigene Akzentfarbe und aktiviere den Premium Logo Ring.",
+        "helpProFeature4": "iCal Integration: Synchronisiere deine Termine direkt mit deinem persönlichen Kalender (Outlook, Google, Apple).",
+        "helpProBilling": "Abo & Abrechnung",
+        "helpProBillingDesc": "Du kannst dein Abo jederzeit in den Team-Einstellungen verwalten. Dort findest du auch deine Rechnungen und kannst deine Zahlungsmethode aktualisieren.",
+        "stripe": {
+            "errors": {
+                "card_declined": "Deine Karte wurde abgelehnt. Bitte kontaktiere deine Bank.",
+                "expired_card": "Deine Karte ist abgelaufen.",
+                "incorrect_cvc": "Der Sicherheitscode deiner Karte ist falsch.",
+                "processing_error": "Beim Verarbeiten deiner Karte ist ein Fehler aufgetreten.",
+                "incorrect_number": "Die Kartennummer ist falsch.",
+                "insufficient_funds": "Deine Karte verfügt nicht über ausreichende Deckung.",
+                "generic_decline": "Deine Karte wurde abgelehnt.",
+                "lost_card": "Deine Karte wurde als verloren gemeldet.",
+                "stolen_card": "Deine Karte wurde als gestohlen gemeldet.",
+                "fraudulent": "Die Zahlung wurde als betrügerisch markiert.",
+                "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen."
+            }
+        },
+        "errors": {
+            "failedToStartCheckout": "Checkout konnte nicht gestartet werden.",
+            "failedToFetchPrice": "Preis konnte nicht abgerufen werden.",
+            "subscriptionFailed": "Abonnement fehlgeschlagen."
+        },
+        "securePayment": "SSL Verschlüsselt & Sichere Zahlung"
+    },
+    "api": {
+        "access": "API Zugriff",
+        "title": "MCP Server API",
+        "description": "Model Context Protocol Server für AI-Integration",
+        "generateKey": "Neuen Key generieren",
+        "keyName": "Key Name",
+        "keyNamePlaceholder": "z.B. Claude Desktop, Development",
+        "keyGenerated": "API Key generiert",
+        "saveKeyWarning": "Speichere diesen Key jetzt! Er wird nur einmal angezeigt.",
+        "yourKey": "Dein API Key",
+        "copyKey": "Kopieren",
+        "copied": "Kopiert!",
+        "revokeKey": "Löschen",
+        "lastUsed": "Zuletzt verwendet",
+        "never": "Nie",
+        "created": "Erstellt",
+        "noKeys": "Noch keine API Keys",
+        "noKeysDesc": "Erstelle einen Key, um mit der MCP Integration zu starten.",
+        "proRequired": "MCP API Zugriff ist ein PRO Feature",
+        "proRequiredDesc": "Upgrade auf PRO für programmatischen API-Zugriff und Integration mit AI Assistenten wie Claude Desktop.",
+        "upgradeBtn": "Auf PRO upgraden",
+        "learnMore": "Mehr über MCP erfahren",
+        "aboutTitle": "Über MCP API Zugriff",
+        "aboutDesc": "Das Model Context Protocol (MCP) ermöglicht es AI-Assistenten wie Claude Desktop, programmatisch mit deinen Team-Daten zu interagieren. Generiere einen API Key, um diese Integration zu aktivieren.",
+        "nextSteps": "Nächste Schritte: Claude Desktop konfigurieren",
+        "loading": "Lade...",
+        "revokeConfirm": "Möchtest du diesen API Key wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "done": "Fertig"
+    },
+    "common": {
+        "apply": "Einlösen",
+        "retry": "Erneut versuchen"
+    }
 }

@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import ExcelJS from 'exceljs';
 import { useLanguage } from '@/context/LanguageContext';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
+import { useDrachenboot } from '@/context/DrachenbootContext';
 import { Upload, FileUp, AlertCircle, CheckCircle, X, Download } from 'lucide-react';
 import { normalizeHeader } from '@/utils/importUtils';
+import { Modal } from '@/components/ui/core/Modal';
+import { SegmentedControl } from '@/components/ui/core/SegmentedControl';
+import { IconButton } from '@/components/ui/core/IconButton';
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -20,6 +25,8 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   onImportEvents 
 }) => {
   const { t } = useLanguage();
+  const { currentTeam, paddlers } = useDrachenboot();
+  const theme = currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey] : null;
   const [activeTab, setActiveTab] = useState<ImportType>('paddler');
   const [isDragOver, setIsDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -55,87 +62,77 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   const processFile = async (file: File) => {
     setFile(file);
     setError(null);
-    setSuccess(null);
+    setIsProcessing(true);
     setPreviewData([]);
 
     try {
-      const data = await parseExcel(file);
-      setPreviewData(data);
-    } catch (err: unknown) {
-      console.error(err);
-      setError(err instanceof Error ? err.message : 'Error parsing file');
-    }
-  };
-
-  const parseExcel = async (file: File): Promise<Record<string, unknown>[]> => {
-    const buffer = await file.arrayBuffer();
-    const workbook = new ExcelJS.Workbook();
-    
-    // Check extension
-    const isCsv = file.name.toLowerCase().endsWith('.csv');
-
-    if (isCsv) {
-        // Manual CSV parsing for browser compatibility (exceljs csv.read requires node streams)
-        const text = await file.text();
-        const sheet = workbook.addWorksheet('Sheet1');
-        const rows = text.split(/\r?\n/);
-        
-        rows.forEach(r => {
+      const arrayBuffer = await file.arrayBuffer();
+      const workbook = new ExcelJS.Workbook();
+      
+      const isCsv = file.name.toLowerCase().endsWith('.csv');
+      
+      if (isCsv) {
+          const text = await file.text();
+          const sheet = workbook.addWorksheet('Sheet1');
+          const rows = text.split(/\r?\n/);
+          
+          rows.forEach(r => {
             if (r.trim()) {
-                // Split by comma, semicolon, pipe, or tab, respecting quotes
-                // Regex matches delimiters that are NOT inside quotes
                 const cells = r.split(/[,;|\t](?=(?:(?:[^"]*"){2})*[^"]*$)/); 
-                
-                // Clean up quotes (remove outer quotes, unescape double quotes)
                 const cleanedCells = cells.map(c => c.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
                 sheet.addRow(cleanedCells);
             }
-        });
-    } else {
-         await workbook.xlsx.load(buffer);
-    }
-    
-    // Get first worksheet
-    const worksheet = workbook.worksheets[0];
-    if (!worksheet) return [];
-
-    const jsonData: Record<string, unknown>[] = [];
-    
-    // Iterate over rows starting from 2 (assuming header is 1)
-    // ExcelJS rows are 1-based.
-    // We need to map headers first.
-    const headers: string[] = [];
-    
-    worksheet.eachRow((row, rowNumber) => {
-      if (rowNumber === 1) {
-        // Capture headers
-        row.eachCell((cell, colNumber) => {
-          headers[colNumber] = normalizeHeader(String(cell.value));
-        });
+          });
       } else {
-        // Capture data
-        const rowData: Record<string, unknown> = {};
-        // Initialize all known headers to null/empty
-        headers.forEach(h => { if(h) rowData[h] = ''; });
+        await workbook.xlsx.load(arrayBuffer);
+      }
+      
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) throw new Error(t('noWorksheet') || 'No worksheet found');
 
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      const data: Record<string, unknown>[] = [];
+      
+      // Get headers
+      const firstRow = worksheet.getRow(1);
+      const headers: string[] = [];
+      
+      firstRow.eachCell((cell, colNumber) => {
+        if (cell.value) {
+          headers[colNumber] = String(cell.value);
+        }
+      });
+
+      // Get data
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header
+        const rowData: Record<string, unknown> = {};
+        let hasData = false;
+
+        row.eachCell((cell, colNumber) => {
           const header = headers[colNumber];
           if (header) {
-             let val = cell.value;
-             if (typeof val === 'object' && val !== null && 'text' in val) {
-                 val = (val as any).text; // eslint-disable-line @typescript-eslint/no-explicit-any 
-             } else if (typeof val === 'object' && val !== null && 'result' in val) {
-                 val = (val as any).result; // eslint-disable-line @typescript-eslint/no-explicit-any
-             }
-             rowData[header] = val;
+            const cleanHeader = normalizeHeader(header);
+            rowData[cleanHeader] = cell.value;
+            hasData = true; 
           }
         });
-        jsonData.push(rowData);
-      }
-    });
 
-    return jsonData;
+        if (hasData) data.push(rowData);
+      });
+
+      if (data.length === 0) {
+        throw new Error(t('noDataFound') || 'No valid data found in file');
+      }
+
+      setPreviewData(data);
+    } catch (err: unknown) {
+      console.error(err);
+      setError(t('fileParseError') || 'Failed to parse file. Please check format.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
 
   const handleImport = async () => {
     if (!previewData.length) return;
@@ -246,205 +243,34 @@ export const ImportModal: React.FC<ImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
-        
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
-          <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <FileUp className="text-blue-600 dark:text-blue-400" />
-            {t('importData') || 'Import Data'}
-          </h2>
-          <button onClick={onClose} className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex border-b border-slate-200 dark:border-slate-800">
-          <button
-            onClick={() => { setActiveTab('paddler'); setFile(null); setPreviewData([]); setError(null); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === 'paddler' 
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
-                : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            {t('paddlers') || 'Paddlers'}
-          </button>
-          <button
-            onClick={() => { setActiveTab('event'); setFile(null); setPreviewData([]); setError(null); }}
-            className={`flex-1 py-3 text-sm font-medium transition-colors ${
-              activeTab === 'event' 
-                ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400' 
-                : 'bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-900'
-            }`}
-          >
-            {t('events') || 'Events'}
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700">
-          
-          {/* Messages */}
-          {error && (
-            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm flex items-center gap-2 border border-red-100 dark:border-red-900/30">
-              <AlertCircle size={16} />
-              {error}
-            </div>
-          )}
-          
-          {success && (
-            <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm flex items-center gap-2 border border-green-100 dark:border-green-900/30">
-              <CheckCircle size={16} />
-              {success}
-            </div>
-          )}
-
-          {/* Upload Area */}
-          {!file ? (
-            <div 
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-              onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-all duration-200 cursor-pointer ${
-                isDragOver 
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 scale-[1.02]' 
-                  : 'border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-slate-50 dark:hover:bg-slate-900/50'
-              }`}
-            >
-              <input 
-                type="file" 
-                accept=".xlsx, .xls, .csv" 
-                onChange={handleFileSelect} 
-                className="hidden" 
-                id="file-upload"
-              />
-              <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center w-full h-full">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mb-4">
-                  <Upload size={32} />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                  {t('dragDropOrClick') || 'Click to upload or drag and drop'}
-                </h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                  {t('supportedFormats') || 'Supports .xlsx, .xls, .csv'}
-                </p>
-                
-                {/* Format Hint */}
-                <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-3 text-xs text-left w-full max-w-sm">
-                  <div className="flex justify-between items-center mb-1">
-                    <p className="font-semibold text-slate-700 dark:text-slate-300">{t('preview') || 'Expected Format'}:</p>
-                    <button 
-                      onClick={(e) => { e.preventDefault(); handleDownloadTemplate(); }}
-                      className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      <Download size={12} />
-                      {t('downloadTemplate') || 'Template'}
-                    </button>
-                  </div>
-                  {activeTab === 'paddler' ? (
-                    <code className="block text-slate-600 dark:text-slate-400 font-mono">
-                      {t('paddlerTemplateColumns') || 'Name | Weight | Side | Skills | Email'}
-                    </code>
-                  ) : (
-                    <code className="block text-slate-600 dark:text-slate-400 font-mono">
-                      {t('eventTemplateColumns') || 'Title | Date | Time | Type | BoatSize | Comment'}
-                    </code>
-                  )}
-                </div>
-              </label>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
-                    <FileUp size={20} />
-                  </div>
-                  <div>
-                    <p className="font-medium text-slate-800 dark:text-slate-200 text-sm">{file.name}</p>
-                    <p className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB • {previewData.length} {t('rowsFound')}</p>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => { setFile(null); setPreviewData([]); }}
-                  className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-full text-slate-500 transition-colors"
-                >
-                  <X size={16} />
-                </button>
-              </div>
-
-              {/* Preview Table */}
-              {previewData.length > 0 && (
-                <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden flex flex-col max-h-[50vh]">
-                  <div className="bg-slate-50 dark:bg-slate-800 px-3 py-2 border-b border-slate-200 dark:border-slate-700 flex-shrink-0">
-                    <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t('preview')} ({previewData.length} Items)</h4>
-                  </div>
-                  <div className="overflow-auto flex-1">
-                    <table className="w-full text-sm text-left relative">
-                      <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium sticky top-0 z-10 shadow-sm">
-                        <tr>
-                          {Object.keys(previewData[0] || {}).map((key) => {
-                            // Map canonical keys to translation keys
-                            const translationMap: { [key: string]: string } = {
-                              title: 'title',
-                              date: 'date',
-                              time: 'time',
-                              type: 'type',
-                              boatSize: 'boatSize',
-                              comment: 'comment',
-                              name: 'name',
-                              weight: 'weight',
-                              side: 'skills',
-                              email: 'emailAddress',
-                              skills: 'skills',
-                            };
-                            const translationKey = translationMap[key];
-                            const displayName = translationKey ? (t(translationKey) || key) : key;
-                            return (
-                              <th key={key} className="px-3 py-2 whitespace-nowrap bg-slate-50 dark:bg-slate-900 capitalize">{displayName}</th>
-                            );
-                          })}
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                        {previewData.map((row, i) => (
-                          <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
-                            {Object.values(row).map((val: unknown, j) => (
-                              <td key={j} className="px-3 py-2 whitespace-nowrap text-slate-700 dark:text-slate-300">
-                                {String(val)}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 flex justify-end gap-3">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="full"
+      padding="p-4"
+      title={
+        <span className="flex items-center gap-2">
+          <FileUp className={theme?.text || 'text-blue-600 dark:text-blue-400'} />
+          {t('importData') || 'Import Data'}
+        </span>
+      }
+      footer={
+        <>
           <button 
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"
           >
             {t('cancel') || 'Cancel'}
           </button>
           <button 
             onClick={handleImport}
-            disabled={!file || !previewData.length || isProcessing}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all flex items-center gap-2"
+            disabled={!!(!file || !previewData.length || isProcessing || (activeTab === 'paddler' && currentTeam?.plan !== 'PRO' && currentTeam?.maxMembers && ((paddlers?.length || 0) + previewData.length > currentTeam.maxMembers)))}
+            className={`px-4 py-2 text-sm font-medium text-white ${theme?.button || 'bg-blue-600 hover:bg-blue-700'} disabled:opacity-50 disabled:cursor-not-allowed rounded-lg shadow-sm transition-all flex items-center gap-2`}
           >
             {isProcessing ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Importing...
+                {t('importing') || 'Importing...'}
               </>
             ) : (
               <>
@@ -453,8 +279,190 @@ export const ImportModal: React.FC<ImportModalProps> = ({
               </>
             )}
           </button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        {/* Tabs */}
+        <div>
+          <label className="text-xs uppercase font-bold text-slate-500 dark:text-slate-400 mb-2 block">{t('importType') || 'Import-Typ'}</label>
+          <SegmentedControl
+            options={[
+              { label: t('paddlers') || 'Paddlers', value: 'paddler' },
+              { label: t('events') || 'Events', value: 'event' }
+            ]}
+            value={activeTab}
+            onChange={(val) => { setActiveTab(val as ImportType); setFile(null); setPreviewData([]); setError(null); }}
+            isFullWidth
+          />
         </div>
+
+        {/* Limit Warning */}
+        {activeTab === 'paddler' && currentTeam?.plan !== 'PRO' && currentTeam?.maxMembers && previewData.length > 0 && (
+          (() => {
+            const limitCaught = paddlers?.length >= currentTeam.maxMembers;
+            const willExceed = (paddlers?.length + previewData.length) > currentTeam.maxMembers;
+            
+            if (limitCaught || willExceed) {
+              return (
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg text-sm flex items-start gap-3">
+                  <div className="text-amber-500 mt-0.5">
+                    <AlertCircle size={18} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-medium text-amber-800 dark:text-amber-400">
+                      {limitCaught ? (t('teamLimitReached') || 'Team limit reached') : (t('teamLimitExceeded') || 'Import exceeds limit')}
+                    </p>
+                    <p className="text-amber-700 dark:text-amber-500 mt-1 text-xs leading-relaxed">
+                      {limitCaught 
+                        ? (t('teamLimitReachedDesc') || 'Limit of {max} reached.').replace('{max}', currentTeam.maxMembers.toString())
+                        : (t('importLimitWarning') || 'Import total {total} exceeds limit {max}.')
+                            .replace('{total}', (paddlers.length + previewData.length).toString())
+                            .replace('{max}', currentTeam.maxMembers.toString())
+                      }
+                    </p>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()
+        )}
+
+        {/* Messages */}
+        {error && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm flex items-center gap-2 border border-red-100 dark:border-red-900/30">
+            <AlertCircle size={16} />
+            {error}
+          </div>
+        )}
+        
+        {success && (
+          <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm flex items-center gap-2 border border-green-100 dark:border-green-900/30">
+            <CheckCircle size={16} />
+            {success}
+          </div>
+        )}
+
+        {/* Upload Area */}
+        {!file ? (
+          <div 
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center transition-all duration-200 cursor-pointer ${
+              isDragOver 
+                ? `${theme?.ringBorder.replace('group-hover:', '') || 'border-blue-500'} ${theme ? theme.buttonGhost.split(' ')[0].replace('hover:', '') : 'bg-blue-50 dark:bg-blue-900/20'} scale-[1.02]` 
+                : `border-slate-300 dark:border-slate-800/40 ${theme?.ringBorder || 'hover:border-blue-400 dark:hover:border-blue-600'} hover:bg-slate-50 dark:hover:bg-slate-900/50`
+            }`}
+          >
+            <input 
+              type="file" 
+              accept=".xlsx, .xls, .csv" 
+              onChange={handleFileSelect} 
+              className="hidden" 
+              id="file-upload"
+            />
+            <label htmlFor="file-upload" className="cursor-pointer flex flex-col items-center w-full h-full">
+              <div className={`w-16 h-16 ${theme ? theme.buttonGhost.split(' ')[0].replace('hover:', '') : 'bg-blue-100 dark:bg-blue-900/30'} ${theme?.text || 'text-blue-600 dark:text-blue-400'} rounded-full flex items-center justify-center mb-4`}>
+                <Upload size={32} />
+              </div>
+              <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-1">
+                {t('dragDropOrClick') || 'Click to upload or drag and drop'}
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                {t('supportedFormats') || 'Supports .xlsx, .xls, .csv'}
+              </p>
+              
+              {/* Format Hint */}
+              <div className="bg-slate-100 dark:bg-slate-800/50 rounded-lg p-3 text-xs text-left w-full max-w-sm">
+                <div className="flex justify-between items-center mb-1">
+                  <p className="font-semibold text-slate-700 dark:text-slate-300">{t('preview') || 'Expected Format'}:</p>
+                  <button 
+                    onClick={(e) => { e.preventDefault(); handleDownloadTemplate(); }}
+                    className={`${theme?.text || 'text-blue-600 dark:text-blue-400'} hover:underline flex items-center gap-1`}
+                  >
+                    <Download size={12} />
+                    {t('downloadTemplate') || 'Template'}
+                  </button>
+                </div>
+                {activeTab === 'paddler' ? (
+                  <code className="block text-slate-600 dark:text-slate-400 font-mono">
+                    {t('paddlerTemplateColumns') || 'Name | Weight | Side | Skills | Email'}
+                  </code>
+                ) : (
+                  <code className="block text-slate-600 dark:text-slate-400 font-mono">
+                    {t('eventTemplateColumns') || 'Title | Date | Time | Type | BoatSize | Comment'}
+                  </code>
+                )}
+              </div>
+            </label>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
+                  <FileUp size={20} />
+                </div>
+                <div>
+                  <p className="font-medium text-slate-800 dark:text-slate-200 text-sm">{file.name}</p>
+                  <p className="text-xs text-slate-500">{(file.size / 1024).toFixed(1)} KB • {previewData.length} {t('rowsFound')}</p>
+                </div>
+              </div>
+              <IconButton icon={X} onClick={() => { setFile(null); setPreviewData([]); }} variant="ghost" size="sm" />
+            </div>
+
+            {/* Preview Table */}
+            {previewData.length > 0 && (
+              <div className="border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden flex flex-col max-h-[50vh]">
+                <div className="bg-slate-50 dark:bg-slate-800 px-3 py-2 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{t('preview')} ({previewData.length} Items)</h4>
+                </div>
+                <div className="overflow-auto flex-1 scrollbar-thin">
+                  <table className="w-full text-sm text-left relative">
+                    <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium sticky top-0 z-10 shadow-sm border-b border-slate-200 dark:border-slate-800">
+                      <tr>
+                        {Object.keys(previewData[0] || {}).map((key) => {
+                          const translationMap: { [key: string]: string } = {
+                            title: 'title',
+                            date: 'date',
+                            time: 'time',
+                            type: 'type',
+                            boatSize: 'boatSize',
+                            comment: 'comment',
+                            name: 'name',
+                            weight: 'weight',
+                            side: 'skills',
+                            email: 'emailAddress',
+                            skills: 'skills',
+                          };
+                          const translationKey = translationMap[key];
+                          const displayName = translationKey ? (t(translationKey) || key) : key;
+                          return (
+                            <th key={key} className="px-3 py-2 whitespace-nowrap bg-slate-50 dark:bg-slate-900 capitalize">{displayName}</th>
+                          );
+                        })}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
+                      {previewData.map((row, i) => (
+                        <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/20">
+                          {Object.values(row).map((val: unknown, j) => (
+                            <td key={j} className="px-3 py-2 whitespace-nowrap text-slate-700 dark:text-slate-300">
+                              {String(val)}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 };

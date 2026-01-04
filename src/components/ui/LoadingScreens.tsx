@@ -25,8 +25,7 @@ const LoadingSkeleton = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column Skeleton: Event List */}
         <div className="lg:col-span-1 flex flex-col gap-4 order-2 lg:order-1">
-           {/* Section Header */}
-           <div className="h-8 w-32 bg-slate-200 dark:bg-slate-800 rounded mb-2 ml-1"></div>
+
            {/* Event Cards */}
            {[1, 2, 3].map((i) => (
              <div key={i} className="h-48 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
@@ -47,31 +46,61 @@ const LoadingSkeleton = () => {
         {/* Right Column Skeleton: Paddler Grid */}
         <div className="lg:col-span-2 flex flex-col gap-4 order-1 lg:order-2">
             {/* Grid Container */}
-           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 h-full min-h-[600px]">
-             <div className="flex justify-between items-center mb-6">
-               <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
-               <div className="flex gap-2">
-                 <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                 <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                 <div className="h-8 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+             {/* Responsive Container: Grid (Mobile) / Table (Desktop) */}
+             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 h-full min-h-[600px]">
+               <div className="flex justify-between items-center mb-6">
+                 <div className="h-6 w-32 bg-slate-200 dark:bg-slate-800 rounded"></div>
+               </div>
+               
+               {/* Mobile: Grid Skeleton */}
+               <div className="block lg:hidden">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                   {[1, 2, 3, 4, 5, 6].map((i) => (
+                     <div key={i} className="h-24 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-3 flex flex-col justify-between">
+                       <div className="flex justify-between items-start">
+                         <div className="space-y-2">
+                           <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                           <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                         </div>
+                         <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+
+               {/* Desktop: Table Skeleton */}
+               <div className="hidden lg:block">
+                 <div className="w-full">
+                   {/* Table Header */}
+                   <div className="flex items-center bg-slate-50 dark:bg-slate-800/50 rounded-t-lg border-b border-slate-200 dark:border-slate-800 px-4 py-3 mb-2">
+                      <div className="w-1/4 h-4 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                      <div className="w-1/4 h-4 bg-slate-200 dark:bg-slate-800 rounded ml-4"></div>
+                      <div className="w-1/4 h-4 bg-slate-200 dark:bg-slate-800 rounded ml-4"></div>
+                      <div className="w-1/4 h-4 bg-slate-200 dark:bg-slate-800 rounded ml-auto"></div>
+                   </div>
+                   {/* Table Rows */}
+                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+                     <div key={i} className="flex items-center px-4 py-3 border-b border-slate-100 dark:border-slate-800/50">
+                       <div className="w-1/4 flex items-center gap-3">
+                         <div className="h-3 w-32 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                       </div>
+                       <div className="w-1/4 ml-4">
+                         <div className="h-6 w-12 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                       </div>
+                       <div className="w-1/4 ml-4 flex gap-1">
+                         <div className="h-5 w-5 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                         <div className="h-5 w-5 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                       </div>
+                       <div className="w-1/4 ml-auto flex justify-end gap-2">
+                         <div className="h-8 w-8 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                         <div className="h-8 w-8 bg-slate-100 dark:bg-slate-800 rounded"></div>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
                </div>
              </div>
-             
-             {/* Paddler Cards Grid */}
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-               {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
-                 <div key={i} className="h-24 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-3 flex flex-col justify-between">
-                   <div className="flex justify-between items-start">
-                     <div className="space-y-2">
-                       <div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                       <div className="h-3 w-12 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                     </div>
-                     <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded"></div>
-                   </div>
-                 </div>
-               ))}
-             </div>
-           </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Team } from '@/types';
-import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Check } from 'lucide-react';
+import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Check, Palette, Sparkles } from 'lucide-react';
 import { useAlert } from '@/context/AlertContext';
 
 import { FormInput } from '@/components/ui/FormInput';
+import { Toggle } from '@/components/ui/core/Toggle';
+import { SettingsItem } from '@/components/ui/core/SettingsItem';
 
 interface TeamSettingsFormProps {
   initialData: Partial<Team>;
@@ -46,10 +48,23 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
     }
   };
 
-  const handleChange = (field: keyof Team, value: string) => {
+  const handleChange = (field: keyof Team, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setSuccess(false);
   };
+
+  const THEMES = [
+    { id: 'amber', name: t('pro.themes.amber') || 'Amber', class: 'bg-amber-500' },
+    { id: 'blue', name: t('pro.themes.blue') || 'Ocean', class: 'bg-blue-500' },
+    { id: 'rose', name: t('pro.themes.rose') || 'Rose', class: 'bg-rose-500' },
+    { id: 'emerald', name: t('pro.themes.emerald') || 'Emerald', class: 'bg-emerald-500' },
+    { id: 'teal', name: t('pro.themes.teal') || 'Teal', class: 'bg-teal-500' },
+    { id: 'indigo', name: t('pro.themes.indigo') || 'Indigo', class: 'bg-indigo-600' },
+    { id: 'violet', name: t('pro.themes.violet') || 'Violet', class: 'bg-violet-500' },
+    { id: 'orange', name: t('pro.themes.orange') || 'Orange', class: 'bg-orange-500' },
+    { id: 'slate', name: t('pro.themes.slate') || 'Slate', class: 'bg-slate-700' },
+    { id: 'zinc', name: t('pro.themes.zinc') || 'Zinc', class: 'bg-zinc-600' },
+  ];
 
   return (
     <form onSubmit={handleSubmit} className={`space-y-4 ${className}`}>
@@ -70,7 +85,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
       {/* Website */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-          <Globe size={16} /> Website
+          <Globe size={16} /> {t('pro.website') || 'Website'}
         </label>
         <FormInput
           type="url"
@@ -84,12 +99,12 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
       {/* Icon Upload */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
-          <ImageIcon size={16} /> Icon
+          <ImageIcon size={16} /> {t('pro.icon') || 'Icon'}
         </label>
         
         <div className="flex items-center gap-4">
           {formData.icon && (
-            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0">
               <img 
                 src={formData.icon} 
                 alt="Team Icon" 
@@ -100,7 +115,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
                 onClick={() => handleChange('icon', '')}
                 className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity text-white"
               >
-                <span className="text-xs">Remove</span>
+                <span className="text-xs">{t('pro.remove') || 'Remove'}</span>
               </button>
             </div>
           )}
@@ -133,7 +148,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
               "
             />
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Max. 5MB. Formats: JPG, PNG, GIF, WebP.
+              {t('pro.imageFormats') || 'Max. 5MB. Formats: JPG, PNG, GIF, WebP.'}
             </p>
           </div>
         </div>
@@ -142,7 +157,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
       {/* Social Media Section */}
       <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
         <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
-          Social Media
+          {t('pro.socialMedia') || 'Social Media'}
         </h3>
         
         <div className="space-y-3">
@@ -152,7 +167,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
               type="text"
               value={formData.instagram || ''}
               onChange={(e) => handleChange('instagram', e.target.value)}
-              placeholder="Instagram Username/URL"
+              placeholder={t('pro.instagramPlaceholder') || 'Instagram Username/URL'}
               className="flex-1 focus:ring-amber-500"
             />
           </div>
@@ -163,7 +178,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
               type="text"
               value={formData.facebook || ''}
               onChange={(e) => handleChange('facebook', e.target.value)}
-              placeholder="Facebook URL"
+              placeholder={t('pro.facebookPlaceholder') || 'Facebook URL'}
               className="flex-1 focus:ring-amber-500"
             />
           </div>
@@ -174,7 +189,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
               type="text"
               value={formData.twitter || ''}
               onChange={(e) => handleChange('twitter', e.target.value)}
-              placeholder="Twitter/X Handle"
+              placeholder={t('pro.twitterPlaceholder') || 'Twitter/X Handle'}
               className="flex-1 focus:ring-amber-500"
             />
           </div>
@@ -185,12 +200,89 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
               type="email"
               value={formData.email || ''}
               onChange={(e) => handleChange('email', e.target.value)}
-              placeholder="Contact Email"
+              placeholder={t('pro.contactEmail') || 'Contact Email'}
               className="flex-1 focus:ring-amber-500"
             />
           </div>
         </div>
       </div>
+
+      {/* PRO Customization - ONLY IF PRO */}
+      {initialData.plan === 'PRO' && (
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+          <h3 className="text-sm font-semibold text-amber-600 dark:text-amber-500 mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Sparkles size={16} /> {t('pro.proCustomization') || 'PRO Customization'}
+          </h3>
+          
+          <div className="space-y-4">
+            {/* Color Theme */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Palette size={16} /> {t('pro.accentColor') || 'Accent Color'}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {THEMES.map(theme => (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    onClick={() => handleChange('primaryColor', theme.id)}
+                    className={`w-10 h-10 rounded-full ${theme.class} border-2 transition-all transform sm:hover:scale-110 active:scale-95 flex items-center justify-center
+                      ${formData.primaryColor === theme.id || (!formData.primaryColor && theme.id === 'amber')
+                        ? 'border-slate-800 dark:border-slate-500 ring-2 ring-slate-200 dark:ring-slate-800/60' 
+                        : 'border-transparent'
+                      }
+                    `}
+                    title={theme.name}
+                  >
+                    {(formData.primaryColor === theme.id || (!formData.primaryColor && theme.id === 'amber')) && (
+                      <Check size={16} className="text-white" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Logo Ring Toggle */}
+            <SettingsItem
+              label={t('pro.showPremiumRing') || 'Show Premium Logo Ring'}
+              description={t('pro.showPremiumRingDesc') || 'Show a shimmering golden ring around your team logo.'}
+            >
+              <Toggle 
+                enabled={formData.showProRing !== false} 
+                onChange={(enabled) => handleChange('showProRing', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
+
+            {/* Show PRO Badge Toggle */}
+            <SettingsItem
+              label={t('pro.showProBadge') || 'Show PRO Badge'}
+              description={t('pro.showProBadgeDesc') || 'Displays the PRO badge in the header and team switcher.'}
+            >
+              <Toggle 
+                enabled={formData.showProBadge !== false} 
+                onChange={(enabled) => handleChange('showProBadge', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
+
+            {/* Show Watermark Toggle */}
+            <SettingsItem
+              label={t('pro.showWatermark') || 'Show branding on exports'}
+              description={t('pro.showWatermarkDesc') || 'Shows "Created with Drachenboot Manager" on image exports.'}
+            >
+              <Toggle 
+                enabled={formData.showWatermark !== false} 
+                onChange={(enabled) => handleChange('showWatermark', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
+          </div>
+        </div>
+      )}
 
       <div className="pt-4 flex justify-end gap-3">
         {onCancel && (

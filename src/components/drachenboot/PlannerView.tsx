@@ -20,6 +20,7 @@ import { useDebounce } from '@/hooks/useDebounce';
 
 import LoadingSkeleton from '../ui/LoadingScreens';
 import PageTransition from '../ui/PageTransition';
+import { THEME_MAP, ThemeKey } from '@/constants/themes';
 
 
 import StatsPanel from './planner/StatsPanel';
@@ -342,27 +343,23 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     setIsExporting(true);
     setTimeout(() => {
       if (boatRef.current) {
-
-        // Using html-to-image for better support of modern CSS (oklch etc.)
         toPng(boatRef.current, { 
             cacheBust: true, 
             pixelRatio: 2,
-            backgroundColor: 'transparent' // Explicitly transparent or null
+            backgroundColor: '#ffffff',
+            style: {
+                backgroundColor: '#ffffff',
+            }
         })
           .then((dataUrl) => {
-            try {
-                const link = document.createElement('a');
-                const safeTitle = (activeEventTitle || 'plan').replace(/[^a-z0-9\u00C0-\u00FF]+/gi, '-').toLowerCase().replace(/(^-|-$)/g, '');
-                const datePrefix = activeEvent?.date ? new Date(activeEvent.date).toISOString().split('T')[0] : '';
-                link.download = `drachenboot-${datePrefix ? datePrefix + '-' : ''}${safeTitle || 'export'}.png`;
-                link.href = dataUrl;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-
-            } catch (innerErr) {
-                console.error('Link generation failed', innerErr);
-            }
+            const link = document.createElement('a');
+            const safeTitle = (activeEventTitle || 'plan').replace(/[^a-z0-9\u00C0-\u00FF]+/gi, '-').toLowerCase().replace(/(^-|-$)/g, '');
+            const datePrefix = activeEvent?.date ? new Date(activeEvent.date).toISOString().split('T')[0] : '';
+            link.download = `drachenboot-${datePrefix ? datePrefix + '-' : ''}${safeTitle || 'export'}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             setIsExporting(false);
           })
           .catch((err) => { 
@@ -370,10 +367,9 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
               setIsExporting(false); 
           });
       } else {
-        console.error('boatRef is null');
         setIsExporting(false);
       }
-    }, 150);
+    }, 500);
   };
 
 
@@ -449,13 +445,14 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
         onConfirm={confirmBoatSizeChange}
         onCancel={() => { setShowBoatSizeConfirm(false); setPendingBoatSize(null); }}
         confirmLabel={t('changeAndClear')}
+        primaryColor={currentTeam?.primaryColor}
       />
 
       <div className="max-w-6xl mx-auto">
         <Header
           title={
             <div className="flex items-center gap-2">
-              <div className="text-blue-500">
+              <div className={currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey]?.text || 'text-blue-500' : 'text-blue-500'}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
               </div>
               <span className="font-bold text-slate-800 dark:text-white text-sm">
@@ -485,7 +482,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
             </Link>
           }
           leftAction={
-            <button onClick={goHome} className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors">
+            <button onClick={goHome} className={`p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 transition-colors ${currentTeam?.plan === 'PRO' ? (THEME_MAP[currentTeam.primaryColor as ThemeKey]?.buttonGhost || 'hover:text-blue-600 hover:border-blue-300') : 'hover:text-blue-600 hover:border-blue-300'}`}>
               <ArrowLeft size={20} />
             </button>
           }
@@ -498,7 +495,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
           <div className="text-center px-2"><div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">{t('total')}</div><div className="font-bold text-sm">{stats.t} kg</div></div>
           <div className="w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
 
-          <div className="text-center px-2"><div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">{t('assigned')}</div><div className="font-bold text-sm text-blue-600 dark:text-blue-400">{stats.c} / 22</div></div>
+          <div className="text-center px-2"><div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold">{t('assigned')}</div><div className={`font-bold text-sm ${currentTeam?.plan === 'PRO' ? THEME_MAP[currentTeam.primaryColor as ThemeKey]?.text || 'text-blue-600 dark:text-blue-400' : 'text-blue-600 dark:text-blue-400'}`}>{stats.c} / 22</div></div>
           <div className="w-px h-8 bg-slate-100 dark:bg-slate-800"></div>
           <UserMenu />
         </Header>
@@ -521,6 +518,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
               setBoatSize={handleUpdateBoatSize}
               isLoading={isCalculating}
               isReadOnly={isReadOnly}
+              primaryColor={currentTeam?.primaryColor}
             />
 
             {/* Paddler Pool */}
@@ -536,6 +534,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
               setShowGuestModal={setShowGuestModal} 
               t={t} 
               isReadOnly={isReadOnly}
+              primaryColor={currentTeam?.primaryColor}
             />
           </div>
 
@@ -556,6 +555,10 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
             toggleLock={toggleLock} 
              rows={rows}
              isReadOnly={isReadOnly}
+             primaryColor={currentTeam?.primaryColor}
+             showProRing={currentTeam?.showProRing}
+             icon={currentTeam?.icon}
+             showWatermark={currentTeam?.showWatermark}
           />
         </div>
         <Footer />
@@ -564,7 +567,7 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     </PageTransition>
     <DragOverlay dropAnimation={null}>
       {activeDragData ? (
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl border-2 border-blue-500 w-28 h-16 flex flex-col items-center justify-center opacity-90 cursor-grabbing scale-105 touch-none relative z-50">
+        <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-2xl border-2 w-28 h-16 flex flex-col items-center justify-center opacity-90 cursor-grabbing scale-105 touch-none relative z-50 ${currentTeam?.plan === 'PRO' ? (THEME_MAP[currentTeam.primaryColor as ThemeKey]?.ringBorder.replace('group-hover:', '') || 'border-blue-500') : 'border-blue-500'}`}>
            <div className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate w-full text-center px-1">
              {activeDragData.name}
              {activeDragData.isGuest && <span className="text-[10px] opacity-80 ml-1 font-normal">{t('guestSuffix')}</span>}

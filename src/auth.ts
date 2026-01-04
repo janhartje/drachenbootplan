@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma"
 import Google from "next-auth/providers/google"
 import GitHub from "next-auth/providers/github"
 import Resend from "next-auth/providers/resend"
+import Credentials from "next-auth/providers/credentials"
 import { sendEmail } from "@/lib/email"
 import MagicLinkEmail from "@/emails/templates/MagicLinkEmail"
 import TeamInviteEmail from "@/emails/templates/TeamInviteEmail"
@@ -157,21 +158,82 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       },
     }),
+    // Test User Provider (Development/Test only)
+    Credentials({
+        id: 'credentials',
+        name: 'Test Credentials',
+        credentials: {
+          email: { label: "Email", type: "text" },
+          password: { label: "Password", type: "password" }
+        },
+        async authorize(credentials) {
+            // ONLY allow in development or test environment
+            const isDev = process.env.NODE_ENV === 'development';
+            const isTest = process.env.NODE_ENV === 'test';
+            const isLocalProduction = process.env.ENABLE_TEST_USER === 'true';
+            
+            if (!isDev && !isTest && !isLocalProduction) {
+                return null;
+            }
+
+            const testEmail = 'test@drachenbootmanager.de';
+            const testPassword = process.env.TEST_USER_PASSWORD || 'testuser123';
+
+            if (credentials.email !== testEmail || credentials.password !== testPassword) {
+                return null;
+            }
+
+            // Create or update the test user
+            const user = await prisma.user.upsert({
+                where: { email: testEmail },
+                update: {
+                    name: "Test User",
+                    emailVerified: new Date(),
+                },
+                create: {
+                    email: testEmail,
+                    name: "Test User",
+                    emailVerified: new Date(),
+                    weight: 85, // Default weight for test user
+                    language: 'de',
+                }
+            });
+
+            return user;
+        }
+    }),
   ],
   pages: {
     signIn: "/login",
     verifyRequest: "/login?verify=1",
   },
+  session: {
+    strategy: "jwt",
+  },
   callbacks: {
-    session({ session, user }) {
-      session.user.id = user.id
-      session.user.weight = user.weight
-      
-      const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
-      if (user.email && adminEmails.includes(user.email.toLowerCase())) {
-        session.user.isAdmin = true;
+    async jwt({ token, user, trigger, session }) {
+        if (user) {
+            token.id = user.id
+            token.weight = user.weight
+             const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
+            if (user.email && adminEmails.includes(user.email.toLowerCase())) {
+                token.isAdmin = true;
+            }
+        }
+        
+        // Handle updates (e.g. when user updates profile)
+        if (trigger === "update" && session?.user) {
+            token.weight = session.user.weight;
+        }
+        
+        return token
+    },
+    session({ session, token }) {
+      if (token && session.user) {
+        session.user.id = token.id as string
+        session.user.weight = token.weight as number | null
+        session.user.isAdmin = token.isAdmin as boolean
       }
-      
       return session
     },
   },

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useDrachenboot } from '@/context/DrachenbootContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { Button } from '@/components/ui/button';
@@ -87,6 +88,7 @@ const PaymentMethodUpdateForm = ({
 
 export const PaymentMethodManager = ({ teamId, currentPaymentMethod }: { teamId: string, currentPaymentMethod: PaymentMethod | undefined | null }) => {
     const { t } = useLanguage();
+    const { isDarkMode } = useDrachenboot();
     const [isEditing, setIsEditing] = useState(false);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [loadingSecret, setLoadingSecret] = useState(false);
@@ -157,7 +159,32 @@ export const PaymentMethodManager = ({ teamId, currentPaymentMethod }: { teamId:
                         stripe={stripePromise} 
                         options={{ 
                             clientSecret, 
-                            appearance: { theme: 'stripe' },
+                            appearance: { 
+                                theme: isDarkMode ? 'night' : 'stripe',
+                                variables: {
+                                    colorPrimary: '#2563eb',
+                                    borderRadius: '6px',
+                                    fontFamily: 'Inter, sans-serif',
+                                    colorBackground: isDarkMode ? '#1e293b' : '#ffffff',
+                                    colorText: isDarkMode ? '#f8fafc' : '#1e293b',
+                                },
+                                rules: {
+                                    '.Input': {
+                                        border: `1px solid ${isDarkMode ? '#334155' : '#e2e8f0'}`,
+                                        borderRadius: '6px',
+                                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                                        color: isDarkMode ? '#f8fafc' : '#1e293b',
+                                        boxShadow: 'none',
+                                    },
+                                    '.Input:focus': {
+                                        border: '2px solid #2563eb',
+                                        boxShadow: 'none',
+                                    },
+                                    '.Label': {
+                                        color: isDarkMode ? '#94a3b8' : '#475569',
+                                    }
+                                }
+                            },
                             locale: (t('common.locale') as 'auto') || 'de'
                         }}
                     >

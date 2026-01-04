@@ -56,4 +56,19 @@ describe('PaddlerModal', () => {
   });
 
 
+  it('disables invite button when limit is reached', () => {
+    mockUseDrachenboot.mockReturnValue({
+      currentTeam: { plan: 'FREE', maxMembers: 5 },
+      paddlers: [{}, {}, {}, {}, {}], // 5 paddlers (full)
+    });
+
+    render(<PaddlerModal isOpen={true} onClose={mockClose} paddlerToEdit={null} onSave={jest.fn()} t={(k) => k} />);
+    
+    // Check form disabled state which propagates to both tabs
+    const form = screen.getByTestId('paddler-form');
+    expect(form).toHaveAttribute('data-disabled', 'true');
+    
+    // Note: Since we mock the form, we assume the Disabled prop logic handles the UI locking.
+    // The previous test was asserting on the result of this prop.
+  });
 });

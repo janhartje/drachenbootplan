@@ -1,12 +1,20 @@
 ---
-description: Entwicklungsrichtlinien für neue Features mit Testfall-Anforderungen
+description: Entwicklungsrichtlinien für neue Features mit Testfall-Anforderungen (Test-First/TDD)
 ---
 
-# Feature Development Workflow
+# Feature Development Workflow (Test-First)
 
-Dieser Workflow definiert die Anforderungen für die Entwicklung neuer Features, insbesondere für größere Features.
+Dieser Workflow definiert die Anforderungen für die Entwicklung neuer Features. **Wir folgen einem strikten Test-First (TDD) Ansatz.**
 
-## 1. Definition "Großes Feature"
+## 1. Grundprinzip: Test-First
+
+**Kein Feature-Code ohne vorherigen roten Test.**
+
+Dies gilt für:
+- **Große Features** (Verpflichtend: Markdown Test Cases + Automatisierte Tests)
+- **Kleine Features / Bugfixes** (Verpflichtend: Automatisierte Tests, optional Markdown Test Cases)
+
+## 2. Definition "Großes Feature"
 
 Ein Feature gilt als "groß", wenn mindestens eines der folgenden Kriterien zutrifft:
 - Es umfasst **mehr als 3 Dateien** oder **mehr als 200 Zeilen Code**
@@ -14,91 +22,74 @@ Ein Feature gilt als "groß", wenn mindestens eines der folgenden Kriterien zutr
 - Es beeinflusst **kritische Geschäftslogik** (z.B. Zahlungen, Datenimport/export, Authentifizierung)
 - Es verändert **bestehende User Journeys** signifikant
 
-## 2. Anforderung: Testfälle erstellen
-
-### Verpflichtung
-Für jedes große Feature **MÜSSEN** Testfälle im Verzeichnis `docs/test_cases/` erstellt werden.
-
-### Warum?
-- Testfälle ermöglichen **automatisiertes Testing** durch Antigravity mit dem Browser Tool
-- Sie dienen als **lebende Dokumentation** der Feature-Funktionalität
-- Sie stellen **Reproduzierbarkeit** von Bugs und Regressionstests sicher
-
-### Was muss dokumentiert werden?
-Erstelle mindestens einen Testfall, der:
-- Den **Happy Path** (Normalfall) des Features abdeckt
-- **Edge Cases** und Fehlerfälle berücksichtigt (falls relevant)
-- **Pre-conditions** klar definiert (z.B. benötigte Testdaten, Benutzerrollen)
-
 ## 3. Workflow für Feature-Entwicklung
 
-### Schritt 1: Planung
-- Analysiere die Feature-Anforderungen
-- Bestimme, ob es sich um ein "großes Feature" handelt
-- Plane die Implementierung
+### Schritt 1: Planung & Analyse
+- Analysiere die Feature-Anforderungen.
+- Erstelle bei großen Features Markdown-Testfälle (siehe unten).
 
-### Schritt 2: Testfall-Erstellung (für große Features)
-**Bevor** du mit der Implementierung beginnst oder **parallel dazu**:
+### Schritt 2: TDD - Tests schreiben (RED)
+**Bevor** du auch nur eine Zeile Produktiv-Code schreibst:
 
-1. Erstelle eine neue Testfall-Datei in `docs/test_cases/`
-   - Naming: `[Nummer]-[feature-name].md` (z.B. `015-export-without-watermark.md`)
-   - Nutze die nächste verfügbare 3-stellige Nummer
+1.  **Erstelle Markdown-Testfälle** (Nur bei großen Features, siehe Format unten).
+2.  **Schreibe automatisierte Tests** (Jest, Vitest, oder Playwright).
+    - Die Tests müssen die Anforderungen des Features abdecken.
+    - **Führe die Tests aus**: Sie MÜSSEN zu diesem Zeitpunkt fehlschlagen ("Red").
+    - Wenn der Test kompiliert, aber fehlschlägt (z.B. `expect(received).toBe(expected)`), ist er bereit.
 
-2. Verwende das Standard-Format:
+### Schritt 3: Implementierung (GREEN)
+- Implementiere das Feature so einfach wie möglich, um die Tests user expectations zu erfüllen.
+- Schreibe nur so viel Code wie nötig.
+- Führe die Tests regelmäßig aus.
+- Ziel: **Alle Tests sind grün.**
+
+### Schritt 4: Refactoring (REFACTOR)
+- Optimiere den Code (Clean Code, Performance).
+- Stelle sicher, dass die Tests weiterhin grün bleiben.
+
+### Schritt 5: Verification & Documentation
+- Führe die Markdown-Testfälle manuell oder via Browser-Tool aus (falls vorhanden).
+- Aktualisiere die Dokumentation.
+
+## 4. Anforderung: Markdown Testfälle (Für große Features)
+
+Zusätzlich zu automatisierten Code-Tests benötigen große Features dokumentierte Testabläufe in `docs/test_cases/`.
+
+### Format
+Dateiname: `[Nummer]-[feature-name].md` (z.B. `015-export-without-watermark.md`)
+
 ```markdown
 # Test Case: [Feature-Name]
 
 **ID**: TC-[Nummer]
-**Description**: [Kurze Beschreibung des Features]
+**Description**: [Kurze Beschreibung]
 **Pre-conditions**:
-- [Vorbedingung 1, z.B. "User ist eingeloggt"]
-- [Vorbedingung 2, z.B. "Team hat PRO-Status"]
+- [Vorbedingung 1]
 
 **Steps**:
-1. [Schritt 1, z.B. "Navigiere zu /planner"]
-2. [Schritt 2, z.B. "Klicke auf 'Export' Button"]
-3. [Schritt 3, z.B. "Wähle PNG-Format"]
-...
+1. [Schritt 1]
+2. [Schritt 2]
 
 **Expected Result**:
-- [Erwartetes Ergebnis 1]
-- [Erwartetes Ergebnis 2]
+- [Erwartetes Ergebnis]
 ```
 
-3. Bei Bedarf: Erstelle Test-Daten (z.B. CSV-Dateien) im selben Verzeichnis
+## 5. Antigravity Testing Support
+- Nutze `/testing` Workflow für exploratives Testen.
+- Neue Bugs werden als Issues mit Label `bug` erfasst.
 
-### Schritt 3: Implementierung
-- Implementiere das Feature
-- Halte den Testfall im Hinterkopf und stelle sicher, dass die Implementierung testbar ist
+## Beispiele
 
-### Schritt 4: Verification
-- Führe den Testfall manuell oder mit Antigravity aus
-- Aktualisiere den Testfall bei Bedarf, falls sich während der Implementierung Details geändert haben
-
-## 4. Testfälle für kleine Features (optional)
-
-Für kleinere Features ist die Erstellung von Testfällen **nicht verpflichtend**, aber **empfohlen**, wenn:
-- Das Feature besonders fehleranfällig sein könnte
-- Es sich um eine kritische Funktion handelt
-- Es später häufig getestet werden muss
-
-## 5. Antigravity Testing
-
-Die erstellten Testfälle können durch Antigravity automatisiert getestet werden:
-- **Befehl**: Führe den `/testing` Workflow aus
-- **Tool**: Antigravity nutzt das Browser Tool zur Ausführung
-- **Reporting**: Gefundene Bugs werden automatisch als GitHub Issues mit den Labels `bug` und `automatisch erfasst` erstellt
-
-## Beispiele großer Features
-
-✅ **Benötigen Testfälle**:
+✅ **Muss vollständig getestet werden (TDD + Markdown)**:
 - CSV Import für Paddler
 - Stripe Pro-Subscription Flow
-- Event-Planung und Export
-- Neue Authentifizierungsmethoden
 
-❌ **Benötigen keine Testfälle**:
-- Kleine UI-Anpassungen (z.B. Button-Farbe ändern)
-- Typo-Fixes in Texten
-- Code-Refactoring ohne funktionale Änderungen
-- Dependency-Updates
+✅ **Muss automatisiert getestet werden (TDD)**:
+- Bugfix in Berechnung
+- Neue Utility-Funktion
+- Kleine UI-Logik (z.B. bedingtes Rendern)
+
+❌ **Braucht keine Tests**:
+- Reine CSS-Änderungen (sofern keine Logik betroffen)
+- Text-Änderungen (Copy)
+- Dependency-Updates (sofern Builds und bestehende Tests laufen)

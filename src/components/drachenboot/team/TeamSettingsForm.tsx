@@ -4,6 +4,8 @@ import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Ch
 import { useAlert } from '@/context/AlertContext';
 
 import { FormInput } from '@/components/ui/FormInput';
+import { Toggle } from '@/components/ui/core/Toggle';
+import { SettingsItem } from '@/components/ui/core/SettingsItem';
 
 interface TeamSettingsFormProps {
   initialData: Partial<Team>;
@@ -102,7 +104,7 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
         
         <div className="flex items-center gap-4">
           {formData.icon && (
-            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0">
+            <div className="relative w-16 h-16 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 shrink-0">
               <img 
                 src={formData.icon} 
                 alt="Team Icon" 
@@ -224,9 +226,9 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
                     key={theme.id}
                     type="button"
                     onClick={() => handleChange('primaryColor', theme.id)}
-                    className={`w-10 h-10 rounded-full ${theme.class} border-2 transition-all transform hover:scale-110 flex items-center justify-center
+                    className={`w-10 h-10 rounded-full ${theme.class} border-2 transition-all transform sm:hover:scale-110 active:scale-95 flex items-center justify-center
                       ${formData.primaryColor === theme.id || (!formData.primaryColor && theme.id === 'amber')
-                        ? 'border-slate-800 dark:border-white ring-2 ring-slate-200 dark:ring-slate-700' 
+                        ? 'border-slate-800 dark:border-slate-500 ring-2 ring-slate-200 dark:ring-slate-800/60' 
                         : 'border-transparent'
                       }
                     `}
@@ -241,79 +243,43 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
             </div>
 
             {/* Logo Ring Toggle */}
-            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {t('pro.showPremiumRing') || 'Show Premium Logo Ring'}
-                </label>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {t('pro.showPremiumRingDesc') || 'Show a shimmering golden ring around your team logo.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleChange('showProRing', !(formData.showProRing !== false))}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-transparent ring-offset-2
-                  ${formData.showProRing !== false ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}
-                `}
-              >
-                <span
-                  className={`relative inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                    ${formData.showProRing !== false ? 'translate-x-6' : 'translate-x-1'}
-                  `}
-                />
-              </button>
-            </div>
+            <SettingsItem
+              label={t('pro.showPremiumRing') || 'Show Premium Logo Ring'}
+              description={t('pro.showPremiumRingDesc') || 'Show a shimmering golden ring around your team logo.'}
+            >
+              <Toggle 
+                enabled={formData.showProRing !== false} 
+                onChange={(enabled) => handleChange('showProRing', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
 
             {/* Show PRO Badge Toggle */}
-            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {t('pro.showProBadge') || 'Show PRO Badge'}
-                </label>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {t('pro.showProBadgeDesc') || 'Displays the PRO badge in the header and team switcher.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleChange('showProBadge', !(formData.showProBadge !== false))}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-transparent ring-offset-2
-                  ${formData.showProBadge !== false ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}
-                `}
-              >
-                <span
-                  className={`relative inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                    ${formData.showProBadge !== false ? 'translate-x-6' : 'translate-x-1'}
-                  `}
-                />
-              </button>
-            </div>
+            <SettingsItem
+              label={t('pro.showProBadge') || 'Show PRO Badge'}
+              description={t('pro.showProBadgeDesc') || 'Displays the PRO badge in the header and team switcher.'}
+            >
+              <Toggle 
+                enabled={formData.showProBadge !== false} 
+                onChange={(enabled) => handleChange('showProBadge', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
 
             {/* Show Watermark Toggle */}
-            <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
-              <div className="space-y-0.5">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                  {t('pro.showWatermark') || 'Show branding on exports'}
-                </label>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {t('pro.showWatermarkDesc') || 'Shows "Created with Drachenboot Manager" on image exports.'}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => handleChange('showWatermark', !(formData.showWatermark !== false))}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ring-2 ring-transparent ring-offset-2
-                  ${formData.showWatermark !== false ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}
-                `}
-              >
-                <span
-                  className={`relative inline-block h-4 w-4 transform rounded-full bg-white transition-transform
-                    ${formData.showWatermark !== false ? 'translate-x-6' : 'translate-x-1'}
-                  `}
-                />
-              </button>
-            </div>
+            <SettingsItem
+              label={t('pro.showWatermark') || 'Show branding on exports'}
+              description={t('pro.showWatermarkDesc') || 'Shows "Created with Drachenboot Manager" on image exports.'}
+            >
+              <Toggle 
+                enabled={formData.showWatermark !== false} 
+                onChange={(enabled) => handleChange('showWatermark', enabled)}
+                activeColor="bg-amber-500"
+                focusColor="focus:ring-amber-500"
+              />
+            </SettingsItem>
           </div>
         </div>
       )}

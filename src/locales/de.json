@@ -26,6 +26,9 @@
     "name": "Name",
     "weight": "Gewicht",
     "skills": "Skills",
+    "actions": "Aktionen",
+    "page": "Seite",
+    "of": "von",
     "tabGeneral": "Allgemein",
     "tabPreferences": "Auto-Besetzung",
     "left": "Links",
@@ -35,6 +38,11 @@
     "regatta": "Regatta",
     "training": "Training",
     "promises": "Zusagen",
+    "attend": "Zusagen",
+    "decline": "Absagen",
+    "unsure": "Unsicher",
+    "participants": "Teilnehmer",
+    "yourStatus": "Dein Status",
     "plan": "Planen",
     "viewPlan": "Plan",
     "squad": "Kader",
@@ -146,6 +154,30 @@
     "clTechnical": "Technische Änderungen",
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
+        {
+            "version": "3.4.0",
+            "date": "Januar 2026",
+            "features": [
+                "Großes UI-Redesign: Neue Core-Komponenten für ein konsistentes, modernes Design.",
+                "Responsive Paddler-Ansicht: Tabelle auf Desktop, Karten auf Mobile.",
+                "Paddler-Paginierung: Übersichtliche Darstellung mit 15 Paddlern pro Seite.",
+                "Neu gestaltete Event-Karten: Kompakte Ansicht mit ausklappbaren Details.",
+                "Verbesserte Teilnehmer-Ansicht: Normale Paddler sehen nur beantwortete Teilnehmer."
+            ],
+            "technical": [
+                "Neue wiederverwendbare UI-Komponenten: Badge, Card, Divider, IconButton, Modal, SegmentedControl, Toggle.",
+                "Responsive Loading-Skeletons passen sich der aktuellen Ansicht an.",
+                "Datenbank-Cleanup: Veraltetes paddlerView-Feld entfernt.",
+                "I18n: Event-Attendance-Strings vollständig lokalisiert."
+            ],
+            "bugfixes": [
+                "Fix: Überlappung von Skill-Badges und Action-Buttons in Paddler-Karten behoben.",
+                "Fix: Konsistente Abstände bei Paginierungs-Indikatoren.",
+                "Fix: Einheitliche Darstellung der Event-Buttons.",
+                "Fix: Skeleton-Layout entspricht nun der tatsächlichen Ansicht.",
+                "Fix: Verbessertes Styling des Gast-Hinzufügen-Modals."
+            ]
+        },
         {
             "version": "3.3.5",
             "date": "Januar 2026",

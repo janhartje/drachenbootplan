@@ -116,7 +116,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
   };
 
   const containerClasses = isModal 
-    ? "p-6" 
+    ? "p-0" 
     : `p-6 rounded-xl shadow-sm border transition-all h-full ${paddlerToEdit ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800 ring-1 ring-orange-200 dark:ring-orange-900' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
 
   return (
@@ -127,9 +127,9 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
         </h3>
       )}
       
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Tabs */}
-        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 mb-4">
+        <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 mb-3">
              <button
                 type="button"
                 onClick={() => setActiveTab('general')}
@@ -156,7 +156,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
 
         {activeTab === 'general' && (
         <>
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="flex-1">
             <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block">{t('name')}</label>
             <FormInput
@@ -178,7 +178,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
         {/* Account Linking Section */}
         {!isGuest && paddlerToEdit && (
         <div className="space-y-3">
-          <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-1 block flex items-center gap-1">
+          <label className="text-[10px] uppercase font-bold text-slate-500 dark:text-slate-400 mb-0.5 block flex items-center gap-1">
             <LinkIcon size={12} /> {t('linkedAccount') || 'Linked Account'}
           </label>
           
@@ -221,7 +221,7 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
                   {t('link') || 'Link'}
                 </button>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
+              <p className="text-[10px] leading-tight text-slate-500 dark:text-slate-400">
                 {t('linkAccountHint') || 'If the email has an account, the paddler will be linked. Otherwise, an invitation will be sent.'}
               </p>
               {linkError && (
@@ -255,10 +255,10 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
             <button
               type="button"
               onClick={() => handleSkillChange('stroke')}
-              className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full ${
+              className={`px-3 py-2.5 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full active:scale-[0.98] ${
                 skills.stroke
                   ? `${theme?.buttonGhost.split(' ').slice(0, 2).join(' ') || 'bg-blue-50 border-blue-200'} ${theme?.text || 'text-blue-700 dark:text-blue-300'}`
-                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 sm:hover:border-slate-300'
               }`}
             >
               <div className="flex flex-col text-left">
@@ -271,10 +271,10 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
             <button
               type="button"
               onClick={() => handleSkillChange('steer_preferred')}
-              className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full ${
+              className={`px-3 py-2.5 rounded-lg border text-sm font-medium transition-all flex items-center justify-between w-full active:scale-[0.98] ${
                 skills.steer_preferred
                   ? `${theme ? theme.buttonGhost.split(' ').slice(0, 2).join(' ').replace('blue', 'purple').replace('blue', 'purple') : 'bg-purple-50 border-purple-200'} ${theme?.text.replace('blue', 'purple').replace('blue', 'purple') || 'text-purple-700 dark:text-purple-300'}`
-                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-slate-300'
+                  : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 sm:hover:border-slate-300'
               }`}
             >
               <div className="flex flex-col text-left">
@@ -287,19 +287,31 @@ const PaddlerForm: React.FC<PaddlerFormProps> = ({ paddlerToEdit, onSave, onCanc
         </div>
         )}
 
-        <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2 justify-end mt-6 border-t border-slate-100 dark:border-slate-800">
-          {(!isModal && paddlerToEdit) && <button type="button" onClick={onCancel} className="w-full sm:w-auto bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded text-sm">{t('cancel')}</button>}
-          {isModal && <button type="button" onClick={onCancel} className="w-full sm:w-auto bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 px-4 py-2 rounded text-sm">{t('cancel')}</button>}
+        <div className={`mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 ${isModal ? 'grid grid-cols-2 gap-3' : 'flex justify-end gap-2'}`}>
+          {(isModal || paddlerToEdit) && (
+            <button 
+              type="button" 
+              onClick={onCancel} 
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isModal 
+                  ? 'w-full border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50' 
+                  : 'bg-white dark:bg-slate-800 text-slate-500 hover:text-slate-700 border border-slate-200'
+              }`}
+            >
+              {t('cancel')}
+            </button>
+          )}
           <button 
             type="submit" 
             disabled={!isFormValid || disabled}
-            className={`w-full sm:w-auto h-9 px-6 py-2 rounded text-sm font-medium flex items-center justify-center gap-2 transition-all
+            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all ${isModal ? 'w-full' : ''}
               ${isFormValid && !disabled
-                ? (paddlerToEdit ? 'bg-orange-500 hover:bg-orange-600 text-white' : (theme?.button || 'bg-blue-600 hover:bg-blue-700') + ' text-white') 
+                ? (paddlerToEdit ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-sm' : (theme?.button || 'bg-blue-600 hover:bg-blue-700') + ' text-white shadow-sm') 
                 : 'bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed opacity-70'
               }`}
           >
-            {paddlerToEdit ? <Save size={16} /> : <Plus size={16} />} {paddlerToEdit ? t('save') : t('add')}
+            {paddlerToEdit ? <Save size={18} /> : <Plus size={18} />} 
+            {paddlerToEdit ? t('save') : t('add')}
           </button>
         </div>
       </form>

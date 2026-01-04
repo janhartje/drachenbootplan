@@ -20,6 +20,9 @@
     "name": "Name",
     "weight": "Weight",
     "skills": "Skills",
+    "actions": "Actions",
+    "page": "Page",
+    "of": "of",
     "tabGeneral": "General",
     "tabPreferences": "Auto-Assignment",
     "left": "Left",
@@ -29,6 +32,11 @@
     "regatta": "Race",
     "training": "Training",
     "promises": "Confirmed",
+    "attend": "Attend",
+    "decline": "Decline",
+    "unsure": "Unsure",
+    "participants": "Participants",
+    "yourStatus": "Your Status",
     "plan": "Plan",
     "viewPlan": "View Plan",
     "squad": "Squad",
@@ -146,6 +154,30 @@
     "clTechnical": "Technical Changes",
     "clBugfixes": "Bug Fixes",
     "changelogData": [
+        {
+            "version": "3.4.0",
+            "date": "January 2026",
+            "features": [
+                "Major UI Redesign: New core components for a consistent, modern design.",
+                "Responsive Paddler View: Table on desktop, cards on mobile.",
+                "Paddler Pagination: Clean display with 15 paddlers per page.",
+                "Redesigned Event Cards: Compact view with expandable details.",
+                "Improved Participant View: Regular paddlers only see responded participants."
+            ],
+            "technical": [
+                "New reusable UI components: Badge, Card, Divider, IconButton, Modal, SegmentedControl, Toggle.",
+                "Responsive loading skeletons adapt to the current view.",
+                "Database Cleanup: Removed deprecated paddlerView field.",
+                "I18n: Event attendance strings fully localized."
+            ],
+            "bugfixes": [
+                "Fix: Resolved overlap of skill badges and action buttons in paddler cards.",
+                "Fix: Consistent spacing for pagination indicators.",
+                "Fix: Unified event button appearance.",
+                "Fix: Skeleton layout now matches actual view.",
+                "Fix: Improved Add Guest modal styling."
+            ]
+        },
         {
             "version": "3.3.5",
             "date": "January 2026",

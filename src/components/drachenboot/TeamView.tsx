@@ -27,6 +27,7 @@ import PageTransition from '../ui/PageTransition';
 import WelcomeView from './WelcomeView';
 import { ImportModal } from './team/ImportModal';
 import { ProBadge } from './pro/ProBadge';
+import PaddlerList from './team/PaddlerList';
 
 import { THEME_MAP } from '@/constants/themes';
 
@@ -53,6 +54,9 @@ const TeamView: React.FC = () => {
     importEvents,
     createEvent,
     updateEvent,
+    loadMorePaddlers,
+    hasMorePaddlers,
+    isMorePaddlersLoading,
   } = useDrachenboot();
 
   // --- REFRESH DATA ON MOUNT ---
@@ -178,13 +182,53 @@ const TeamView: React.FC = () => {
 
   const handleEditPaddler = (p: Paddler) => {
     setEditingPaddlerId(p.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDeletePaddler = (id: number | string) => {
     deletePaddler(id);
     if (editingPaddlerId === id) setEditingPaddlerId(null);
   };
+
+  const paddlerGridHeaderAction = useMemo(() => (
+    <div className="flex gap-2 flex-wrap justify-end items-center">
+      <button 
+        onClick={() => setShowImport(true)}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]
+            ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' 
+            : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+        }`}
+      >
+        <FileUp size={16} />
+        {t('import') || 'Import'}
+      </button>
+
+      <button 
+        id="tour-new-event"
+        onClick={() => setShowEventModal(true)}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        <Calendar size={16} />
+        {t('newTermin')}
+      </button>
+      <button 
+        id="tour-paddler-form"
+        onClick={() => setEditingPaddlerId('new')}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        <Plus size={16} />
+        {t('addPaddler')}
+      </button>
+    </div>
+  ), [currentTeam, t]);
 
 
 
@@ -439,55 +483,54 @@ const TeamView: React.FC = () => {
                 <EventsSection sortedPaddlers={sortedPaddlers} onEdit={setEditingEvent} />
               </div>
 
-              {/* Paddler Grid */}
+              {/* Paddler Grid (Mobile) / List (Desktop) */}
               <div className="lg:col-span-2 flex flex-col">
-                <PaddlerGrid 
-                  paddlers={sortedPaddlers} 
-                  editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
-                  onEdit={handleEditPaddler} 
-                  onDelete={handleDeletePaddler} 
-                  t={t}
-                  headerAction={
-                    <div className="flex gap-2 flex-wrap justify-end">
-                       <button 
-                         onClick={() => setShowImport(true)}
-                         className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors ${
-                           currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]
-                             ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' 
-                             : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
-                         }`}
-                       >
-                          <FileUp size={16} />
-                          {t('import') || 'Import'}
-                       </button>
-
-                        <button 
-                           id="tour-new-event"
-                          onClick={() => setShowEventModal(true)}
-                          className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
-                            currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
-                              ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
-                              : 'bg-blue-600 hover:bg-blue-700'
-                          }`}
-                        >
-                           <Calendar size={16} />
-                           {t('newTermin')}
-                        </button>
+                <div className="block lg:hidden">
+                  <PaddlerGrid 
+                    paddlers={sortedPaddlers} 
+                    editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                    headerAction={paddlerGridHeaderAction}
+                  />
+                  {hasMorePaddlers && (
+                    <div className="mt-4 flex justify-center">
                       <button 
-                        id="tour-paddler-form"
-                        onClick={() => setEditingPaddlerId('new')}
-                        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
-                          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
-                            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
-                            : 'bg-blue-600 hover:bg-blue-700'
-                        }`}
+                        onClick={() => loadMorePaddlers()} 
+                        disabled={isMorePaddlersLoading}
+                        className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                       >
-                        <Plus size={16} />
-                        {t('addPaddler')}
+                         {isMorePaddlersLoading ? (
+                           <span className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
+                         ) : 'Load More'}
                       </button>
                     </div>
-                  }
-                />
+                  )}
+                </div>
+                <div className="hidden lg:block">
+                  <PaddlerList 
+                    paddlers={sortedPaddlers} 
+                    editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                    headerAction={paddlerGridHeaderAction}
+                  />
+                  {hasMorePaddlers && (
+                    <div className="mt-4 flex justify-center">
+                      <button 
+                        onClick={() => loadMorePaddlers()} 
+                        disabled={isMorePaddlersLoading}
+                        className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                      >
+                         {isMorePaddlersLoading ? (
+                           <span className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
+                         ) : 'Load More'}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -498,15 +541,26 @@ const TeamView: React.FC = () => {
 
               </div>
 
-              {/* Paddler Grid */}
+              {/* Paddler Grid (Mobile) / List (Desktop) */}
               <div className="lg:col-span-2 flex flex-col">
-                <PaddlerGrid 
-                  paddlers={sortedPaddlers} 
-                  editingId={null} 
-                  onEdit={handleEditPaddler} 
-                  onDelete={handleDeletePaddler} 
-                  t={t}
-                />
+                <div className="block lg:hidden">
+                  <PaddlerGrid 
+                    paddlers={sortedPaddlers} 
+                    editingId={null} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                  />
+                </div>
+                <div className="hidden lg:block">
+                   <PaddlerList 
+                    paddlers={sortedPaddlers} 
+                    editingId={null} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                  />
+                </div>
               </div>
             </div>
           )}

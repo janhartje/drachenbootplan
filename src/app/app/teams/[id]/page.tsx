@@ -240,8 +240,8 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
           <UserMenu />
         </Header>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col min-h-[600px]">
-          <div className="flex border-b border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800/40 overflow-hidden flex flex-col min-h-[600px]">
+          <div className="flex border-b border-slate-200 dark:border-slate-800/40">
             <button
               onClick={() => {
                 router.push(`/app/teams/${id}?tab=general`);

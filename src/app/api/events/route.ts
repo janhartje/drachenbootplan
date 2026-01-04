@@ -56,6 +56,29 @@ export async function GET(request: Request) {
         }
     }
 
+    // Parse Pagination & Filter Params
+    const fromParam = searchParams.get('from');
+    const toParam = searchParams.get('to');
+    const skipParam = searchParams.get('skip');
+    const takeParam = searchParams.get('take');
+
+    if (fromParam) {
+       const fromDate = new Date(fromParam);
+       if (!isNaN(fromDate.getTime())) {
+         whereClause.date = { ...((whereClause.date as Prisma.DateTimeFilter) || {}), gte: fromDate };
+       }
+    }
+
+    if (toParam) {
+       const toDate = new Date(toParam);
+       if (!isNaN(toDate.getTime())) {
+         whereClause.date = { ...((whereClause.date as Prisma.DateTimeFilter) || {}), lte: toDate };
+       }
+    }
+
+    const skip = skipParam ? parseInt(skipParam) : undefined;
+    const take = takeParam ? parseInt(takeParam) : undefined;
+
     const events = await prisma.event.findMany({
       where: whereClause,
       include: {
@@ -67,6 +90,8 @@ export async function GET(request: Request) {
         assignments: true,
       },
       orderBy: { date: 'asc' },
+      skip: !isNaN(Number(skip)) ? skip : undefined,
+      take: !isNaN(Number(take)) ? take : undefined,
     });
 
     const eventsWithGuests = events.map(event => {

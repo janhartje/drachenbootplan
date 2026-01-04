@@ -7,6 +7,10 @@ import { CheckoutForm } from '@/components/stripe/CheckoutForm';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { Team } from '@/types';
+import { Card } from '@/components/ui/core/Card';
+import { SegmentedControl } from '@/components/ui/core/SegmentedControl';
+import { Badge } from '@/components/ui/core/Badge';
+import { Divider } from '@/components/ui/core/Divider';
 
 if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
   throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is missing');
@@ -172,14 +176,14 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   };
 
   return (
-    <div className="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-4 md:p-8 border border-slate-200 dark:border-slate-800">
+    <Card className="p-4 md:p-8 border-slate-200 dark:border-slate-800">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start max-w-5xl mx-auto">
              {/* LEFT COLUMN: Benefits */}
              <div className="space-y-6 pt-2">
                  <div className="space-y-3">
-                      <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 text-xs font-bold tracking-wider mb-2">
-                        PREMIUM UPGRADE
-                      </div>
+                      <Badge variant="warning">
+                        {t('pro.premiumUpgrade') || 'PREMIUM UPGRADE'}
+                      </Badge>
                       <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-50">{t(`pro.benefits.title`)}</h2>
                       <p className="text-slate-500 dark:text-slate-400 text-base">
                          {t('pro.unlockFeaturesDescription')}
@@ -209,40 +213,36 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                 {/* Decorative glow */}
                 <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl blur opacity-25 dark:opacity-40"></div>
                 
-                <div className="relative bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <Card className="relative p-0 overflow-hidden border-slate-200 dark:border-slate-800 shadow-lg">
                     {/* Premium Top Bar */}
                     <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 to-orange-500"></div>
                     
                     <div className="p-6">
                         {/* Billing Interval Toggle */}
                         <div className="flex justify-center mb-6">
-                            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700 w-fit">
-                                <button
-                                    onClick={() => setBillingInterval('year')}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                                        billingInterval === 'year' 
-                                        ? 'bg-white text-slate-900 border border-slate-200 shadow-sm dark:bg-slate-700 dark:text-white dark:border-slate-600' 
-                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                                    }`}
-                                >
-                                    {t('pro.intervalYearly')} <span className="text-amber-600 dark:text-amber-400 text-xs font-bold ml-1">-20%</span>
-                                </button>
-                                <button
-                                    onClick={() => setBillingInterval('month')}
-                                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
-                                        billingInterval === 'month' 
-                                        ? 'bg-white text-slate-900 border border-slate-200 shadow-sm dark:bg-slate-700 dark:text-white dark:border-slate-600' 
-                                        : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-                                    }`}
-                                >
-                                    {t('pro.intervalMonthly')}
-                                </button>
-                            </div>
+                            <SegmentedControl
+                                options={[
+                                    { 
+                                        label: (
+                                            <span className="flex items-center gap-2">
+                                                {t('pro.intervalYearly')} 
+                                                <Badge variant="warning" size="xs" className="dark:bg-amber-900/40 dark:text-amber-400">
+                                                    -20%
+                                                </Badge>
+                                            </span>
+                                        ), 
+                                        value: 'year' 
+                                    },
+                                    { label: t('pro.intervalMonthly'), value: 'month' }
+                                ]}
+                                value={billingInterval}
+                                onChange={(val) => setBillingInterval(val as 'month' | 'year')}
+                            />
                         </div>
 
                         {/* Price Header */}
                         {priceDetails ? (
-                            <div className="text-center mb-6 pb-6 border-b border-slate-100 dark:border-slate-800">
+                            <div className="text-center mb-6 pb-6">
                                 <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">
                                     {t('pro.productName')}
                                 </h3>
@@ -254,11 +254,13 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                                         / {priceDetails.interval === 'year' ? t('pro.intervalYearly') : t('pro.intervalMonthly')}
                                     </span>
                                 </div>
+                                <Divider className="mt-6 mb-0" />
                             </div>
                         ) : (
-                            <div className="text-center mb-6 pb-6 border-b border-slate-100 dark:border-slate-800 animate-pulse">
+                            <div className="text-center mb-6 pb-6 animate-pulse">
                                 <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3 mx-auto mb-3"></div>
                                 <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded w-1/2 mx-auto"></div>
+                                <Divider className="mt-6 mb-0" />
                             </div>
                         )}
 
@@ -267,9 +269,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-lg text-center mb-4">
                                 <p className="text-red-700 dark:text-red-400 text-sm mb-2">{error}</p>
                                 <button 
-                                    onClick={() => {
-                                        setError(null);
-                                    }}
+                                    onClick={() => setError(null)}
                                     className="text-xs font-bold text-red-600 dark:text-red-500 underline uppercase tracking-wider"
                                 >
                                     {t('common.retry') || 'Retry'}
@@ -296,9 +296,9 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                              <span className="flex items-center gap-1">🔒 {t('pro.securePayment') || 'SSL Encrypted & Secure Payment'}</span>
                         </div>
                     </div>
-                </div>
+                </Card>
             </div>
          </div>
-    </div>
+    </Card>
   );
 };

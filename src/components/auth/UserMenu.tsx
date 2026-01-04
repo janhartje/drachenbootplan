@@ -59,7 +59,7 @@ export function UserMenu() {
       <div className="relative" ref={dropdownRef}>
         <button 
           onClick={() => setIsOpen(!isOpen)}
-          className="relative h-9 w-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="relative h-9 w-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-blue-500"
         >
           <Avatar className="h-full w-full">
             <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />

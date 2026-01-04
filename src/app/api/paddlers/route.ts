@@ -10,6 +10,11 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const requestedTeamId = searchParams.get('teamId');
+  const skipParam = searchParams.get('skip');
+  const takeParam = searchParams.get('take');
+  
+  const skip = skipParam ? parseInt(skipParam) : undefined;
+  const take = takeParam ? parseInt(takeParam) : undefined;
 
   try {
     let paddlers;
@@ -28,7 +33,9 @@ export async function GET(request: Request) {
         paddlers = await prisma.paddler.findMany({
             where: { teamId },
             orderBy: { name: 'asc' },
-            include: { user: { select: { email: true, name: true, image: true } } }
+            include: { user: { select: { email: true, name: true, image: true } } },
+            skip: !isNaN(Number(skip)) ? skip : undefined,
+            take: !isNaN(Number(take)) ? take : undefined,
         });
         
         // Return full data for API Key (assumed admin/tool access)
@@ -52,7 +59,9 @@ export async function GET(request: Request) {
                 orderBy: { name: 'asc' },
                 include: {
                     user: { select: { email: true, name: true, image: true } }
-                }
+                },
+                skip: !isNaN(Number(skip)) ? skip : undefined,
+                take: !isNaN(Number(take)) ? take : undefined,
                 })
             ]);
 
@@ -85,7 +94,9 @@ export async function GET(request: Request) {
                 orderBy: { name: 'asc' },
                 include: {
                     user: { select: { email: true, name: true, image: true } }
-                }
+                },
+                skip: !isNaN(Number(skip)) ? skip : undefined,
+                take: !isNaN(Number(take)) ? take : undefined,
             });
         }
 

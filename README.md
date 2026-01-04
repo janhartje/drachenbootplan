@@ -50,82 +50,97 @@ Das folgende Diagramm zeigt den Top-Down-Aufbau des Systems, von der Benutzerint
 
 ```mermaid
 flowchart TD
-    %% Entry Points
-    User((Nutzer / Browser))
-    AI_Agent((AI Agent / Claude))
+    %% --- STYLES ---
+    classDef default fill:#ffffff,stroke:#334155,stroke-width:1px,color:#0f172a;
+    classDef interaction fill:#eff6ff,stroke:#2563eb,stroke-width:2px,color:#1e3a8a;
+    classDef service fill:#fefce8,stroke:#ca8a04,stroke-width:2px,color:#713f12;
+    classDef functional fill:#f0fdf4,stroke:#16a34a,stroke-width:2px,color:#14532d;
+    classDef technical fill:#f3f4f6,stroke:#4b5563,stroke-width:2px,color:#374151;
+    classDef base fill:#f1f5f9,stroke:#64748b,stroke-width:2px,color:#334155;
+    classDef invisible fill:none,stroke:none,color:none,width:0px;
 
-    %% 1. Interaction Layer
-    subgraph Interaction ["1. Interaction Layer (Client/Interface)"]
+    %% --- 1. INTERACTION LAYER ---
+    subgraph Interaction ["1. Interaction Layer"]
         direction LR
-        PWA["Human UI (PWA / React)"]
-        MCP["AI Interface (MCP Server)"]
+        PWA["<div class='node-fixed-width'><span class='node-title'>PWA / React</span><span class='node-desc'>Human UI</span></div>"]
+        MCP["<div class='node-fixed-width'><span class='node-title'>MCP Server</span><span class='node-desc'>AI Agent Interface</span></div>"]
     end
 
-    %% 2. Service Layer
-    subgraph Service ["2. Service Layer (Access)"]
-        API[REST Web Services / OpenAPI]
+    %% --- 2. SERVICE LAYER ---
+    subgraph Service ["2. Service Layer"]
+        API["<div class='node-fixed-width'><span class='node-title'>REST Web Services</span><span class='node-desc'>OpenAPI Gateway</span></div>"]
     end
 
-    %% 3. Functional Layer
-    subgraph Functional ["3. Functional Capabilities (Fachlich)"]
+    %% --- 3-5. CORE SYSTEM ---
+    subgraph Core ["Kernsystem (Fachlich | Technisch | Basis)"]
         direction LR
-        F1["Team- & Kaderverwaltung"]
-        F2["Aufstellungsplanung (KI)"]
-        F3["Event- & Terminmanagement"]
-        F4["Abonnement-Features"]
+        
+        %% Column 3
+        subgraph Functional ["3. Fachlich (Functional)"]
+            direction TB
+            F1["<div class='node-fixed-width'><span class='node-title'>Team- & Kader</span><span class='node-desc'>Verwaltung</span></div>"]
+            F2["<div class='node-fixed-width'><span class='node-title'>Aufstellung (KI)</span><span class='node-desc'>Planungsalgorithmus</span></div>"]
+            F3["<div class='node-fixed-width'><span class='node-title'>Events & Termine</span><span class='node-desc'>Management</span></div>"]
+            F4["<div class='node-fixed-width'><span class='node-title'>Abos & Billing</span><span class='node-desc'>SaaS Features</span></div>"]
+        end
+
+        %% Column 4
+        subgraph Technical ["4. Technisch (Infrastructure)"]
+            direction TB
+            T1["<div class='node-fixed-width'><span class='node-title'>Auth.js</span><span class='node-desc'>Identity Provider</span></div>"]
+            T2["<div class='node-fixed-width'><span class='node-title'>Prisma 7</span><span class='node-desc'>ORM Layer</span></div>"]
+            T3["<div class='node-fixed-width'><span class='node-title'>Stripe Integration</span><span class='node-desc'>Payment Service</span></div>"]
+            T4["<div class='node-fixed-width'><span class='node-title'>Resend</span><span class='node-desc'>Email Engine</span></div>"]
+        end
+
+        %% Column 5
+        subgraph Base ["5. Basis (Storage/Ext)"]
+            direction TB
+            DB["<div class='node-fixed-width'><span class='node-title'>PostgreSQL</span><span class='node-desc'>Database Cluster</span></div>"]
+            DB_Dummy["<div class='node-fixed-width' style='opacity:0; height:0;'>Spacer</div>"]:::invisible
+            Ext_Stripe["<div class='node-fixed-width'><span class='node-title'>Stripe API</span><span class='node-desc'>External System</span></div>"]
+            Ext_Resend["<div class='node-fixed-width'><span class='node-title'>Resend API</span><span class='node-desc'>External System</span></div>"]
+            Logs["<div class='node-fixed-width'><span class='node-title'>Logging</span><span class='node-desc'>Audit Trail</span></div>"]
+        end
     end
 
-    %% 4. Technical Layer
-    subgraph Technical ["4. Technical Capabilities (Infrastruktur)"]
-        direction LR
-        T1["Auth.js (Identity)"]
-        T2["Prisma 7 (ORM)"]
-        T3["Stripe Integration (Payments)"]
-        T4["Mail Engine (Resend)"]
-    end
+    %% --- CONNECTIONS ---
+    PWA <--> API
+    MCP <--> API
 
-    %% 5. Base Layer
-    subgraph Base ["5. Base Layer (Storage & External)"]
-        direction LR
-        DB[(PostgreSQL)]
-        Ext_Stripe[[Stripe API]]
-        Ext_Resend[[Resend API]]
-    end
+    API <--> F1
+    API <--> F2
+    API <--> F3
+    API <--> F4
 
-    %% Connections (Top-Down Flow)
-    User --> PWA
-    AI_Agent --> MCP
-    
-    PWA <-->|REST| API
-    MCP <-->|REST| API
-    
-    API <--> Functional
-    Functional <--> Technical
-    
-    Technical <--> T2 <--> DB
-    Technical <--> T1
+    %% Horizontal Alignment
+    F1 <--> T1
+    F1 <--> T2
+    F2 <--> T2
+    F3 <--> T2
+    F4 <--> T3
+
+    %% Technical Down
+    T1 -.-> DB
+    T2 <--> DB
     T3 <--> Ext_Stripe
     T4 --> Ext_Resend
     
+    %% Log Connections (Subtle)
+    API -.-> Logs
+    T2 -.-> Logs
+
     %% Webhook Loop
-    Ext_Stripe -- "Webhooks" --> API
+    Ext_Stripe -.-> API
 
-    %% Styling (High Contrast & Clear Hierarchy)
-    classDef default fill:#ffffff,stroke:#111827,stroke-width:1px,color:#111827;
-    classDef layer fill:#f9fafb,stroke:#374151,stroke-width:2px,stroke-dasharray: 5 5,color:#111827;
-    classDef interaction fill:#dbeafe,stroke:#1e40af,stroke-width:2px,color:#111827;
-    classDef service fill:#fef9c3,stroke:#854d0e,stroke-width:2px,color:#111827;
-    classDef functional fill:#dcfce7,stroke:#166534,stroke-width:2px,color:#111827;
-    classDef technical fill:#f3f4f6,stroke:#4b5563,stroke-width:1px,color:#111827;
-    classDef base fill:#f1f5f9,stroke:#334155,stroke-width:1px,color:#111827;
-    classDef actor fill:#ffffff,stroke:#111827,stroke-width:2px,color:#111827;
-
+    %% --- CLASS ASSIGNMENTS ---
     class Interaction interaction;
     class Service service;
     class Functional functional;
     class Technical technical;
     class Base base;
-    class User,AI_Agent actor;
+    class PWA,MCP,API,F1,F2,F3,F4,T1,T2,T3,T4,DB,Ext_Stripe,Ext_Resend,Logs default;
+    class DB_Dummy invisible;
 ```
 
 ## 📂 Projektstruktur

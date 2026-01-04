@@ -32,85 +32,85 @@ Der **Drachenboot Manager** ist eine Progressive Web App (PWA) zur Verwaltung vo
 
 ## 🛠 Tech Stack
 
-*   **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
-*   **Language**: [TypeScript](https://www.typescriptlang.org/)
-*   **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma ORM](https://www.prisma.io/)
-*   **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-*   **Icons**: [Lucide React](https://lucide.dev/)
-*   **State Management**: React Context API (`DrachenbootContext`, `LanguageContext`)
-*   **Drag & Drop**: [@dnd-kit](https://dndkit.com/) (Modern, lightweight DnD library)
-*   **Export**: `html-to-image` für hochauflösenden Bild-Export der Aufstellung (unterstützt moderne CSS-Features)
-*   **Charts**: `recharts` für Statistik-Visualisierung
+*   **Framework**: [Next.js 16](https://nextjs.org/) (App Router, Server Actions)
+*   **Runtime**: [Node.js 24+](https://nodejs.org/)
+*   **Language**: [TypeScript 5.x](https://www.typescriptlang.org/)
+*   **Database**: [PostgreSQL](https://www.postgresql.org/) with [Prisma 7 ORM](https://www.prisma.io/)
+*   **Auth**: [Auth.js v5](https://authjs.dev/) (NextAuth Beta)
+*   **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)
+*   **Components**: [Radix UI](https://www.radix-ui.com/) & [Lucide Icons](https://lucide.dev/)
+*   **PWA**: [@ducanh2912/next-pwa](https://github.com/ducanh2912/next-pwa)
+*   **AI Integration**: [MCP SDK](https://github.com/modelcontextprotocol/sdk) (Model Context Protocol)
+*   **Payments**: [Stripe](https://stripe.com/)
+*   **Email**: [Resend](https://resend.com/) & [React Email](https://react.email/)
 
 ## 🏗 Gesamtarchitektur
 
 ```mermaid
-graph TD
-    %% Entities
+flowchart TB
+    %% Entry Points
     User((Nutzer / Browser))
-    AI((AI Agent / Claude))
-    
-    subgraph "Frontend & PWA"
-        PWA[Next.js 14 Frontend]
-        SW[Service Worker / Offline Cache]
-        State[React Context / State]
-    end
-    
-    subgraph "Vercel / Next.js Server"
-        Backend[App Router / Server Actions]
-        MCPServer[MCP Server Interface]
-        MailQueue[Mail Queue & Cron Jobs]
-        API[REST & OpenAPI Endpoints]
+    AI_Agent((AI Agent / Claude))
+
+    %% Client Layer
+    subgraph Client ["Client Layer (PWA)"]
+        direction TB
+        UI[React 19 / Tailwind 4]
+        State[React Context / DrachenbootContext]
+        PWA_SW[Service Worker / Offline Support]
+        Auth_Client[Auth.js Session Management]
     end
 
-    subgraph "Datenbank"
-        Prisma[Prisma ORM]
-        DB[(PostgreSQL)]
+    %% Server Layer
+    subgraph Server ["Next.js Server (App Router)"]
+        direction TB
+        direction TB
+        ServerActions[Server Actions / Business Logic]
+        API_Routes[API Routes / REST / OpenAPI]
+        MCP_Server[MCP Server / Tool Definitions]
+        Email_Engine[Resend / Mail Queue]
     end
 
-    subgraph "Externe Services"
-        Stripe[Stripe Payments]
-        Resend[Resend Mail Service]
+    %% Data Layer
+    subgraph Storage ["Data Layer"]
+        Prisma[Prisma 7 Client]
+        Postgres[(PostgreSQL)]
+        Prisma --- Postgres
+    end
+
+    %% External Services
+    subgraph External ["Externe Services"]
+        Stripe[Stripe Checkout & Billing]
+        Resend_API[Resend Transactional Email]
     end
 
     %% Connections
-    User <--> PWA
-    PWA <--> Backend
-    PWA <--> API
-    AI <--> MCPServer
+    User -->|HTTPS| UI
+    AI_Agent <-->|MCP/SSE| MCP_Server
     
-    Backend <--> Prisma
-    API <--> Prisma
-    MCPServer <--> Prisma
-    Prisma <--> DB
+    UI <--> ServerActions
+    UI <--> API_Routes
+    UI --- PWA_SW
     
-    Backend <--> Stripe
-    Stripe -- "Webhooks" --> API
+    ServerActions <--> Auth_Client
+    ServerActions --> Prisma
+    API_Routes --> Prisma
+    MCP_Server --> Prisma
     
-    Backend <--> Resend
-    MailQueue <--> Resend
+    ServerActions -->|Payment Flow| Stripe
+    Stripe -- "Webhooks" --> API_Routes
     
-    %% Capabilities
-    subgraph "System Capabilities"
-        Cap1[Team- & Mitgliederverwaltung]
-        Cap2[Bootsbesetzungs-Algorithmus]
-        Cap3[Abonnement & Zahlungen via Stripe]
-        Cap4[Transactional Email via Resend]
-        Cap5[AI Integration via MCP]
-    end
+    Email_Engine -->|SMTP/API| Resend_API
+    ServerActions --> Email_Engine
 
-    DB -.-> Cap1
-    DB -.-> Cap2
-    Stripe -.-> Cap3
-    Resend -.-> Cap4
-    MCPServer -.-> Cap5
-
-    %% Styles
-    style User fill:#f9f,stroke:#333,stroke-width:2px
-    style AI fill:#bbf,stroke:#333,stroke-width:2px
-    style DB fill:#ff9,stroke:#333,stroke-width:2px
-    style Stripe fill:#6772e5,color:#fff
-    style Resend fill:#000,color:#fff
+    %% Styling
+    style User fill:#e1f5fe,stroke:#01579b
+    style AI_Agent fill:#f3e5f5,stroke:#4a148c
+    style Server fill:#f1f8e9,stroke:#33691e
+    style Client fill:#fff3e0,stroke:#e65100
+    style Storage fill:#eceff1,stroke:#263238
+    style External fill:#fce4ec,stroke:#880e4f
+    style Postgres fill:#fff9c4,stroke:#fbc02d
 ```
 
 ## 📂 Projektstruktur

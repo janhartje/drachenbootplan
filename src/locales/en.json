@@ -154,7 +154,10 @@
             "technical": [
                 "Code hygiene: Removed debug logs, added missing translations."
             ],
-            "bugfixes": []
+            "bugfixes": [
+                "Fix: Corrected automatic redirect after team creation.",
+                "Fix: Profile completion (onboarding) now validates role selection."
+            ]
         },
         {
             "version": "3.4.4",
@@ -740,6 +743,9 @@
     "onboardingBody": "To help your coach plan and balance the boat optimally, we need a few details from you.",
     "weightReason": "Your weight is visible only to you and the coach. It is essential for calculating the boat's balance (trim).",
     "skillsReason": "Your preferred position (left/right/drum/steer) helps with creating the seating plan.",
+    "nameRequired": "Name is required.",
+    "weightRequired": "Please provide a valid weight.",
+    "skillRequired": "Please select at least one side/role.",
     "completeProfile": "Complete Profile",
     "thankYou": "Thank you!",
     "sending": "Sending...",

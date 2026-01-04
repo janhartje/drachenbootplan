@@ -154,7 +154,10 @@
             "technical": [
                 "Code-Hygiene: Debug-Logs entfernt, fehlende Übersetzungen ergänzt."
             ],
-            "bugfixes": []
+            "bugfixes": [
+                "Fix: Automatische Weiterleitung nach Teamerstellung korrigiert.",
+                "Fix: Profil-Vervollständigung (Onboarding) validiert jetzt die Rollenauswahl."
+            ]
         },
         {
             "version": "3.4.4",
@@ -743,6 +746,9 @@
     "onboardingBody": "Damit dein Trainer das Boot optimal planen und ausbalancieren kann, benötigen wir noch ein paar Angaben von dir.",
     "weightReason": "Dein Gewicht ist nur für dich und den Trainer sichtbar. Es ist essentiell für die Berechnung der Balance (Trim) des Bootes.",
     "skillsReason": "Deine Position (links/rechts/Trommel/Steuer) hilft beim Erstellen der Sitzordnung.",
+    "nameRequired": "Name ist erforderlich.",
+    "weightRequired": "Bitte gib ein gültiges Gewicht an.",
+    "skillRequired": "Bitte wähle mindestens eine Seite/Rolle aus.",
     "completeProfile": "Profil vervollständigen",
     "thankYou": "Danke!",
     "sending": "Wird gesendet...",

@@ -31,9 +31,18 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ onClose, paddl
     setSkills(sObj);
   }, [paddler]);
 
+  const hasSkills = Object.values(skills).some(v => v);
+  const isFormValid = name.trim() !== '' && weight.trim() !== '' && parseFloat(weight) > 0 && hasSkills;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    if (!hasSkills) {
+      setError(t('skillRequired') || 'Bitte wähle mindestens eine Seite/Rolle aus.');
+      return;
+    }
+    
     setIsSaving(true);
     
     try {
@@ -60,8 +69,6 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({ onClose, paddl
   const handleSkillChange = (skill: keyof SkillsState) => {
     setSkills(prev => ({ ...prev, [skill]: !prev[skill] }));
   };
-  
-  const isFormValid = name.trim() !== '' && weight.trim() !== '' && parseFloat(weight) > 0;
 
   return (
     <Modal

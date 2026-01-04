@@ -7,7 +7,7 @@ import { Paddler, Event, Assignments, Team } from '@/types';
 interface DrachenbootContextType {
   teams: Team[];
   currentTeam: Team | null;
-  createTeam: (name: string) => Promise<void>;
+  createTeam: (name: string) => Promise<Team | null>;
   updateTeam: (id: string, data: Partial<Team>) => Promise<void>;
   deleteTeam: (id: string) => Promise<void>;
   switchTeam: (teamId: string) => void;
@@ -426,10 +426,12 @@ export const DrachenbootProvider: React.FC<{ children: React.ReactNode }> = ({ c
         setIsDataLoading(true);
         setCurrentTeam(newTeam);
         localStorage.setItem('drachenboot_team', newTeam.id);
+        return newTeam;
       }
     } catch (e) {
       console.error('Failed to create team', e);
     }
+    return null;
   }, []);
 
   const updateTeam = useCallback(async (id: string, data: Partial<Team>) => {

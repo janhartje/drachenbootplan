@@ -29,10 +29,15 @@ const TeamSwitcher: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCreateTeam = (name: string) => {
-    createTeam(name);
+  const handleCreateTeam = async (name: string) => {
+    const newTeam = await createTeam(name);
     setShowCreateModal(false);
     setIsOpen(false);
+
+    if (newTeam && pathname.includes('/app/teams/')) {
+      const tab = searchParams.get('tab') || 'general';
+      router.push(`/app/teams/${newTeam.id}?tab=${tab}`);
+    }
   };
 
   if (!currentTeam && teams.length === 0) {

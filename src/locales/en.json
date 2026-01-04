@@ -155,6 +155,26 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.4.3",
+            "date": "January 2026",
+            "features": [],
+            "technical": [
+                "Improved backend support for direct Stripe coupon IDs."
+            ],
+            "bugfixes": [
+                "Fix: Coupon codes are now correctly recognized and applied."
+            ]
+        },
+        {
+            "version": "3.4.2",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: The 'Change Payment Method' window is now correctly displayed in dark mode."
+            ]
+        },
+        {
             "version": "3.4.1",
             "date": "January 2026",
             "features": [],

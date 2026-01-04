@@ -126,15 +126,34 @@ export async function findExistingSubscription(
 }
 
 /**
- * Lookup a promotion code by its code string.
+ * Lookup a discount (promotion code or direct coupon ID).
  */
-export async function lookupPromotionCode(code: string): Promise<string | null> {
+export async function lookupDiscount(code: string): Promise<{ type: 'promotion_code' | 'coupon'; id: string } | null> {
+  const cleanCode = code.trim();
+  if (!cleanCode) return null;
+
+  // 1. Try to find a promotion code (customer-facing)
   const promos = await stripe.promotionCodes.list({
-    code,
+    code: cleanCode,
     active: true,
     limit: 1,
   });
-  return promos.data.length > 0 ? promos.data[0].id : null;
+
+  if (promos.data.length > 0) {
+    return { type: 'promotion_code', id: promos.data[0].id };
+  }
+
+  // 2. Fallback: Check if it's a direct Coupon ID
+  try {
+    const coupon = await stripe.coupons.retrieve(cleanCode);
+    if (coupon.valid) {
+      return { type: 'coupon', id: coupon.id };
+    }
+  } catch {
+    // Not a valid coupon ID
+  }
+
+  return null;
 }
 
 /**
@@ -246,11 +265,10 @@ export async function createOrResumeSubscription(
   }
   
   // 4. Prepare Params
-  let promotionCodeId: string | undefined;
+  let discount: { type: 'promotion_code' | 'coupon'; id: string } | null = null;
   if (promotionCode) {
-    const promoId = await lookupPromotionCode(promotionCode);
-    if (!promoId) throw new Error('Invalid promotion code');
-    promotionCodeId = promoId;
+    discount = await lookupDiscount(promotionCode);
+    if (!discount) throw new Error('Invalid promotion code');
   }
   
   const targetPrice = await getPriceForInterval(interval);
@@ -288,7 +306,7 @@ export async function createOrResumeSubscription(
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
       metadata: { teamId },
-      discounts: promotionCodeId ? [{ promotion_code: promotionCodeId }] : undefined,
+      discounts: discount ? [{ [discount.type]: discount.id }] : undefined,
   });
 
   if (!subscription) throw new Error('Failed to create subscription');
@@ -420,11 +438,10 @@ export async function getSubscriptionPreview(
   const { customerId } = await getOrCreateCustomer(teamId, null);
   const targetPrice = await getPriceForInterval(interval);
   
-  let promotionCodeId: string | undefined;
+  let discount: { type: 'promotion_code' | 'coupon'; id: string } | null = null;
   if (promotionCode) {
-    const promoId = await lookupPromotionCode(promotionCode);
-    if (!promoId) throw new Error('Invalid promotion code');
-    promotionCodeId = promoId;
+    discount = await lookupDiscount(promotionCode);
+    if (!discount) throw new Error('Invalid promotion code');
   }
 
   // Use createPreview (cast to any as types are missing/outdated)
@@ -434,7 +451,7 @@ export async function getSubscriptionPreview(
     subscription_details: {
       items: [{ price: targetPrice.id }],
     },
-    discounts: promotionCodeId ? [{ promotion_code: promotionCodeId }] : undefined,
+    discounts: discount ? [{ [discount.type]: discount.id }] : undefined,
   });
 
   const discountTotal = upcomingInvoice.total_discount_amounts?.reduce((a: number, b: { amount: number }) => a + b.amount, 0) || 0;

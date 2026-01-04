@@ -34,6 +34,11 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   // Use a ref to access the latest promoCode without triggering re-renders of hooks
   const promoCodeRef = React.useRef(promoCode);
 
+  // Sync ref with state
+  useEffect(() => {
+    promoCodeRef.current = promoCode;
+  }, [promoCode]);
+
   // No more manual initializeSetup. The Payment Element will use Deferred Intent mode.
 
 
@@ -120,7 +125,6 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
       fontFamily: 'Inter, sans-serif',
       colorBackground: isDarkMode ? '#1e293b' : '#ffffff',
       colorText: isDarkMode ? '#f8fafc' : '#1e293b',
-      borderColor: isDarkMode ? '#334155' : '#e2e8f0',
     },
     rules: {
         '.Input': {
@@ -165,7 +169,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   const handleApplyPromo = async () => {
       setIsInitializing(true);
       try {
-          await updatePricePreview(billingInterval);
+          await updatePricePreview(billingInterval, promoCode);
           // Don't reset anything, just update price
       } catch {
           setError('Invalid promotion code');

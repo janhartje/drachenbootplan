@@ -2,7 +2,7 @@
 import { 
   getOrCreateCustomer, 
   findExistingSubscription, 
-  lookupPromotionCode,
+  lookupDiscount,
   getPriceForInterval
 } from '../stripe-service';
 import { stripe } from '@/lib/stripe';
@@ -22,6 +22,9 @@ jest.mock('@/lib/stripe', () => ({
     },
     promotionCodes: {
       list: jest.fn(),
+    },
+    coupons: {
+      retrieve: jest.fn(),
     },
     prices: {
       retrieve: jest.fn(),
@@ -140,24 +143,35 @@ describe('stripe-service', () => {
     });
   });
 
-  describe('lookupPromotionCode', () => {
-    it('returns promotion code ID when found', async () => {
+  describe('lookupDiscount', () => {
+    it('returns promotion code object when found', async () => {
       (mockStripe.promotionCodes.list as jest.Mock).mockResolvedValue({
         data: [{ id: 'promo_123' }],
       });
 
-      const result = await lookupPromotionCode('SAVE20');
+      const result = await lookupDiscount('SAVE20');
 
-      expect(result).toBe('promo_123');
+      expect(result).toEqual({ type: 'promotion_code', id: 'promo_123' });
     });
 
-    it('returns null when code not found', async () => {
-      (mockStripe.promotionCodes.list as jest.Mock).mockResolvedValue({ data: [] });
+    it('returns null when returning unknown code', async () => {
+        (mockStripe.promotionCodes.list as jest.Mock).mockResolvedValue({ data: [] });
+        // Mock coupon retrieve to fail for invalid coupon check
+        (mockStripe.coupons.retrieve as jest.Mock).mockRejectedValue({ code: 'resource_missing' });
+  
+        const result = await lookupDiscount('INVALID');
+  
+        expect(result).toBeNull();
+      });
 
-      const result = await lookupPromotionCode('INVALID');
-
-      expect(result).toBeNull();
-    });
+    it('returns coupon object when direct coupon ID is found', async () => {
+        (mockStripe.promotionCodes.list as jest.Mock).mockResolvedValue({ data: [] });
+        (mockStripe.coupons.retrieve as jest.Mock).mockResolvedValue({ id: 'coupon_123', valid: true });
+  
+        const result = await lookupDiscount('coupon_123');
+  
+        expect(result).toEqual({ type: 'coupon', id: 'coupon_123' });
+      });
   });
 
   describe('getPriceForInterval', () => {

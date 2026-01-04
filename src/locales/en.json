@@ -155,6 +155,15 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.4.1",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Event cards now properly adapt to Light/Dark Mode."
+            ]
+        },
+        {
             "version": "3.4.0",
             "date": "January 2026",
             "features": [

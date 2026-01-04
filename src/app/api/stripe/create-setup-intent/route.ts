@@ -18,7 +18,6 @@ export async function POST(request: Request) {
 
     const { clientSecret } = await createSetupIntent(
         teamId, 
-        session.user.id, 
         session.user.email ?? null
     );
 

@@ -13,7 +13,7 @@ export interface CheckoutFormProps {
   onApplyPromo?: () => void;
   isApplyingPromo?: boolean;
   priceDetails?: { amount: number; currency: string; interval: string } | null;
-  onSuccess?: (paymentMethodId: string) => Promise<{ clientSecret: string | null }>;
+  onSuccess?: (paymentMethodId: string, metadata?: Record<string, string>) => Promise<{ clientSecret: string | null }>;
 }
 
 export const CheckoutForm = ({ 
@@ -56,7 +56,13 @@ export const CheckoutForm = ({
     // This returns the clientSecret for the PaymentIntent (or SetupIntent if Trial)
     if (onSuccess) {
         try {
-            const subResult = await onSuccess(''); // No PM ID needed yet, Elements will handle it
+            const now = new Date().toISOString();
+            const metadata = {
+                agb_consent: now,
+                revocation_waiver: now
+            };
+
+            const subResult = await onSuccess('', metadata); // No PM ID needed yet, Elements will handle it
             
             if (subResult && subResult.clientSecret) {
                 const secret = subResult.clientSecret as string;
@@ -184,6 +190,33 @@ export const CheckoutForm = ({
       <h3 className="text-lg font-semibold mb-4 text-slate-700 dark:text-slate-200">{t('pro.upgradeTitle')}</h3>
       <PaymentElement id="payment-element" options={{layout: "tabs"}} />
       
+      <div className="mt-6 space-y-3">
+        <label className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+          <input 
+            type="checkbox" 
+            required
+            className="mt-1 rounded border-slate-300 dark:border-slate-700 text-amber-500 focus:ring-amber-500 bg-transparent"
+          />
+          <span dangerouslySetInnerHTML={{ 
+            __html: (t('legal.agbConsent') || 'I agree to the <a href="/legal/agb" target="_blank" class="underline">AGB</a> and <a href="/legal/datenschutz" target="_blank" class="underline">Privacy Policy</a>.')
+            .replace('[AGB]', '<a href="/legal/agb" target="_blank" class="underline">AGB</a>')
+            .replace('[Datenschutzerklärung]', '<a href="/legal/datenschutz" target="_blank" class="underline">Datenschutzerklärung</a>')
+            .replace('[Privacy Policy]', '<a href="/legal/datenschutz" target="_blank" class="underline">Privacy Policy</a>')
+          }} />
+        </label>
+
+        <label className="flex items-start gap-2 text-sm text-slate-600 dark:text-slate-400 cursor-pointer">
+          <input 
+            type="checkbox" 
+            required
+            className="mt-1 rounded border-slate-300 dark:border-slate-700 text-amber-500 focus:ring-amber-500 bg-transparent"
+          />
+          <span className="text-xs">
+            {t('legal.revocationWaiver') || 'I agree that the execution of the contract begins before the expiration of the withdrawal period and I lose my right of withdrawal.'}
+          </span>
+        </label>
+      </div>
+
       {message && (
         <div id="payment-message" className="mt-4 p-3 bg-red-100 text-red-700 rounded text-sm">
           {message}
@@ -197,7 +230,12 @@ export const CheckoutForm = ({
         className="w-full mt-6 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold transition-all transform hover:scale-[1.02]"
         size="lg"
       >
-        {isLoading || isApplyingPromo ? t('pro.processing') : t('pro.payNow')}
+        <span className="flex flex-col items-center leading-tight">
+            <span>{isLoading || isApplyingPromo ? t('pro.processing') : t('pro.payNow')}</span>
+            {!isLoading && !isApplyingPromo && (
+                <span className="text-[10px] font-normal opacity-80">{t('pro.vatIncluded')}</span>
+            )}
+        </span>
       </Button>
     </form>
   );

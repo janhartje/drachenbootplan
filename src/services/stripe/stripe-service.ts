@@ -237,7 +237,8 @@ export async function createOrResumeSubscription(
   userEmail: string | null,
   interval: 'month' | 'year' = 'year',
   promotionCode?: string,
-  paymentMethodId?: string
+  paymentMethodId?: string,
+  metadata?: Record<string, string>
 ): Promise<SubscriptionResponse> {
   const safeEmail = userEmail ? userEmail.toLowerCase() : null;
 
@@ -305,7 +306,7 @@ export async function createOrResumeSubscription(
       payment_behavior: 'default_incomplete', // CRITICAL: Allows creation without immediate payment success
       payment_settings: { save_default_payment_method: 'on_subscription' },
       expand: ['latest_invoice.payment_intent', 'pending_setup_intent'],
-      metadata: { teamId },
+      metadata: { teamId, ...metadata },
       discounts: discount ? [{ [discount.type]: discount.id }] : undefined,
   });
 

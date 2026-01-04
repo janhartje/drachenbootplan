@@ -63,7 +63,6 @@
     "noPromises": "Keine Zusagen.",
     "unknownEvent": "Unbekanntes Event",
     "pleaseChooseRole": "Bitte eine Rolle wählen.",
-    "imprint": "Impressum",
     "madeWithLove": "Made with ❤️ in Hannover.",
     "helpTitle": "Hilfe & Anleitung",
     "helpBoatManning": "Bootsbesetzung",
@@ -107,13 +106,6 @@
     "helpInteractiveTour": "Interaktive Einführung",
     "helpStartTour": "Tour starten",
     "helpUnderstood": "Verstanden",
-    "imprintTitle": "Impressum",
-    "imprintLegal": "Angaben gemäß § 5 TMG",
-    "imprintContact": "Kontakt",
-    "imprintResponsible": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV",
-    "imprintLiabilityContent": "Haftung für Inhalte",
-    "imprintLiabilityLinks": "Haftung für Links",
-    "imprintCopyright": "Urheberrecht",
     "close": "Schließen",
     "guestAddTitle": "Gast hinzufügen",
     "guestName": "Gast Name",
@@ -154,6 +146,18 @@
     "clTechnical": "Technische Änderungen",
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
+        {
+            "version": "3.4.4",
+            "date": "Januar 2026",
+            "features": [
+                "DSGVO-konforme Einwilligungen: Pflicht-Checkboxen für AGB/Datenschutz und Widerrufsverzicht beim Checkout.",
+                "Rechtliche Nachverfolgbarkeit: Einwilligungszeitpunkte werden in Stripe-Abos gespeichert."
+            ],
+            "technical": [
+                "Überarbeitete Lokalisierung der rechtlichen Texte (AGB, Datenschutz, Impressum, AVV)."
+            ],
+            "bugfixes": []
+        },
         {
             "version": "3.4.3",
             "date": "Januar 2026",
@@ -665,25 +669,6 @@
     "errorSavingPaddler": "Fehler beim Speichern des Paddlers.",
     "warning": "Warnung",
     "info": "Information",
-    "privacy": "Datenschutz",
-    "privacyTitle": "Datenschutzerklärung",
-    "privacyIntro": "Verantwortlicher im Sinne der Datenschutzgesetze, insbesondere der EU-Datenschutzgrundverordnung (DSGVO), ist:",
-    "privacyHosting": "Hosting",
-    "privacyHostingText": "Wir hosten unsere Anwendung bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Der Anbieter ist zertifiziert nach dem EU-US Data Privacy Framework und bietet hierdurch eine Garantie, das europäische Datenschutzrecht einzuhalten. Die Daten werden in Frankfurt (Deutschland) verarbeitet. Vercel erhebt Logfiles mit IP-Adressen, um die Sicherheit und Stabilität des Dienstes zu gewährleisten.",
-    "privacyDatabase": "Datenbank",
-    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Prenzlauer Allee 193, 10405 Berlin, Deutschland) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
-    "privacyAuth": "Authentifizierung",
-    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland) und GitHub (GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, Niederlande). Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
-    "privacyEmails": "E-Mail Versand",
-    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt.",
-    "privacyPayments": "Zahlungsabwicklung (Stripe)",
-    "privacyPaymentsText": "Wir nutzen Stripe (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Irland) für die Zahlungsabwicklung. Stripe verarbeitet Zahlungsdaten (z.B. Kreditkartendaten) in unserem Auftrag. Die Datenübertragung erfolgt verschlüsselt. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung). Weitere Informationen finden Sie in der Datenschutzerklärung von Stripe: https://stripe.com/de/privacy.",
-    "privacyRights": "Ihre Rechte",
-    "privacyRightsText": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer gespeicherten Daten. Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen.",
-    "disclaimerTitle": "Haftungsausschluss & Technische Hinweise",
-    "disclaimerSafety": "Sicherheitshinweis: Die in dieser Applikation bereitgestellten Berechnungen (z.B. zur Balance und Trimmung) dienen ausschließlich zur Unterstützung und Orientierung. Sie ersetzen nicht die fachliche Einschätzung und Verantwortung des Bootsführers/Kapitäns. Die Nutzung erfolgt auf eigene Gefahr.",
-    "disclaimerWarranty": "Software-Gewährleistung: Die Software wird 'wie besehen' (as-is) ohne jegliche Gewährleistung, weder ausdrücklich noch stillschweigend, bereitgestellt. Es wird keine Garantie für Fehlerfreiheit oder ständige Verfügbarkeit übernommen.",
-    "techInfo": "Realisiert mit Next.js, Vercel, Prisma & Resend.",
     "emailWelcomeSubject": "Willkommen beim Drachenboot Manager!",
     "emailWelcomeGreeting": "Hallo",
     "emailWelcomeIntro": "Herzlich willkommen beim Drachenboot Manager. Wir freuen uns, dich an Bord zu haben!",
@@ -853,12 +838,13 @@
     "errorReload": "Neu laden",
     "pro": {
         "upgradeTitle": "Upgrade auf PRO",
-        "upgradeDescription": "Erhalte unbegrenzte Mitglieder, iCal Integration und werbefreie Exporte.",
+        "upgradeDescription": "Erhalte unbegrenzte Mitglieder, MCP-Zugriff für KI und werbefreie Exporte.",
         "upgradeButton": "Jetzt upgraden",
         "unlockFeaturesTitle": "Pro-Features freischalten",
         "unlockFeaturesDescription": "Erhalte unbegrenzte Mitglieder, Import/Export Funktionen und bevorzugten Support.",
         "billingAddress": "Rechnungsadresse",
-        "payNow": "Jetzt bezahlen",
+        "payNow": "Zahlungspflichtig bestellen",
+        "vatIncluded": "inkl. MwSt.",
         "processing": "Verarbeite...",
         "priceLabel": "Preis",
         "intervalYearly": "Jährlich",
@@ -876,8 +862,7 @@
         "benefits": {
             "title": "Warum Pro?",
             "item1": "Unbegrenzte Mitgliederzahl",
-            "item2": "Export ohne Wasserzeichen",
-            "item3": "iCal Kalender Integration",
+            "item3": "Export ohne Wasserzeichen",
             "item4": "Bevorzugter Support",
             "item5": "Unterstütze die Weiterentwicklung",
             "item6": "MCP Server für KI-Integration"
@@ -1018,6 +1003,109 @@
         "loading": "Lade...",
         "revokeConfirm": "Möchtest du diesen API Key wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
         "done": "Fertig"
+    },
+    "legal": {
+        "common": {
+            "imprint": "Impressum",
+            "tos": "AGB",
+            "privacy": "Datenschutz",
+            "avv": "AVV"
+        },
+        "imprint": {
+            "title": "Impressum",
+            "legal": "Angaben gemäß § 5 TMG",
+            "name": "Jan Hartje",
+            "address": "Hamburger Allee 6, 30161 Hannover",
+            "contact": "Kontakt",
+            "email": "support@janhartje.com",
+            "ustId": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+            "responsible": "Redaktionell verantwortlich",
+            "liability_content": "Haftung für Inhalte",
+            "liability_content_text": "Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.",
+            "liability_links": "Haftung für Links",
+            "liability_links_text": "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.",
+            "copyright": "Urheberrecht",
+            "copyright_text": "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen."
+        },
+        "privacy": {
+            "title": "Datenschutzerklärung",
+            "intro": "1. Datenschutz auf einen Blick",
+            "intro_text": "Diese Datenschutzerklärung informiert Sie darüber, wie Jan Hartje (nachfolgend „wir“) personenbezogene Daten im Rahmen der Nutzung des „Drachenboot Manager“ verarbeitet.",
+            "responsible": "2. Verantwortlicher",
+            "hosting": "Hosting & CDN",
+            "hosting_text": "Wir hosten unsere Website bei Vercel. Anbieter ist die Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA. Serverstandort: Frankfurt, Deutschland. Vercel ist unter dem EU-US Data Privacy Framework zertifiziert.",
+            "database": "Datenbank",
+            "database_text": "Unsere Datenbank wird von Vercel Postgres bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
+            "auth": "Registrierung & Login (NextAuth)",
+            "auth_text": "Sie können sich über Google oder GitHub anmelden. Dabei werden Daten vom jeweiligen Provider an uns übermittelt (E-Mail, Name, Profilbild). Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).",
+            "emails": "E-Mail Versand",
+            "emails_text": "Wir nutzen Resend für den Versand von System-E-Mails. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an zuverlässiger Kommunikation).",
+            "payments": "Zahlungsabwicklung (Stripe)",
+            "payments_text": "Für kostenpflichtige Funktionen nutzen wir Stripe. Stripe verarbeitet Zahlungsdaten und Informationen zur Betrugsprävention. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.",
+            "analytics": "4. Analyse-Tools",
+            "analytics_text": "Wir nutzen Vercel Analytics und Speed Insights, um die Nutzung unserer Website statistisch auszuwerten. Hierbei werden Daten i.d.R. anonymisiert erhoben.",
+            "rights": "5. Ihre Rechte",
+            "rights_text": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten sowie das Recht auf Datenübertragbarkeit."
+        },
+        "tos": {
+            "title": "Allgemeine Geschäftsbedingungen (AGB)",
+            "scope": "1. Geltungsbereich",
+            "scope_text": "Diese AGB gelten für alle Verträge zwischen Jan Hartje (nachfolgend „Anbieter“) und seinen Kunden über die Nutzung der Software „Drachenboot Manager“ (nachfolgend „Software“).",
+            "subject": "2. Vertragsgegenstand und Leistungen",
+            "subject_text": "Der Anbieter stellt dem Kunden die Software als SaaS-Lösung zur Verfügung. Der Funktionsumfang ergibt sich aus der Leistungsbeschreibung auf der Website. In der kostenlosen Version („Free“) ist der Funktionsumfang eingeschränkt. Die kostenpflichtige Version („PRO“) bietet erweiterte Funktionen.",
+            "conclusion": "3. Vertragsschluss",
+            "conclusion_text": "Der Vertrag kommt durch Abschluss des Registrierungsvorgangs und (bei kostenpflichtigen Abos) durch Abschluss des Zahlungsvorgangs zustande.",
+            "withdrawal": "4. Widerrufsrecht für Verbraucher (B2C)",
+            "withdrawal_policy": "Widerrufsbelehrung",
+            "withdrawal_text": "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Jan Hartje, Hamburger Allee 6, 30161 Hannover, support@janhartje.com) mittels einer eindeutigen Erklärung über Ihren Entschluss informieren.",
+            "withdrawal_expiry": "Besonderer Hinweis zum Erlöschen des Widerrufsrechts:",
+            "withdrawal_expiry_text": "Das Widerrufsrecht erlischt bei einem Vertrag über die Lieferung von nicht auf einem körperlichen Datenträger befindlichen digitalen Inhalten, wenn wir mit der Ausführung des Vertrags begonnen haben, nachdem Sie ausdrücklich zugestimmt haben, dass wir mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist beginnen, und Sie Ihre Kenntnis davon bestätigt haben, dass Sie durch Ihre Zustimmung mit Beginn der Ausführung des Vertrags Ihr Widerrufsrecht verlieren.",
+            "prices": "5. Preise und Zahlungsbedingungen",
+            "prices_text": "Es gelten die zum Zeitpunkt des Vertragsschlusses angegebenen Preise. Der Anbieter ist Kleinunternehmer im Sinne des § 19 UStG; daher wird keine Umsatzsteuer berechnet und diese auch nicht ausgewiesen. Die Zahlungsabwicklung erfolgt über den Dienstleister Stripe.",
+            "term": "6. Laufzeit und Kündigung",
+            "term_text1": "1. Die kostenlose Version kann jederzeit durch Löschung des Accounts beendet werden.",
+            "term_text2": "2. Kostenpflichtige Abonnements haben die gewählte Laufzeit (monatlich/jährlich) und verlängern sich automatisch, sofern sie nicht vor Ablauf der jeweiligen Periode gekündigt werden.",
+            "liability": "7. Haftung",
+            "liability_text1": "1. Der Anbieter haftet unbeschränkt bei Vorsatz oder grober Fahrlässigkeit.",
+            "liability_text2": "2. Bei leichter Fahrlässigkeit haftet der Anbieter nur bei Verletzung einer wesentlichen Vertragspflicht (Kardinalpflicht). In diesem Fall ist die Haftung auf den vertragstypischen, vorhersehbaren Schaden begrenzt."
+        },
+        "avv": {
+            "title": "AVV-Hinweis (Data Processing)",
+            "note": "Hinweis zur Auftragsverarbeitung (AVV)",
+            "note_text": "Wenn Sie „Drachenboot Manager“ für Ihren Verein, Ihr Unternehmen oder eine sonstige Organisation nutzen und dabei personenbezogene Daten Dritter (z.B. Teammitglieder) verarbeiten, erfolgt dies im Rahmen einer Auftragsverarbeitung gemäß Art. 28 DSGVO.",
+            "subject": "Gegenstand der Verarbeitung:",
+            "subject_text": "Nutzung der Software zur Organisation von Drachenboot-Teams, Verwaltung von Teilnehmerlisten, Gewichtsangaben und Rollenzuweisungen.",
+            "conclusion": "Abschluss des AVV:",
+            "conclusion_text": "Mit der Registrierung und Nutzung des Dienstes akzeptieren Sie unsere AGB. In diesen ist der Abschluss einer Vereinbarung zur Auftragsverarbeitung (AVV) enthalten bzw. referenziert.",
+            "tom": "Technisch-organisatorische Maßnahmen (TOM):",
+            "tom_text": "Wir setzen moderne Sicherheitsstandards ein, um Ihre Daten zu schützen, unter anderem: Verschlüsselung (SSL/TLS), Hosting in Frankfurt, regelmäßige Backups und Zugriffsbeschränkungen."
+        },
+        "disclaimer": {
+            "title": "Haftungsausschluss & Technische Hinweise",
+            "safety": "Sicherheitshinweis: Die in dieser Applikation bereitgestellten Berechnungen (z.B. zur Balance und Trimmung) dienen ausschließlich zur Unterstützung und Orientierung. Sie ersetzen nicht die fachliche Einschätzung und Verantwortung des Bootsführers/Kapitäns. Die Nutzung erfolgt auf eigene Gefahr.",
+            "warranty": "Software Gewährleistung: Die Software wird 'wie besehen' (as-is) ohne jegliche Gewährleistung, weder ausdrücklich noch stillschweigend, bereitgestellt. Es wird keine Garantie für Fehlerfreiheit oder ständige Verfügbarkeit übernommen.",
+            "tech_info": "Realisiert mit Next.js, Vercel, Prisma & Resend."
+        },
+        "revocation": {
+            "title": "Widerrufsbelehrung für digitale Inhalte",
+            "intro": "Verbraucher haben ein vierzehntägiges Widerrufsrecht.",
+            "right": {
+                "title": "Widerrufsrecht",
+                "content": "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen."
+            },
+            "expiry": {
+                "title": "Vorzeitiges Erlöschen",
+                "content": "Das Widerrufsrecht erlischt bei einem Vertrag über die Lieferung von digitalen Inhalten vorzeitig, wenn Sie ausdrücklich zugestimmt haben, dass wir mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist beginnen, und Sie Ihre Kenntnis davon bestätigt haben, dass Sie dadurch Ihr Widerrufsrecht verlieren."
+            },
+            "form": {
+                "title": "Muster-Widerrufsformular",
+                "content": "Wenn Sie den Vertrag widerrufen wollen, senden Sie uns bitte eine E-Mail mit folgenden Daten: Hiermit widerrufe(n) ich/wir den Vertrag über den Kauf der folgenden Waren/Dienstleistung, Bestellt am/Erhalten am, Name, Anschrift, Datum."
+            }
+        },
+        "agbConsent": "Ich stimme den [AGB] und der [Datenschutzerklärung] zu.",
+        "revocationWaiver": "Ich stimme zu, dass mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist begonnen wird. Ich weiß, dass ich dadurch mein Widerrufsrecht verliere.",
+        "backToHome": "Zurück",
+        "stand": "Stand: Januar 2026"
     },
     "common": {
         "apply": "Einlösen",

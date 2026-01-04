@@ -78,7 +78,7 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
   }, [team.id, t]);
 
   // 3. Finalize Subscription (Called after SetupIntent success)
-  const finalizeSubscription = async (paymentMethodId: string) => {
+  const finalizeSubscription = async (paymentMethodId: string, metadata?: Record<string, string>) => {
       try {
           const response = await fetch('/api/stripe/create-subscription', {
               method: 'POST',
@@ -87,7 +87,8 @@ export const UpgradeView: React.FC<UpgradeViewProps> = ({ team }) => {
                   teamId: team.id,
                   interval: billingInterval,
                   promotionCode: promoCodeRef.current || undefined,
-                  paymentMethodId // Attach the verified card
+                  paymentMethodId, // Attach the verified card
+                  metadata // Include metadata
               }),
           });
           

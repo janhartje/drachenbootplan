@@ -57,7 +57,6 @@
     "noPromises": "No confirmations.",
     "unknownEvent": "Unknown Event",
     "pleaseChooseRole": "Please choose a role.",
-    "imprint": "Imprint",
     "changelog": "Changelog",
     "teamLimitReached": "Team limit reached",
     "teamLimitReachedDesc": "You have reached the limit of {max} members. Upgrade to PRO for unlimited access.",
@@ -107,13 +106,6 @@
     "helpInteractiveTour": "Interactive Tour",
     "helpStartTour": "Start Tour",
     "helpUnderstood": "Understood",
-    "imprintTitle": "Imprint",
-    "imprintLegal": "Information according to § 5 TMG",
-    "imprintContact": "Contact",
-    "imprintResponsible": "Responsible for content according to § 55 Abs. 2 RStV",
-    "imprintLiabilityContent": "Liability for Content",
-    "imprintLiabilityLinks": "Liability for Links",
-    "imprintCopyright": "Copyright",
     "close": "Close",
     "guestAddTitle": "Add Guest",
     "guestName": "Guest Name",
@@ -154,6 +146,18 @@
     "clTechnical": "Technical Changes",
     "clBugfixes": "Bug Fixes",
     "changelogData": [
+        {
+            "version": "3.4.4",
+            "date": "January 2026",
+            "features": [
+                "GDPR-compliant consent: Mandatory checkboxes for Terms/Privacy and withdrawal waiver at checkout.",
+                "Legal traceability: Consent timestamps are now stored in Stripe subscriptions."
+            ],
+            "technical": [
+                "Refactored localization for legal texts (Terms, Privacy, Imprint, DPA)."
+            ],
+            "bugfixes": []
+        },
         {
             "version": "3.4.3",
             "date": "January 2026",
@@ -663,25 +667,6 @@
     "errorSavingPaddler": "Error saving paddler.",
     "warning": "Warning",
     "info": "Information",
-    "privacy": "Privacy Policy",
-    "privacyTitle": "Privacy Policy",
-    "privacyIntro": "Responsible party within the meaning of data protection laws:",
-    "privacyHosting": "Hosting",
-    "privacyHostingText": "We host our application with Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. The provider is certified under the EU-US Data Privacy Framework. Data is processed in Frankfurt (Germany). Vercel collects log files with IP addresses to ensure security and stability.",
-    "privacyDatabase": "Database",
-    "privacyDatabaseText": "Our database is provided by Prisma (Prisma Data Services GmbH, Prenzlauer Allee 193, 10405 Berlin, Germany) and is hosted in Frankfurt. Your user data (name, email, team data) is stored here.",
-    "privacyAuth": "Authentication",
-    "privacyAuthText": "For login, we use NextAuth.js with providers Google (Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland) and GitHub (GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, The Netherlands). When you log in via these services, we receive your email address, name, and profile picture. We use this data exclusively for identification and user management.",
-    "privacyEmails": "Email Delivery",
-    "privacyEmailsText": "Transaction emails (e.g., invitations) are sent via Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Data processing takes place in Ireland.",
-    "privacyPayments": "Payment Processing (Stripe)",
-    "privacyPaymentsText": "We use Stripe (Stripe Payments Europe, Ltd., 1 Grand Canal Street Lower, Grand Canal Dock, Dublin, Ireland) for payment processing. Stripe processes payment data (e.g., credit card information) on our behalf. Data transmission is encrypted. The legal basis is Art. 6 (1) (b) GDPR (performance of a contract). For more information, please see Stripe's privacy policy: https://stripe.com/privacy.",
-    "privacyRights": "Your Rights",
-    "privacyRightsText": "You have the right to access, rectification, deletion, and restriction of processing of your stored data. You can object to the processing of your data at any time.",
-    "disclaimerTitle": "Disclaimer & Technical Notices",
-    "disclaimerSafety": "Safety Notice: The calculations provided in this application (e.g., for balance and trim) are for assistance and guidance only. They do not replace the professional judgment and responsibility of the boat captain. Use at your own risk.",
-    "disclaimerWarranty": "Software Warranty: The software is provided 'as is', without warranty of any kind, express or implied. No guarantee is made for error-free operation or continuous availability.",
-    "techInfo": "Built with Next.js, Vercel, Prisma & Resend.",
     "emailWelcomeSubject": "Welcome to Drachenboot Manager!",
     "emailWelcomeGreeting": "Hello",
     "emailWelcomeIntro": "Welcome to Drachenboot Manager. We're excited to have you on board!",
@@ -850,12 +835,13 @@
     "errorReload": "Reload",
     "pro": {
         "upgradeTitle": "Upgrade to PRO",
-        "upgradeDescription": "Get unlimited members, iCal integration, and watermark-free exports.",
+        "upgradeDescription": "Get unlimited members, MCP access for AI, and watermark-free exports.",
         "upgradeButton": "Upgrade Now",
         "unlockFeaturesTitle": "Unlock Pro Features",
         "unlockFeaturesDescription": "Get unlimited members, import/export functionality, and priority support.",
         "billingAddress": "Billing Address",
-        "payNow": "Pay now",
+        "payNow": "Order with obligation to pay",
+        "vatIncluded": "incl. VAT",
         "processing": "Processing...",
         "priceLabel": "Price",
         "intervalYearly": "Yearly",
@@ -873,10 +859,9 @@
         "benefits": {
             "title": "Why go Pro?",
             "item1": "Unlimited Members",
-            "item2": "Export without watermark",
-            "item3": "iCal Calendar Integration",
+            "item3": "Watermark-free exports",
             "item4": "Priority Support",
-            "item5": "Support Future Development",
+            "item5": "Support development",
             "item6": "MCP Server for AI Integration"
         },
         "manageSubscription": "Manage Subscription",
@@ -1015,6 +1000,185 @@
         "loading": "Loading...",
         "revokeConfirm": "Are you sure you want to delete this API key? This action cannot be undone.",
         "done": "Done"
+    },
+    "legal": {
+        "common": {
+            "imprint": "Imprint",
+            "tos": "Terms of Service",
+            "privacy": "Privacy Policy",
+            "avv": "DPA"
+        },
+        "imprint": {
+            "title": "Imprint",
+            "legal": "Information according to § 5 TMG",
+            "name": "Jan Hartje",
+            "address": "Hamburger Allee 6, 30161 Hannover, Germany",
+            "contact": "Contact",
+            "email": "support@janhartje.com",
+            "ustId": "According to § 19 UStG (German Small Business Act), no sales tax is charged.",
+            "responsible": "Responsible for content",
+            "liability_content": "Liability for Content",
+            "liability_content_text": "As a service provider, we are responsible for our own content on these pages in accordance with general laws pursuant to § 7 Para.1 TMG. According to §§ 8 to 10 TMG, however, we as a service provider are not obliged to monitor transmitted or stored third-party information or to investigate circumstances that indicate illegal activity. Obligations to remove or block the use of information in accordance with general laws remain unaffected by this. However, liability in this respect is only possible from the time of knowledge of a specific infringement. As soon as we become aware of such infringements, we will remove this content immediately.",
+            "liability_links": "Liability for Links",
+            "liability_links_text": "Our offer contains links to external third-party websites, over whose content we have no influence. Therefore, we cannot assume any liability for this external content. The respective provider or operator of the pages is always responsible for the content of the linked pages. The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. However, permanent monitoring of the content of the linked pages is not reasonable without concrete evidence of an infringement. As soon as we become aware of legal violations, we will remove such links immediately.",
+            "copyright": "Copyright",
+            "copyright_text": "The content and works created by the site operators on these pages are subject to German copyright law. Duplication, processing, distribution and any kind of exploitation outside the limits of copyright law require the written consent of the respective author or creator. Downloads and copies of this page are only permitted for private, non-commercial use. Insofar as the content on this page was not created by the operator, the copyrights of third parties are observed. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. As soon as we become aware of legal violations, we will remove such content immediately."
+        },
+        "privacy": {
+            "title": "Privacy Policy",
+            "intro": "1. Data protection at a glance",
+            "intro_text": "This privacy policy informs you about how Jan Hartje (hereinafter \"we\") processes personal data in the context of using the \"Drachenboot Manager\".",
+            "responsible": "2. Responsible person",
+            "hosting": "Hosting & CDN",
+            "hosting_text": "We host our website with Vercel. The provider is Vercel Inc, 440 N Barranca Ave #4133, Covina, CA 91723, USA. Server location: Frankfurt, Germany. Vercel is certified under the EU-US Data Privacy Framework.",
+            "database": "Database",
+            "database_text": "Our database is provided by Vercel Postgres and is also hosted in Frankfurt. Your user data (name, email, team data) is stored here.",
+            "auth": "Registration & Login (NextAuth)",
+            "auth_text": "You can log in via Google or GitHub. In doing so, data is transmitted to us by the respective provider (e-mail, name, profile picture). Legal basis: Art. 6 para. 1 lit. b GDPR (performance of contract).",
+            "emails": "Email Delivery",
+            "emails_text": "We use Resend to send system emails. Legal basis: Art. 6 para. 1 lit. f GDPR (legitimate interest in reliable communication).",
+            "payments": "Payment Processing (Stripe)",
+            "payments_text": "We use Stripe for paid functions. Stripe processes payment data and information for fraud prevention. Legal basis: Art. 6 para. 1 lit. b GDPR.",
+            "analytics": "4. Analysis Tools",
+            "analytics_text": "We use Vercel Analytics and Speed Insights to statistically evaluate the use of our website. Data is generally collected anonymously.",
+            "rights": "5. Your Rights",
+            "rights_text": "You have the right to access, rectification, deletion, and restriction of the processing of your data as well as the right to data portability."
+        },
+        "tos": {
+            "title": "Terms of Service",
+            "scope": "1. Scope of Application",
+            "scope_text": "These Terms apply to all contracts between Jan Hartje (hereinafter \"Provider\") and his customers regarding the use of the software \"Drachenboot Manager\" (hereinafter \"Software\").",
+            "subject": "2. Subject Matter and Services",
+            "subject_text": "The Provider makes the software available to the Customer as a SaaS solution. The scope of functions results from the service description on the website. In the free version (\"Free\"), the scope of functions is limited. The paid version (\"PRO\") offers extended functions.",
+            "conclusion": "3. Conclusion of Contract",
+            "conclusion_text": "The contract is concluded by completing the registration process and (for paid subscriptions) by completing the payment process.",
+            "withdrawal": "4. Right of Withdrawal for Consumers (B2C)",
+            "withdrawal_policy": "Withdrawal Policy",
+            "withdrawal_text": "You have the right to withdraw from this contract within fourteen days without giving any reason. The withdrawal period is fourteen days from the day the contract is concluded. To exercise your right of withdrawal, you must inform us (Jan Hartje, Hamburger Allee 6, 30161 Hannover, support@janhartje.com) by means of a clear statement of your decision.",
+            "withdrawal_expiry": "Special note on the expiry of the right of withdrawal:",
+            "withdrawal_expiry_text": "The right of withdrawal expires in the case of a contract for the supply of digital content not stored on a tangible medium if we have begun performance of the contract after you have expressly consented to our beginning performance of the contract before the end of the withdrawal period and you have confirmed your knowledge that you lose your right of withdrawal by your consent as soon as performance of the contract begins.",
+            "prices": "5. Prices and Payment Terms",
+            "prices_text": "The prices stated at the time the contract is concluded shall apply. The Provider is a small business within the meaning of § 19 UStG (German Small Business Act); therefore, no sales tax is charged or shown. Payment processing is handled via the service provider Stripe.",
+            "term": "6. Term and Termination",
+            "term_text1": "1. The free version can be terminated at any time by deleting the account.",
+            "term_text2": "2. Paid subscriptions have the selected term (monthly/yearly) and are automatically renewed unless they are cancelled before the end of the respective period.",
+            "liability": "7. Liability",
+            "liability_text1": "1. The Provider is liable without limitation in cases of intent or gross negligence.",
+            "liability_text2": "2. In cases of slight negligence, the Provider is only liable for the breach of an essential contractual obligation (cardinal obligation). In this case, liability is limited to the contract-typical, foreseeable damage."
+        },
+        "avv": {
+            "title": "DPA-Note (Data Processing)",
+            "note": "Note on Data Processing Agreement (DPA)",
+            "note_text": "If you use \"Drachenboot Manager\" for your club, company or other organization and process personal data of third parties (e.g. team members), this is done within the framework of data processing according to Art. 28 GDPR.",
+            "subject": "Subject of processing:",
+            "subject_text": "Use of the software for organizing dragon boat teams, managing participant lists, weight information and role assignments.",
+            "conclusion": "Conclusion of the DPA:",
+            "conclusion_text": "By registering and using the service, you accept our Terms of Service. These include or reference the conclusion of a data processing agreement (DPA).",
+            "tom": "Technical and organizational measures (TOM):",
+            "tom_text": "We use modern security standards to protect your data, including encryption (SSL/TLS), hosting in Frankfurt, regular backups and access restrictions."
+        },
+        "disclaimer": {
+            "title": "Disclaimer & Technical Notices",
+            "safety": "Safety Notice: The calculations provided in this application (e.g., for balance and trim) are for assistance and guidance only. They do not replace the professional judgment and responsibility of the boat captain. Use at your own risk.",
+            "warranty": "Software Warranty: The software is provided 'as is', without warranty of any kind, express or implied. No guarantee is made for error-free operation or continuous availability.",
+            "tech_info": "Built with Next.js, Vercel, Prisma & Resend."
+        },
+        "revocation": {
+            "title": "Right of Withdrawal for Digital Content",
+            "intro": "Consumers generally have a fourteen-day right of withdrawal.",
+            "right": {
+                "title": "Right of Withdrawal",
+                "content": "You have the right to withdraw from this contract within fourteen days without giving any reason."
+            },
+            "expiry": {
+                "title": "Early Expiration",
+                "content": "The right of withdrawal expires early in the case of a contract for the supply of digital content if you have expressly agreed that we begin the execution of the contract before the expiration of the withdrawal period, and you have confirmed your knowledge that you lose your right of withdrawal by doing so."
+            },
+            "form": {
+                "title": "Model Withdrawal Form",
+                "content": "If you wish to withdraw from the contract, please send us an email with the following data: I/we hereby withdraw from the contract concluded by me/us for the purchase of the following goods/provision of the following service, Ordered on/Received on, Name, Address, Date."
+            }
+        },
+        "agbConsent": "I agree to the [AGB] and [Privacy Policy].",
+        "revocationWaiver": "I agree that the execution of the contract begins before the expiration of the withdrawal period and I lose my right of withdrawal.",
+        "backToHome": "Back",
+        "copyright": "Copyright",
+        "copyright_text": "The content and works created by the site operators on these pages are subject to German copyright law. Duplication, processing, distribution and any kind of exploitation outside the limits of copyright law require the written consent of the respective author or creator. Downloads and copies of this page are only permitted for private, non-commercial use. Insofar as the content on this page was not created by the operator, the copyrights of third parties are observed. In particular, third-party content is identified as such. Should you nevertheless become aware of a copyright infringement, please inform us accordingly. As soon as we become aware of legal violations, we will remove such content immediately."
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "intro": "1. Data protection at a glance",
+        "intro_text": "This privacy policy informs you about how Jan Hartje (hereinafter \"we\") processes personal data in the context of using the \"Drachenboot Manager\".",
+        "responsible": "2. Responsible person",
+        "hosting": "Hosting & CDN",
+        "hosting_text": "We host our website with Vercel. The provider is Vercel Inc, 440 N Barranca Ave #4133, Covina, CA 91723, USA. Server location: Frankfurt, Germany. Vercel is certified under the EU-US Data Privacy Framework.",
+        "database": "Database",
+        "database_text": "Our database is provided by Vercel Postgres and is also hosted in Frankfurt. Your user data (name, email, team data) is stored here.",
+        "auth": "Registration & Login (NextAuth)",
+        "auth_text": "You can log in via Google or GitHub. In doing so, data is transmitted to us by the respective provider (e-mail, name, profile picture). Legal basis: Art. 6 para. 1 lit. b GDPR (performance of contract).",
+        "emails": "Email Delivery",
+        "emails_text": "We use Resend to send system emails. Legal basis: Art. 6 para. 1 lit. f GDPR (legitimate interest in reliable communication).",
+        "payments": "Payment Processing (Stripe)",
+        "payments_text": "We use Stripe for paid functions. Stripe processes payment data and information for fraud prevention. Legal basis: Art. 6 para. 1 lit. b GDPR.",
+        "analytics": "4. Analysis Tools",
+        "analytics_text": "We use Vercel Analytics and Speed Insights to statistically evaluate the use of our website. Data is generally collected anonymously.",
+        "rights": "5. Your Rights",
+        "rights_text": "You have the right to access, rectification, deletion, and restriction of the processing of your data as well as the right to data portability."
+    },
+    "tos": {
+        "title": "Terms of Service",
+        "scope": "1. Scope of Application",
+        "scope_text": "These Terms apply to all contracts between Jan Hartje (hereinafter \"Provider\") and his customers regarding the use of the software \"Drachenboot Manager\" (hereinafter \"Software\").",
+        "subject": "2. Subject Matter and Services",
+        "subject_text": "The Provider makes the software available to the Customer as a SaaS solution. The scope of functions results from the service description on the website. In the free version (\"Free\"), the scope of functions is limited. The paid version (\"PRO\") offers extended functions.",
+        "conclusion": "3. Conclusion of Contract",
+        "conclusion_text": "The contract is concluded by completing the registration process and (for paid subscriptions) by completing the payment process.",
+        "withdrawal": "4. Right of Withdrawal for Consumers (B2C)",
+        "withdrawal_policy": "Withdrawal Policy",
+        "withdrawal_text": "You have the right to withdraw from this contract within fourteen days without giving any reason. The withdrawal period is fourteen days from the day the contract is concluded. To exercise your right of withdrawal, you must inform us (Jan Hartje, Hamburger Allee 6, 30161 Hannover, support@janhartje.com) by means of a clear statement of your decision.",
+        "withdrawal_expiry": "Special note on the expiry of the right of withdrawal:",
+        "withdrawal_expiry_text": "The right of withdrawal expires in the case of a contract for the supply of digital content not stored on a tangible medium if we have begun performance of the contract after you have expressly consented to our beginning performance of the contract before the end of the withdrawal period and you have confirmed your knowledge that you lose your right of withdrawal by your consent as soon as performance of the contract begins.",
+        "prices": "5. Prices and Payment Terms",
+        "prices_text": "The prices stated at the time the contract is concluded shall apply. The Provider is a small business within the meaning of § 19 UStG (German Small Business Act); therefore, no sales tax is charged or shown. Payment processing is handled via the service provider Stripe.",
+        "term": "6. Term and Termination",
+        "term_text1": "1. The free version can be terminated at any time by deleting the account.",
+        "term_text2": "2. Paid subscriptions have the selected term (monthly/yearly) and are automatically renewed unless they are cancelled before the end of the respective period.",
+        "liability": "7. Liability",
+        "liability_text1": "1. The Provider is liable without limitation in cases of intent or gross negligence.",
+        "liability_text2": "2. In cases of slight negligence, the Provider is only liable for the breach of an essential contractual obligation (cardinal obligation). In this case, liability is limited to the contract-typical, foreseeable damage."
+    },
+    "avv": {
+        "title": "DPA-Note (Data Processing)",
+        "note": "Note on Data Processing Agreement (DPA)",
+        "note_text": "If you use \"Drachenboot Manager\" for your club, company or other organization and process personal data of third parties (e.g. team members), this is done within the framework of data processing according to Art. 28 GDPR.",
+        "subject": "Subject of processing:",
+        "subject_text": "Use of the software for organizing dragon boat teams, managing participant lists, weight information and role assignments.",
+        "conclusion": "Conclusion of the DPA:",
+        "conclusion_text": "By registering and using the service, you accept our Terms of Service. These include or reference the conclusion of a data processing agreement (DPA).",
+        "tom": "Technical and organizational measures (TOM):",
+        "tom_text": "We use modern security standards to protect your data, including encryption (SSL/TLS), hosting in Frankfurt, regular backups and access restrictions."
+    },
+    "disclaimer": {
+        "title": "Disclaimer & Technical Notices",
+        "safety": "Safety Notice: The calculations provided in this application (e.g., for balance and trim) are for assistance and guidance only. They do not replace the professional judgment and responsibility of the boat captain. Use at your own risk.",
+        "warranty": "Software Warranty: The software is provided 'as is', without warranty of any kind, express or implied. No guarantee is made for error-free operation or continuous availability.",
+        "tech_info": "Built with Next.js, Vercel, Prisma & Resend."
+    },
+    "revocation": {
+        "title": "Right of Withdrawal for Digital Content",
+        "intro": "Consumers generally have a fourteen-day right of withdrawal.",
+        "right": {
+            "title": "Right of Withdrawal",
+            "content": "You have the right to withdraw from this contract within fourteen days without giving any reason."
+        },
+        "expiry": {
+            "title": "Early Expiration",
+            "content": "The right of withdrawal expires early in the case of a contract for the supply of digital content if you have expressly agreed that we begin the execution of the contract before the expiration of the withdrawal period, and you have confirmed your knowledge that you lose your right of withdrawal by doing so."
+        },
+        "form": {
+            "title": "Model Withdrawal Form",
+            "content": "If you wish to withdraw from the contract, please send us an email with the following data: I/we hereby withdraw from the contract concluded by me/us for the purchase of the following goods/provision of the following service, Ordered on/Received on, Name, Address, Date."
+        }
     },
     "common": {
         "apply": "Apply",

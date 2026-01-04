@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 
     // 2. Parse request
     const body = await request.json();
-    const { teamId, interval = 'year', promotionCode, paymentMethodId } = body;
+    const { teamId, interval = 'year', promotionCode, paymentMethodId, metadata } = body;
 
     if (!teamId) {
       return NextResponse.json({ error: 'Team ID is required' }, { status: 400 });
@@ -48,7 +48,8 @@ export async function POST(request: Request) {
       session.user.email ?? null,
       interval as 'month' | 'year',
       promotionCode,
-      paymentMethodId // Pass the payment method ID if present
+      paymentMethodId, // Pass the payment method ID if present
+      metadata // Pass metadata
     );
 
     // 5. Return response

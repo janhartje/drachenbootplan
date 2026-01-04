@@ -162,7 +162,8 @@
                 "Verbesserte Unterstützung für direkte Stripe-Coupon-IDs im Backend."
             ],
             "bugfixes": [
-                "Fix: Gutscheincodes werden jetzt korrekt erkannt und angewendet."
+                "Fix: Gutscheincodes werden jetzt korrekt erkannt und angewendet.",
+                "Fix: Abos werden nach Kündigung jetzt zuverlässig zurückgesetzt."
             ]
         },
         {

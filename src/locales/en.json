@@ -162,7 +162,8 @@
                 "Improved backend support for direct Stripe coupon IDs."
             ],
             "bugfixes": [
-                "Fix: Coupon codes are now correctly recognized and applied."
+                "Fix: Coupon codes are now correctly recognized and applied.",
+                "Fix: Subscriptions are now reliably reset after cancellation."
             ]
         },
         {

@@ -104,7 +104,12 @@ export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
 export async function handleSubscriptionUpdated(sub: Stripe.Subscription, eventType: string) {
   const teamId = sub.metadata?.teamId;
-  const customerId = sub.customer as string;
+  const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id;
+
+  if (!customerId) {
+    console.error(`Webhook ${eventType}: No customer ID found in subscription`);
+    return;
+  }
 
   // Try to find team by ID first (more reliable), then by customer ID
   const customerTeam = teamId
@@ -151,22 +156,43 @@ export async function handleSubscriptionUpdated(sub: Stripe.Subscription, eventT
 }
 
 export async function handleSubscriptionDeleted(sub: Stripe.Subscription) {
-  const customerId = sub.customer as string;
+  const teamId = sub.metadata?.teamId;
+  const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id;
 
-  // Use updateMany to handle multiple teams and avoid race conditions
-  await prisma.team.updateMany({
-    where: { stripeCustomerId: customerId },
-    data: {
-      plan: 'FREE',
-      subscriptionStatus: 'canceled',
-      maxMembers: PLAN_LIMITS.FREE,
-    }
-  });
+  if (!customerId) {
+    console.error('Webhook customer.subscription.deleted: No customer ID found');
+    return;
+  }
+
+  if (teamId) {
+     await prisma.team.update({
+       where: { id: teamId },
+       data: {
+         plan: 'FREE',
+         subscriptionStatus: 'canceled',
+         maxMembers: PLAN_LIMITS.FREE,
+       }
+     });
+  } else {
+    // Use updateMany to handle multiple teams and avoid race conditions
+    await prisma.team.updateMany({
+      where: { stripeCustomerId: customerId },
+      data: {
+        plan: 'FREE',
+        subscriptionStatus: 'canceled',
+        maxMembers: PLAN_LIMITS.FREE,
+      }
+    });
+  }
 }
 
 export async function handleTrialWillEnd(sub: Stripe.Subscription) {
-  const customerId = sub.customer as string;
+  const customerId = typeof sub.customer === 'string' ? sub.customer : sub.customer?.id;
 
+  if (!customerId) {
+    console.error('Webhook customer.subscription.trial_will_end: No customer ID found');
+    return;
+  }
 
   const team = await prisma.team.findFirst({ where: { stripeCustomerId: customerId } });
   if (team) {

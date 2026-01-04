@@ -160,103 +160,65 @@
             "features": [],
             "technical": [],
             "bugfixes": [
-                "Fix: Event-Karten passen sich jetzt korrekt an Light/Dark Mode an."
+                "Die Anzeige passt sich jetzt automatisch an den hellen oder dunklen Modus an."
             ]
         },
         {
             "version": "3.4.0",
             "date": "Januar 2026",
             "features": [
-                "Großes UI-Redesign: Neue Core-Komponenten für ein konsistentes, modernes Design.",
-                "Responsive Paddler-Ansicht: Tabelle auf Desktop, Karten auf Mobile.",
-                "Paddler-Paginierung: Übersichtliche Darstellung mit 15 Paddlern pro Seite.",
-                "Neu gestaltete Event-Karten: Kompakte Ansicht mit ausklappbaren Details.",
-                "Verbesserte Teilnehmer-Ansicht: Normale Paddler sehen nur beantwortete Teilnehmer."
+                "Modernes Design: Die gesamte App wurde optisch überarbeitet.",
+                "Verbesserte Listen: Mobile-optimierte Ansicht und übersichtliche Seitenaufteilung.",
+                "Detailansicht für Termine: Kompakte Karten, die bei Bedarf mehr Infos zeigen.",
+                "Teilnehmer-Privatsphäre: Paddler sehen nur noch relevante Teilnehmerlisten."
             ],
             "technical": [
-                "Neue wiederverwendbare UI-Komponenten: Badge, Card, Divider, IconButton, Modal, SegmentedControl, Toggle.",
-                "Responsive Loading-Skeletons passen sich der aktuellen Ansicht an.",
-                "Datenbank-Cleanup: Veraltetes paddlerView-Feld entfernt.",
-                "I18n: Event-Attendance-Strings vollständig lokalisiert."
+                "Optimierung der Benutzeroberfläche und der Ladebildschirme."
             ],
             "bugfixes": [
-                "Fix: Überlappung von Skill-Badges und Action-Buttons in Paddler-Karten behoben.",
-                "Fix: Konsistente Abstände bei Paginierungs-Indikatoren.",
-                "Fix: Einheitliche Darstellung der Event-Buttons.",
-                "Fix: Skeleton-Layout entspricht nun der tatsächlichen Ansicht.",
-                "Fix: Verbessertes Styling des Gast-Hinzufügen-Modals."
+                "Diverse Fehlerkorrekturen bei Überlappungen und Abständen.",
+                "Verbesserte Darstellung auf verschiedenen Bildschirmgrößen."
             ]
         },
         {
-            "version": "3.3.5",
-            "date": "Januar 2026",
-            "features": [],
-            "technical": [],
-            "bugfixes": [
-                "Fix: Scrollbalken im Darkmode korrigiert (Teams-Liste und Modale)."
-            ]
-        },
-        {
-            "version": "3.3.4",
+            "version": "3.3.x",
             "date": "Januar 2026",
             "features": [],
             "technical": [
-                "DrachenbootContext: refetchTeams hinzugefügt und fetchTeams für zuverlässigere Datenaktualisierung optimiert."
+                "Stabilitäts- und Performance-Verbesserungen.",
+                "Optimierung der Datenaktualisierung."
             ],
             "bugfixes": [
-                "Fix: Pro-Status wird nun beim Wechsel zur Startseite oder nach dem Upgrade zuverlässig aktualisiert."
-            ]
-        },
-        {
-            "version": "3.3.3",
-            "date": "Januar 2026",
-            "features": [],
-            "technical": [
-                "I18n: Lokalisierung von Stripe-Fehlermeldungen und Upgrade-Prozess verbessert."
-            ],
-            "bugfixes": [
-                "Fix: Fehlende Übersetzung für Kreditkarten-Ablehnungen hinzugefügt."
-            ]
-        },
-        {
-            "version": "3.3.2",
-            "date": "Januar 2026",
-            "features": [],
-            "technical": [
-                "Code Quality: Refactoring der Stripe-Integration und Bereinigung von Code-Altlasten.",
-                "Stripe: Korrektur der Invoice-Preview-Methode für bessere Stabilität."
-            ],
-            "bugfixes": [
-                "Fix: Linting-Fehler und Typ-Probleme im Stripe-Service behoben."
+                "Fix: Scrollbalken im dunklen Modus korrigiert.",
+                "Fix: Fehler bei der Anzeige des Pro-Status behoben.",
+                "Fix: Fehler bei der Anzeige von Fehlermeldungen behoben."
             ]
         },
         {
             "version": "3.3.1",
             "date": "Januar 2026",
             "features": [
-                "Gutscheincodes: Volle Unterstützung für Promotion Codes beim Pro-Upgrade.",
-                "Bessere Abo-Übersicht: Detaillierter Status und klare Anzeige des Gültigkeitszeitraums.",
-                "Optimierte Zahlungsverwaltung: Verbessertes Formular zum Aktualisieren der Zahlungsmethode."
+                "Gutscheincodes: Unterstützung für Aktionscodes beim Upgrade.",
+                "Bessere Abo-Übersicht: Klare Anzeige des Status und der Laufzeit.",
+                "Zahlungsverwaltung: Einfacheres Aktualisieren der Zahlungsdaten."
             ],
             "technical": [
-                "Datenbank-Optimierung: Eindeutige Verknüpfung von Stripe-Kunden-IDs.",
-                "UI-Verbesserung: Lokalisierung des Stripe-Checkout-Elements."
+                "Verbesserte Anbindung an den Zahlungsdienstleister."
             ],
             "bugfixes": [
-                "Fix: Zeiträume in der Abo-Historie werden nun korrekt für aktive und kündigende Abos angezeigt.",
-                "Fix: Promotion-Codes werden nicht mehr während des Tippens automatisch abgesendet."
+                "Fix: Korrekte Anzeige von Zeiträumen in der Abo-Historie."
             ]
         },
         {
             "version": "3.3.0",
             "date": "Januar 2026",
             "features": [
-                "Automatische E-Mail-Benachrichtigungen bei fehlgeschlagenen Zahlungen",
-                "Warn-E-Mail vor Ablauf der Testphase",
-                "Link zum Stripe-Kundenportal für Abo-Verwaltung"
+                "Bessere Benachrichtigungen: Automatische Infos bei Zahlungsproblemen.",
+                "Erinnerungen: Warnung vor Ablauf von Testphasen.",
+                "Verwaltungs-Portal: Direkter Link zur Abo-Verwaltung."
             ],
             "technical": [
-                "Refactoring der Stripe Webhook-Handler für bessere Wartbarkeit"
+                "Technische Optimierung der Benachrichtigungssysteme."
             ],
             "bugfixes": []
         },
@@ -264,66 +226,49 @@
             "version": "3.2.0",
             "date": "Januar 2026",
             "features": [
-                "MCP Dokumentation: Umfassende Anleitung für die Gemini-Integration hinzugefügt.",
-                "MCP Server als PRO-Benefit: KI-Integration jetzt auf der Upgrade-Seite beworben."
+                "Hilfe-Bereich erweitert: Neue Anleitungen für die KI-Integration.",
+                "PRO-Vorteile: KI-Funktionen werden jetzt deutlicher hervorgehoben."
             ],
             "technical": [
-                "MCP SSE Transport: Verbesserte Stabilität und Session-Management.",
-                "Build Fixes: Prerendering-Fehler für Fehlerseiten behoben.",
-                "Linter-Konfiguration: Explizite Ignores für bessere Build-Stabilität."
+                "Stabilitätsverbesserungen bei der KI-Anbindung."
             ],
             "bugfixes": [
-                "Fix: Hooks in statisch gerenderten Seiten korrigiert (not-found, global-error)."
+                "Diverse Fehler beim Laden von Seiten behoben."
             ]
         },
         {
             "version": "3.1.0",
             "date": "Januar 2026",
             "features": [
-                "MCP Integration: Spezifische Tools für Event-Management und Kanister-Handling.",
-                "API Keys: Neue Verwaltung für API-Schlüssel pro Team.",
-                "Erweiterte Event-API: Verbesserte Endpunkte für Assignments und Guests."
+                "KI-Erweiterung: Neue Funktionen für die Bootsplanung.",
+                "Sicherheit: Neue Verwaltung für Team-Schlüssel."
             ],
             "technical": [
-                "Datenbank-Schema für API Keys erweitert.",
-                "Refactoring der API-Authentifizierung (Unified Auth Context).",
-                "OpenAPI Spec Fixes und Updates."
+                "Überarbeitung der internen Sicherheitsstruktur."
             ],
             "bugfixes": [
-                "Fix: Syntax-Fehler in OpenAPI JSON behoben."
+                "Kleine Fehlerkorrekturen an der technischen Dokumentation."
             ]
         },
         {
             "version": "3.0.0",
             "date": "Januar 2026",
             "features": [
-                "PRO Mitgliedschaft: Schalte unbegrenzte Mitglieder, Exporte und mehr frei.",
-                "Team-Branding: Wähle aus 10 verschiedenen Akzentfarben deine Teamfarbe aus.",
-                "Einfache Zahlungsverwaltung via Stripe (Kreditkarte, SEPA, PayPal, etc.).",
-                "Premium Logo-Ring: Verleihe deinem Icon einen exklusiven goldenen Schimmer (PRO).",
-                "Dynamisches Design: Akzentfarben werden jetzt app-weit in Planer, Modalen und Listen angewendet.",
-                "Personalisiertes Boot: Dein Team-Logo wird nun (optional rund) an der Bootsspitze im Planer angezeigt.",
-                "Branding auf Exports: Automatische Drachenboot Manager Werbung auf Bild-Exports (für PRO-Teams ausgeschaltet).",
-                "InfoCards: Wichtige Hinweise können nun dauerhaft ausgeblendet werden (gespeichert in Datenbank).",
-                "Team-Wechsel: Schnellerer Wechsel zwischen Teams und verbesserte Verwaltung.",
-                "UI Optimierung: Die Auslastung des Kaders (z.B. 4/25) wird nun direkt in der Übersicht angezeigt.",
-                "Team-Limit: Limits werden nun in allen Dialogen (Hinzufügen, Import, Einladen) konsistent durchgesetzt.",
-                "Import: Der Import-Dialog zeigt nun eine präzise Warnung, wenn das Limit überschritten würde.",
-                "UX: Fehler beim Schließen von Dialogen werden nun automatisch zurückgesetzt."
+                "PRO Mitgliedschaft: Unbegrenzte Mitglieder und exklusive Funktionen.",
+                "Team-Farben: Wähle aus verschiedenen Farben deinen Team-Look.",
+                "Einfache Zahlungen: Unterstützung für Kreditkarte, SEPA, PayPal und mehr.",
+                "Design-Upgrade: Dynamische Farben und modernisierte Symbole.",
+                "Personalisiertes Boot: Dein Team-Logo direkt an der Bootsspitze.",
+                "Schneller Team-Wechsel: Verbesserte Navigation zwischen mehreren Teams.",
+                "Verbesserter Import: Klare Warnungen bei Erreichen von Limits."
             ],
             "technical": [
-                "Zentralisiertes Theme-Management für konsistente Farbdarstellung über alle Komponenten.",
-                "Server-Side Persistenz für InfoCard-Status.",
-                "Optimierte Stripe Webhooks für Abo-Synchronisation.",
-                "Erweiterte Logo-Logik im Bootsplaner mit Unterstützung für Custom Icons und Brand-Icons am Heck.",
-                "Refactoring der Navigationsstruktur und Billing-Integration."
+                "Zentralisiertes Design-System für einheitliche Farben.",
+                "Verbesserte Daten-Synchronisation."
             ],
             "bugfixes": [
-                "Fix: Konsistente Farbgebung der 'Planen'-Buttons und Event-Badges.",
-                "Fix: Korrekte Darstellung der Account-Verknüpfungen in der Mitgliederliste.",
-                "Fix: Anzeige des Abo-Status bei gekündigten Abos korrigiert.",
-                "Fix: Team-Switcher verhält sich nun korrekt auf Unterseiten.",
-                "Fix: Stabilitätsverbesserungen bei der Datenbank-Synchronisation (Prisma Sync)."
+                "Fix: Konsistente Farben in der gesamten App.",
+                "Fix: Fehler bei der Anzeige von Verknüpfungen behoben."
             ]
         },
         {

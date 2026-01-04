@@ -160,103 +160,65 @@
             "features": [],
             "technical": [],
             "bugfixes": [
-                "Fix: Event cards now properly adapt to Light/Dark Mode."
+                "The display now automatically adjusts to Light or Dark mode."
             ]
         },
         {
             "version": "3.4.0",
             "date": "January 2026",
             "features": [
-                "Major UI Redesign: New core components for a consistent, modern design.",
-                "Responsive Paddler View: Table on desktop, cards on mobile.",
-                "Paddler Pagination: Clean display with 15 paddlers per page.",
-                "Redesigned Event Cards: Compact view with expandable details.",
-                "Improved Participant View: Regular paddlers only see responded participants."
+                "Modern Design: The entire app has been visually refreshed.",
+                "Improved Lists: Mobile-optimized view and clear pagination.",
+                "Event Details: Compact cards that show more info when needed.",
+                "Participant Privacy: Paddlers now only see relevant participant lists."
             ],
             "technical": [
-                "New reusable UI components: Badge, Card, Divider, IconButton, Modal, SegmentedControl, Toggle.",
-                "Responsive loading skeletons adapt to the current view.",
-                "Database Cleanup: Removed deprecated paddlerView field.",
-                "I18n: Event attendance strings fully localized."
+                "UI and loading screen optimizations."
             ],
             "bugfixes": [
-                "Fix: Resolved overlap of skill badges and action buttons in paddler cards.",
-                "Fix: Consistent spacing for pagination indicators.",
-                "Fix: Unified event button appearance.",
-                "Fix: Skeleton layout now matches actual view.",
-                "Fix: Improved Add Guest modal styling."
+                "Various fixes for overlapping elements and spacing.",
+                "Improved display across different screen sizes."
             ]
         },
         {
-            "version": "3.3.5",
-            "date": "January 2026",
-            "features": [],
-            "technical": [],
-            "bugfixes": [
-                "Fix: Corrected scrollbar styling in dark mode (team list and modals)."
-            ]
-        },
-        {
-            "version": "3.3.4",
+            "version": "3.3.x",
             "date": "January 2026",
             "features": [],
             "technical": [
-                "DrachenbootContext: Added refetchTeams and optimized fetchTeams for more reliable data updates."
+                "Stability and performance improvements.",
+                "Optimized data synchronization."
             ],
             "bugfixes": [
-                "Fix: Pro status now reliably updates when navigating to the home page or after an upgrade."
-            ]
-        },
-        {
-            "version": "3.3.3",
-            "date": "January 2026",
-            "features": [],
-            "technical": [
-                "I18n: Improved localization of Stripe error messages and upgrade process."
-            ],
-            "bugfixes": [
-                "Fix: Added missing translation for credit card declines."
-            ]
-        },
-        {
-            "version": "3.3.2",
-            "date": "January 2026",
-            "features": [],
-            "technical": [
-                "Code Quality: Refactoring of Stripe integration and cleanup of technical debt.",
-                "Stripe: Fixed Invoice Preview method for better stability."
-            ],
-            "bugfixes": [
-                "Fix: Resolved linting errors and type issues in Stripe service."
+                "Fix: Corrected scrollbar in dark mode.",
+                "Fix: Resolved Pro status display issues.",
+                "Fix: Resolved error message display issues."
             ]
         },
         {
             "version": "3.3.1",
             "date": "January 2026",
             "features": [
-                "Promotion Codes: Full support for promo codes during Pro upgrade.",
-                "Better Subscription Overview: Detailed status and clear display of validity periods.",
-                "Optimized Payment Management: Improved form for updating payment methods."
+                "Promo Codes: Support for promotion codes during upgrade.",
+                "Better Subscription Overview: Clear status and duration display.",
+                "Payment Management: Easier updates for payment details."
             ],
             "technical": [
-                "Database Optimization: Unique constraint for Stripe customer IDs.",
-                "UI Improvement: Localization of the Stripe Checkout element."
+                "Improved integration with the payment provider."
             ],
             "bugfixes": [
-                "Fix: Subscription history periods now correctly display for active and canceling subscriptions.",
-                "Fix: Promotion codes are no longer automatically applied while typing."
+                "Fix: Correct display of periods in subscription history."
             ]
         },
         {
             "version": "3.3.0",
             "date": "January 2026",
             "features": [
-                "Automatic email notifications for failed payments",
-                "Warning email before trial expiration",
-                "Link to Stripe Customer Portal for subscription management"
+                "Better Notifications: Automatic info on payment issues.",
+                "Reminders: Warning before trial expiration.",
+                "Management Portal: Direct link to subscription management."
             ],
             "technical": [
-                "Refactoring of Stripe webhook handlers for better maintainability"
+                "Technical optimization of notification systems."
             ],
             "bugfixes": []
         },
@@ -264,67 +226,49 @@
             "version": "3.2.0",
             "date": "January 2026",
             "features": [
-                "MCP Documentation: Comprehensive guide for Gemini integration added.",
-                "MCP Server as PRO Benefit: AI integration now promoted on the upgrade page."
+                "Enhanced Help Section: New guides for AI integration.",
+                "PRO Benefits: AI features are now more prominently featured."
             ],
             "technical": [
-                "MCP SSE Transport: Improved stability and session management.",
-                "Build Fixes: Resolved prerendering errors for error pages.",
-                "Linter Configuration: Explicit ignores for better build stability."
+                "Stability improvements for AI connectivity."
             ],
             "bugfixes": [
-                "Fix: Corrected hooks in statically rendered pages (not-found, global-error)."
+                "Resolved various page loading errors."
             ]
         },
         {
             "version": "3.1.0",
             "date": "January 2026",
             "features": [
-                "MCP Integration: Specific tools for event management and canister handling.",
-                "API Keys: New management for API keys per team.",
-                "Enhanced Event API: Improved endpoints for assignments and guests."
+                "AI Expansion: New features for boat planning.",
+                "Security: New management for team keys."
             ],
             "technical": [
-                "Database schema extended for API keys.",
-                "Refactoring of API authentication (Unified Auth Context).",
-                "OpenAPI Spec fixes and updates."
+                "Refactoring of internal security structure."
             ],
             "bugfixes": [
-                "Fix: Resolved syntax error in OpenAPI JSON."
+                "Minor fixes to technical documentation."
             ]
         },
         {
             "version": "3.0.0",
             "date": "January 2026",
             "features": [
-                "PRO Subscription: Unlock unlimited members, exports, and more.",
-                "Team Branding: Choose your team color from 10 different accent colors.",
-                "Easy payment management via Stripe (Credit Card, SEPA, PayPal, etc.).",
-                "Premium Logo Ring: Give your icon an exclusive golden shimmer (PRO).",
-                "Dynamic Design: Accent colors are now applied app-wide in planners, modals, and lists.",
-                "Personalized Boat: Your team logo is now displayed at the boat tip in the planner.",
-                "Branding on Exports: Automatic Drachenboot Manager watermark on exports (removed for PRO).",
-                "InfoCards: Important notices can now be permanently dismissed.",
-                "Team Switching: Faster switching between teams and improved management.",
-                "Refined Aesthetics: Brand new PRO badge with shimmer effect.",
-                "UI Optimization: The squad usage (e.g. 4/25) is now displayed directly in the overview.",
-                "Team Limit: Limits are now consistently enforced in all dialogs (Add, Import, Invite).",
-                "Import: The import dialog now shows a precise warning if the limit would be exceeded.",
-                "UX: Errors are now automatically cleared when closing dialogs."
+                "PRO Subscription: Unlimited members and exclusive features.",
+                "Team Colors: Choose your team look from various colors.",
+                "Easy Payments: Support for Credit Card, SEPA, PayPal, and more.",
+                "Design Upgrade: Dynamic colors and modernized icons.",
+                "Personalized Boat: Your team logo directly at the boat tip.",
+                "Fast Team Switching: Improved navigation between multiple teams.",
+                "Improved Import: Clear warnings when reaching limits."
             ],
             "technical": [
-                "Centralized theme management for consistent color display.",
-                "Server-side persistence for InfoCard dismissal status.",
-                "Optimized Stripe webhooks for subscription synchronization.",
-                "Enhanced logo logic in the boat visualizer.",
-                "Refactoring of navigation structure and billing integration."
+                "Centralized design system for consistent colors.",
+                "Improved data synchronization."
             ],
             "bugfixes": [
-                "Fix: Ensured consistent coloring of 'Plan' buttons and event badges.",
-                "Fix: Correct display of account links in the member list.",
-                "Fix: Corrected subscription status display for canceled subscriptions.",
-                "Fix: Team switcher now behaves correctly on subpages.",
-                "Fix: Stability improvements for database synchronization (Prisma Sync)."
+                "Fix: Consistent colors across the entire app.",
+                "Fix: Resolved linking display issues in the member list."
             ]
         },
         {

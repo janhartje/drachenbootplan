@@ -16,6 +16,7 @@ interface PaddlerPoolProps {
   setShowGuestModal: (show: boolean) => void;
   t: (key: string) => string;
   isReadOnly?: boolean;
+  primaryColor?: string;
 }
 
 const PaddlerPool: React.FC<PaddlerPoolProps> = ({ 
@@ -29,7 +30,8 @@ const PaddlerPool: React.FC<PaddlerPoolProps> = ({
   onRemoveGuest,
   setShowGuestModal, 
   t,
-  isReadOnly 
+  isReadOnly,
+  primaryColor 
 }) => {
   const [deleteConfirmId, setDeleteConfirmId] = React.useState<string | null>(null);
 
@@ -77,6 +79,7 @@ const PaddlerPool: React.FC<PaddlerPoolProps> = ({
               triggerDelete={triggerDelete}
               t={t}
               isReadOnly={isReadOnly}
+              primaryColor={primaryColor}
             />
           );
         })}

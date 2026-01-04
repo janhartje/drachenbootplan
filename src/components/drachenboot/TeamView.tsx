@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
-
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from "next-auth/react";
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { HelpModal } from '../ui/Modals';
+import { HelpModal, AlertModal } from '../ui/Modals';
 import { OnboardingModal } from '../auth/OnboardingModal';
 import DragonLogo from '../ui/DragonLogo';
 import Header from '../ui/Header';
@@ -14,6 +14,7 @@ import { UserMenu } from '@/components/auth/UserMenu';
 import { updateProfile } from '@/app/actions/user';
 
 import { Globe, Instagram, Plus, FileUp, Calendar } from 'lucide-react';
+import { InfoCard } from '@/components/ui/InfoCard';
 
 
 import { Event, Paddler } from '@/types';
@@ -25,9 +26,13 @@ import LoadingSkeleton from '../ui/LoadingScreens';
 import PageTransition from '../ui/PageTransition';
 import WelcomeView from './WelcomeView';
 import { ImportModal } from './team/ImportModal';
+import { ProBadge } from './pro/ProBadge';
+import PaddlerList from './team/PaddlerList';
+
+import { THEME_MAP } from '@/constants/themes';
 
 const TeamView: React.FC = () => {
-
+  const router = useRouter();
   const { t } = useLanguage();
   const { 
     teams,
@@ -44,17 +49,22 @@ const TeamView: React.FC = () => {
     isDataLoading,
     refetchPaddlers,
     refetchEvents,
+    refetchTeams,
     importPaddlers,
     importEvents,
     createEvent,
     updateEvent,
+    loadMorePaddlers,
+    hasMorePaddlers,
+    isMorePaddlersLoading,
   } = useDrachenboot();
 
   // --- REFRESH DATA ON MOUNT ---
   React.useEffect(() => {
     refetchPaddlers();
     refetchEvents();
-  }, [refetchPaddlers, refetchEvents]);
+    refetchTeams();
+  }, [refetchPaddlers, refetchEvents, refetchTeams]);
 
   // --- LOCAL UI STATE ---
   const [editingPaddlerId, setEditingPaddlerId] = useState<number | string | null>(null);
@@ -64,6 +74,19 @@ const TeamView: React.FC = () => {
 
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [showEventModal, setShowEventModal] = useState<boolean>(false);
+  
+  // --- UPGRADE SUCCESS HANDLING ---
+  const searchParams = useSearchParams();
+  const [showUpgradeSuccess, setShowUpgradeSuccess] = useState<boolean>(false);
+  
+  React.useEffect(() => {
+    if (searchParams.get('upgrade_success') === 'true') {
+      setShowUpgradeSuccess(true);
+      refetchTeams(); // Force refresh teams to see PRO status
+      // Clean URL without reload
+      window.history.replaceState({}, '', '/app');
+    }
+  }, [searchParams, refetchTeams]);
 
   const handleCreateEvent = (title: string, date: string, type: 'training' | 'regatta', boatSize: 'standard' | 'small', comment?: string) => {
     createEvent(title, date, type, boatSize, comment);
@@ -149,19 +172,63 @@ const TeamView: React.FC = () => {
       }
       setEditingPaddlerId(null);
     } catch (e: unknown) {
-      setErrorMessage(e instanceof Error ? e.message : t('errorSavingPaddler'));
+      if (e instanceof Error && e.message === 'Team limit reached') {
+        setErrorMessage(t('teamLimitReached') || 'Team limit reached');
+      } else {
+        setErrorMessage(e instanceof Error ? e.message : t('errorSavingPaddler'));
+      }
     }
   };
 
   const handleEditPaddler = (p: Paddler) => {
     setEditingPaddlerId(p.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleDeletePaddler = (id: number | string) => {
     deletePaddler(id);
     if (editingPaddlerId === id) setEditingPaddlerId(null);
   };
+
+  const paddlerGridHeaderAction = useMemo(() => (
+    <div className="flex gap-2 flex-wrap justify-end items-center">
+      <button 
+        onClick={() => setShowImport(true)}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]
+            ? 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200' 
+            : 'bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+        }`}
+      >
+        <FileUp size={16} />
+        {t('import') || 'Import'}
+      </button>
+
+      <button 
+        id="tour-new-event"
+        onClick={() => setShowEventModal(true)}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        <Calendar size={16} />
+        {t('newTermin')}
+      </button>
+      <button 
+        id="tour-paddler-form"
+        onClick={() => setEditingPaddlerId('new')}
+        className={`px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors text-white ${
+          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+            : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        <Plus size={16} />
+        {t('addPaddler')}
+      </button>
+    </div>
+  ), [currentTeam, t]);
 
 
 
@@ -173,7 +240,10 @@ const TeamView: React.FC = () => {
         const keys = Object.keys(row);
         const nameKey = keys.find(k => k.toLowerCase().includes('name'));
         const weightKey = keys.find(k => k.toLowerCase().includes('weight') || k.toLowerCase().includes('gewicht'));
-        const sideKey = keys.find(k => k.toLowerCase().includes('side') || k.toLowerCase().includes('seite') || k.toLowerCase().includes('rolle'));
+        const sideKey = keys.find(k => {
+          const lk = k.toLowerCase();
+          return lk.includes('side') || lk.includes('seite') || lk.includes('rolle') || lk.includes('skill');
+        });
         const emailKey = keys.find(k => k.toLowerCase().includes('email') || k.toLowerCase().includes('mail'));
         
         if (!nameKey || !row[nameKey]) return null;
@@ -199,22 +269,26 @@ const TeamView: React.FC = () => {
 
         const foundRoles = new Set<string>();
 
-        const parts = sideStrRaw.split(/[,/|&+\s]+/).filter((p: string) => p.trim().length > 0);
+         // Split by common delimiters (comma, slash, pipe, ampersand, plus)
+         // Do NOT split by whitespace directly - instead trim each part
+         const parts = sideStrRaw.split(/[,/|&+]/).map((p: string) => p.trim()).filter((p: string) => p.length > 0);
 
-        parts.forEach(part => {
-             const p = part.trim();
-             // Check against dictionaries
-             if (dict.both.some(term => p === term || p.includes(term))) {
-                foundRoles.add('left');
-                foundRoles.add('right');
-             }
-             else {
-               if (dict.left.some(term => p === term || (term.length > 2 && p.includes(term)))) foundRoles.add('left');
-               if (dict.right.some(term => p === term || (term.length > 2 && p.includes(term)))) foundRoles.add('right');
-               if (dict.drum.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('drum');
-               if (dict.steer.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('steer');
-             }
-        });
+         // Side/role parsing (multilingual support)
+
+         parts.forEach(part => {
+              const p = part.trim();
+              // Check against dictionaries
+              if (dict.both.some(term => p === term || p.includes(term))) {
+                 foundRoles.add('left');
+                 foundRoles.add('right');
+              }
+              else {
+                if (dict.left.some(term => p === term || (term.length > 2 && p.includes(term)))) foundRoles.add('left');
+                if (dict.right.some(term => p === term || (term.length > 2 && p.includes(term)))) foundRoles.add('right');
+                if (dict.drum.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('drum');
+                if (dict.steer.some(term => p === term || (term.length > 1 && p.includes(term)))) foundRoles.add('steer');
+              }
+         });
 
         // Determine main 'side' property for UI preference
 
@@ -318,13 +392,27 @@ const TeamView: React.FC = () => {
           <Header 
             title={t('appTitle')}
             subtitle={t('teamManager')}
+            badge={
+              currentTeam?.plan === 'PRO' && currentTeam?.showProBadge !== false ? (
+                <ProBadge color={currentTeam.primaryColor} />
+              ) : currentTeam?.plan === 'PRO' ? null : (
+                <span className="bg-slate-100 text-slate-600 text-xs font-bold px-2 py-0.5 rounded border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700">FREE</span>
+              )
+            }
             logo={
               <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-                {currentTeam?.icon ? (
-                  <img src={currentTeam.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
-                ) : (
-                  <DragonLogo className="w-10 h-10" />
-                )}
+                 <div className="relative group">
+                    {currentTeam?.plan === 'PRO' && currentTeam?.showProRing !== false && (
+                      <div className={`absolute -inset-[3px] bg-gradient-to-tr ${THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]?.ring || THEME_MAP.amber.ring} rounded-full animate-shine opacity-90 shadow-[0_0_12px_rgba(251,191,36,0.2)] dark:shadow-[0_0_15px_rgba(251,191,36,0.1)]`}></div>
+                    )}
+                    <div className={`relative rounded-full ${currentTeam?.plan === 'PRO' && currentTeam?.showProRing !== false ? 'p-[2px] bg-white dark:bg-slate-900 shadow-inner' : ''}`}>
+                      {currentTeam?.icon ? (
+                        <img src={currentTeam.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <DragonLogo className={`w-10 h-10 ${currentTeam?.plan === 'PRO' ? (THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP]?.text || THEME_MAP.amber.text) : ''}`} />
+                      )}
+                    </div>
+                 </div>
               </Link>
             }
             showHelp={true}
@@ -367,47 +455,82 @@ const TeamView: React.FC = () => {
                   That works.
               */}
               
-              <div className="lg:col-span-1 flex flex-col">
+                <div className="lg:col-span-1 flex flex-col">
+                 {(currentTeam?.plan === 'FREE' || !currentTeam?.plan) && (
+                    <InfoCard 
+                      id={`upgrade_prompt_team_${currentTeam?.id}`}
+                      className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6"
+                      allowedRoles={['CAPTAIN']}
+                    >
+                      <h3 className="text-lg font-bold text-amber-800 dark:text-amber-500 mb-2 pr-6">
+                        {t('pro.upgradeTitle')} 🔗
+                      </h3>
+                      <p className="text-sm text-amber-700 dark:text-amber-400 mb-4">
+                        {t('pro.upgradeDescription')}
+                      </p>
+                      <button
+                        onClick={() => router.push(`/app/teams/${currentTeam?.id}?tab=subscription`)}
+                        className={`w-full py-2 bg-gradient-to-r text-white font-bold rounded-lg shadow-sm transition-all transform hover:scale-[1.02] ${
+                          currentTeam?.primaryColor && THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP] 
+                            ? THEME_MAP[currentTeam.primaryColor as keyof typeof THEME_MAP].button 
+                            : 'from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600'
+                        }`}
+                      >
+                        {t('pro.upgradeButton')}
+                      </button>
+                    </InfoCard>
+                 )}
                 <EventsSection sortedPaddlers={sortedPaddlers} onEdit={setEditingEvent} />
               </div>
 
-              {/* Paddler Grid */}
+              {/* Paddler Grid (Mobile) / List (Desktop) */}
               <div className="lg:col-span-2 flex flex-col">
-                <PaddlerGrid 
-                  paddlers={sortedPaddlers} 
-                  editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
-                  onEdit={handleEditPaddler} 
-                  onDelete={handleDeletePaddler} 
-                  t={t}
-                  headerAction={
-                    <div className="flex gap-2 flex-wrap justify-end">
+                <div className="block lg:hidden">
+                  <PaddlerGrid 
+                    paddlers={sortedPaddlers} 
+                    editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                    headerAction={paddlerGridHeaderAction}
+                  />
+                  {hasMorePaddlers && (
+                    <div className="mt-4 flex justify-center">
                       <button 
-                        onClick={() => setShowImport(true)}
-                        className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
+                        onClick={() => loadMorePaddlers()} 
+                        disabled={isMorePaddlersLoading}
+                        className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
                       >
-                         <FileUp size={16} />
-                         {t('import') || 'Import'}
-                      </button>
-
-                       <button 
-                          id="tour-new-event"
-                         onClick={() => setShowEventModal(true)}
-                         className="bg-blue-600 hover:bg-blue-700 text-white px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
-                       >
-                          <Calendar size={16} />
-                          {t('newTermin')}
-                       </button>
-                      <button 
-                        id="tour-paddler-form"
-                        onClick={() => setEditingPaddlerId('new')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-3 h-8 rounded text-sm font-medium flex items-center gap-2 shadow-sm transition-colors"
-                      >
-                        <Plus size={16} />
-                        {t('addPaddler')}
+                         {isMorePaddlersLoading ? (
+                           <span className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
+                         ) : t('loadMore')}
                       </button>
                     </div>
-                  }
-                />
+                  )}
+                </div>
+                <div className="hidden lg:block">
+                  <PaddlerList 
+                    paddlers={sortedPaddlers} 
+                    editingId={editingPaddlerId === 'new' ? null : editingPaddlerId} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                    headerAction={paddlerGridHeaderAction}
+                  />
+                  {hasMorePaddlers && (
+                    <div className="mt-4 flex justify-center">
+                      <button 
+                        onClick={() => loadMorePaddlers()} 
+                        disabled={isMorePaddlersLoading}
+                        className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors flex items-center gap-2"
+                      >
+                         {isMorePaddlersLoading ? (
+                           <span className="w-4 h-4 border-2 border-slate-500 border-t-transparent rounded-full animate-spin"></span>
+                         ) : t('loadMore')}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
@@ -415,17 +538,29 @@ const TeamView: React.FC = () => {
               {/* Event Liste */}
               <div className="lg:col-span-1 flex flex-col">
                 <EventsSection sortedPaddlers={sortedPaddlers} onEdit={setEditingEvent} />
+
               </div>
 
-              {/* Paddler Grid */}
+              {/* Paddler Grid (Mobile) / List (Desktop) */}
               <div className="lg:col-span-2 flex flex-col">
-                <PaddlerGrid 
-                  paddlers={sortedPaddlers} 
-                  editingId={null} 
-                  onEdit={handleEditPaddler} 
-                  onDelete={handleDeletePaddler} 
-                  t={t}
-                />
+                <div className="block lg:hidden">
+                  <PaddlerGrid 
+                    paddlers={sortedPaddlers} 
+                    editingId={null} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                  />
+                </div>
+                <div className="hidden lg:block">
+                   <PaddlerList 
+                    paddlers={sortedPaddlers} 
+                    editingId={null} 
+                    onEdit={handleEditPaddler} 
+                    onDelete={handleDeletePaddler} 
+                    t={t}
+                  />
+                </div>
               </div>
             </div>
           )}
@@ -435,7 +570,7 @@ const TeamView: React.FC = () => {
             <>
               <PaddlerModal
                 isOpen={!!editingPaddlerId}
-                onClose={() => setEditingPaddlerId(null)}
+                onClose={() => { setEditingPaddlerId(null); setErrorMessage(null); }}
                 paddlerToEdit={editingPaddlerId === 'new' ? null : paddlerToEdit}
                 onSave={handleSavePaddler}
                 t={t}
@@ -472,6 +607,15 @@ const TeamView: React.FC = () => {
           onSave={handleOnboardingSave}
         />
       )}
+      
+      {/* Upgrade Success Modal */}
+      <AlertModal
+        isOpen={showUpgradeSuccess}
+        message={t('pro.upgradeSuccessMessage')}
+        onClose={() => setShowUpgradeSuccess(false)}
+        type="info"
+        title={t('pro.upgradeSuccessTitle')}
+      />
     </PageTransition>
   );
 };

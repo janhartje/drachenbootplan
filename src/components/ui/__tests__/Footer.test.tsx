@@ -48,14 +48,14 @@ describe('Footer', () => {
 
   it('renders footer links', () => {
     render(<Footer />);
-    expect(screen.getByText('imprint')).toBeInTheDocument();
-    expect(screen.getByText('changelog')).toBeInTheDocument();
-    expect(screen.getByText('API Docs')).toBeInTheDocument();
+    expect(screen.getByText('legal.common.imprint')).toBeInTheDocument();
+    expect(screen.getByText('legal.common.tos')).toBeInTheDocument();
+    expect(screen.getByText('legal.common.privacy')).toBeInTheDocument();
   });
 
-  it('opens imprint modal when clicked', () => {
+  it('opens modals when links are clicked', () => {
     render(<Footer />);
-    fireEvent.click(screen.getByText('imprint'));
+    fireEvent.click(screen.getByText('legal.common.imprint'));
     expect(screen.getByTestId('imprint-modal')).toBeInTheDocument();
   });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
@@ -13,19 +13,104 @@ import TeamSettingsForm from '@/components/drachenboot/team/TeamSettingsForm';
 import { InviteMemberForm } from '@/components/drachenboot/team/InviteMemberForm';
 import { HelpModal, AlertModal, ConfirmModal } from '@/components/ui/Modals';
 import PageTransition from '@/components/ui/PageTransition';
+import TeamSwitcher from '@/components/drachenboot/TeamSwitcher';
+import { UserMenu } from '@/components/auth/UserMenu';
+import { BillingContent, SubscriptionData } from '@/components/stripe/BillingContent';
+import { ProBadge } from '@/components/drachenboot/pro/ProBadge';
+import { ApiAccessTab } from '@/components/drachenboot/team/ApiAccessTab';
+
+const THEME_MAP = {
+  amber: {
+    text: 'text-amber-600 dark:text-amber-500',
+    ring: 'from-amber-500 via-yellow-200 to-amber-600',
+    tab: 'border-amber-600 text-amber-600 dark:border-amber-400 dark:text-amber-400 bg-amber-50/50 dark:bg-amber-900/10'
+  },
+  blue: {
+    text: 'text-blue-600 dark:text-blue-500',
+    ring: 'from-blue-500 via-cyan-200 to-blue-600',
+    tab: 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+  },
+  rose: {
+    text: 'text-rose-600 dark:text-rose-500',
+    ring: 'from-rose-500 via-pink-200 to-rose-600',
+    tab: 'border-rose-600 text-rose-600 dark:border-rose-400 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-900/10'
+  },
+  emerald: {
+    text: 'text-emerald-600 dark:text-emerald-500',
+    ring: 'from-emerald-500 via-teal-200 to-emerald-600',
+    tab: 'border-emerald-600 text-emerald-600 dark:border-emerald-400 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-900/10'
+  },
+  violet: {
+    text: 'text-violet-600 dark:text-violet-500',
+    ring: 'from-violet-500 via-purple-200 to-violet-600',
+    tab: 'border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400 bg-violet-50/50 dark:bg-violet-900/10'
+  },
+  slate: {
+    text: 'text-slate-700 dark:text-slate-300',
+    ring: 'from-slate-600 via-slate-200 to-slate-700',
+    tab: 'border-slate-700 text-slate-700 dark:border-slate-300 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/50'
+  }
+};
+
+
+import { Team } from '@/types';
+
+
+// Re-defined SubscriptionTab to use native BillingContent
+function SubscriptionTab({ team }: { team: Team }) {
+  const teamId = team.id;
+  const [loading, setLoading] = useState(true);
+  const [subData, setSubData] = useState<SubscriptionData | null>(null);
+
+  useEffect(() => {
+    const fetchSubscription = async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(`/api/stripe/subscription-details?teamId=${teamId}`);
+          const data = await res.json();
+          setSubData(data);
+        } catch (e) {
+          console.error('Failed to fetch subscription:', e);
+        }
+        setLoading(false);
+      };
+
+    fetchSubscription();
+  }, [teamId]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  // We now let BillingContent handle the "No Subscription" state (it will show UpgradeView)
+  return <BillingContent team={team} subscription={subData} />;
+}
+
 
 export default function TeamDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { teams, updateTeam, deleteTeam, isDarkMode, toggleDarkMode, paddlers, updatePaddler, deletePaddler, refetchPaddlers, userRole, isDataLoading } = useDrachenboot();
+  const searchParams = useSearchParams();
+  const { teams, updateTeam, deleteTeam, isDarkMode, toggleDarkMode, paddlers, updatePaddler, deletePaddler, refetchPaddlers, refetchTeams, userRole, isDataLoading } = useDrachenboot();
   const { t } = useLanguage();
   
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [activeTab, setActiveTab] = useState<'general' | 'members'>('general');
+  
+  // Refactor: activeTab is fully controlled by URL
+  // We use a helper to get safe tab value
+  const getTabFromUrl = () => {
+      const tab = searchParams.get('tab');
+      return (tab === 'general' || tab === 'members' || tab === 'subscription' || tab === 'api') ? tab : 'general';
+  };
+  const activeTab = getTabFromUrl();
+  
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [memberToRemove, setMemberToRemove] = useState<any>(null);
+  const [memberToRemove, setMemberToRemove] = useState<{ id: string | number; name: string } | null>(null);
 
   const team = teams.find(t => t.id === id);
 
@@ -40,6 +125,13 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
       router.push('/app/teams');
     }
   }, [teams, team, router, isDataLoading]);
+
+  // Refetch teams if we just upgraded
+  useEffect(() => {
+     if (searchParams.get('upgrade_success') === 'true') {
+         refetchTeams();
+     }
+  }, [searchParams, refetchTeams]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleSave = async (data: any) => {
@@ -114,12 +206,24 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
           title={t('editTeam') || 'Edit Team'}
           logo={
             <Link href="/" className="cursor-pointer hover:opacity-80 transition-opacity">
-              <DragonLogo className="w-10 h-10" />
+               <div className="relative group">
+                  {team?.plan === 'PRO' && team?.showProRing !== false && (
+                    <div className={`absolute -inset-[3px] bg-gradient-to-tr ${THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.ring || THEME_MAP.amber.ring} rounded-full animate-shine opacity-90 shadow-[0_0_12px_rgba(251,191,36,0.2)] dark:shadow-[0_0_15px_rgba(251,191,36,0.1)]`}></div>
+                  )}
+                  <div className={`relative rounded-full ${team?.plan === 'PRO' && team?.showProRing !== false ? 'p-[2px] bg-white dark:bg-slate-900 shadow-inner' : ''}`}>
+                    {team?.icon ? (
+                      <img src={team.icon} alt="Team Icon" className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <DragonLogo className={`w-10 h-10 ${team?.plan === 'PRO' ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.text || THEME_MAP.amber.text) : ''}`} />
+                    )}
+                  </div>
+               </div>
             </Link>
           }
+          badge={team?.plan === 'PRO' && <ProBadge color={team.primaryColor} />}
           leftAction={
             <button 
-              onClick={() => router.push('/app/teams')} 
+              onClick={() => router.push('/app')} 
               className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:border-blue-300 transition-colors"
             >
               <ArrowLeft size={20} />
@@ -130,29 +234,61 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
           toggleDarkMode={toggleDarkMode}
           showHelp={true}
           onHelp={() => setShowHelp(true)}
-        />
+        >
+          <TeamSwitcher />
+          <div className="w-px h-8 bg-slate-100 dark:bg-slate-800 mx-2"></div>
+          <UserMenu />
+        </Header>
 
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col min-h-[600px]">
-          <div className="flex border-b border-slate-200 dark:border-slate-800">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800/40 overflow-hidden flex flex-col min-h-[600px]">
+          <div className="flex border-b border-slate-200 dark:border-slate-800/40">
             <button
-              onClick={() => setActiveTab('general')}
+              onClick={() => {
+                router.push(`/app/teams/${id}?tab=general`);
+              }}
               className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === 'general'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
               {t('general') || 'General'}
             </button>
             <button
-              onClick={() => setActiveTab('members')}
+              onClick={() => {
+                router.push(`/app/teams/${id}?tab=members`);
+              }}
               className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
                 activeTab === 'members'
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
                   : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
               {t('members') || 'Members'}
+            </button>
+            <button
+              onClick={() => {
+                router.push(`/app/teams/${id}?tab=subscription`);
+              }}
+              className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
+                activeTab === 'subscription'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              {t('pro.subscription') || 'Subscription'}
+            </button>
+            <button
+              onClick={() => {
+                router.push(`/app/teams/${id}?tab=api`);
+              }}
+              className={`flex-1 py-4 text-sm font-medium transition-colors border-b-2 ${
+                activeTab === 'api'
+                  ? (THEME_MAP[team.primaryColor as keyof typeof THEME_MAP]?.tab || 'border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-900/10')
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              API Access
             </button>
           </div>
 
@@ -197,7 +333,7 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
                   </div>
                 </div>
               </div>
-            ) : (
+            ) : activeTab === 'members' ? (
               <div className="space-y-8">
                 <div>
                   <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200 mb-4">
@@ -279,7 +415,11 @@ export default function TeamDetailPage({ params }: { params: Promise<{ id: strin
                   </div>
                 </div>
               </div>
-            )}
+            ) : activeTab === 'subscription' ? (
+              <SubscriptionTab team={team} />
+            ) : activeTab === 'api' ? (
+              <ApiAccessTab teamId={team.id} isPro={team.plan === 'PRO'} />
+            ) : null}
           </div>
         </div>
 

@@ -52,6 +52,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   paddlers      Paddler[]
+  dismissedInfoCards DismissedInfoCard[]
 }
 
 model VerificationToken {
@@ -154,6 +155,22 @@ model Team {
   facebook  String?
   twitter   String?
   email     String?
+
+  // Subscription / Plan
+  plan               String   @default("FREE") // 'FREE', 'PRO', 'ENTERPRISE'
+  subscriptionStatus String?  // 'active', 'trialing', 'past_due'
+  stripeCustomerId   String?  @unique
+  billingUserId      String?  // User who purchased/manages the subscription
+  maxMembers         Int      @default(25)
+
+  // PRO Customization
+  primaryColor       String?  @default("amber")
+  showProRing        Boolean  @default(true)
+  showProBadge       Boolean  @default(true)
+  showWatermark      Boolean  @default(true)
+
+  // MCP Server API Keys
+  apiKeys            ApiKey[]
 }
 
 model EmailQueue {
@@ -175,3 +192,28 @@ model EmailQueue {
   @@index([createdAt])
 }
 
+
+model DismissedInfoCard {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardId    String   
+  createdAt DateTime @default(now())
+
+  @@unique([userId, cardId])
+  @@index([userId])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  hashedKey String   @unique
+  displayKey String   // Partial key for display (e.g. "dbm_...a1b2")
+  name      String   // User-friendly name like "Claude Desktop" or "Development"
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  lastUsed  DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([teamId])
+  @@index([hashedKey])
+}

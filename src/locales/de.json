@@ -15,12 +15,21 @@
     "comment": "Kommentar",
     "commentPlaceholder": "Infos zum Training...",
     "changelog": "Versionshistorie",
+    "loadMore": "Mehr laden",
+    "teamLimitReached": "Team-Limit erreicht",
+    "teamLimitReachedDesc": "Du hast das Limit von {max} Mitgliedern erreicht. Upgrade auf PRO für unbegrenzte Mitglieder.",
+    "guestHint": "Hinweis: Gäste können weiterhin für einzelne Termine hinzugefügt werden.",
+    "teamLimitExceeded": "Import überschreitet Limit",
+    "importLimitWarning": "Dieser Import würde die Gesamtanzahl auf {total} erhöhen und das Limit von {max} überschreiten.",
     "cancel": "Abbruch",
     "editPaddler": "Paddler bearbeiten",
     "newMember": "Neues Mitglied",
     "name": "Name",
     "weight": "Gewicht",
     "skills": "Skills",
+    "actions": "Aktionen",
+    "page": "Seite",
+    "of": "von",
     "tabGeneral": "Allgemein",
     "tabPreferences": "Auto-Besetzung",
     "left": "Links",
@@ -30,6 +39,11 @@
     "regatta": "Regatta",
     "training": "Training",
     "promises": "Zusagen",
+    "attend": "Zusagen",
+    "decline": "Absagen",
+    "unsure": "Unsicher",
+    "participants": "Teilnehmer",
+    "yourStatus": "Dein Status",
     "plan": "Planen",
     "viewPlan": "Plan",
     "squad": "Kader",
@@ -50,7 +64,6 @@
     "noPromises": "Keine Zusagen.",
     "unknownEvent": "Unbekanntes Event",
     "pleaseChooseRole": "Bitte eine Rolle wählen.",
-    "imprint": "Impressum",
     "madeWithLove": "Made with ❤️ in Hannover.",
     "helpTitle": "Hilfe & Anleitung",
     "helpBoatManning": "Bootsbesetzung",
@@ -94,13 +107,6 @@
     "helpInteractiveTour": "Interaktive Einführung",
     "helpStartTour": "Tour starten",
     "helpUnderstood": "Verstanden",
-    "imprintTitle": "Impressum",
-    "imprintLegal": "Angaben gemäß § 5 TMG",
-    "imprintContact": "Kontakt",
-    "imprintResponsible": "Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV",
-    "imprintLiabilityContent": "Haftung für Inhalte",
-    "imprintLiabilityLinks": "Haftung für Links",
-    "imprintCopyright": "Urheberrecht",
     "close": "Schließen",
     "guestAddTitle": "Gast hinzufügen",
     "guestName": "Gast Name",
@@ -141,6 +147,179 @@
     "clTechnical": "Technische Änderungen",
     "clBugfixes": "Fehlerbehebungen",
     "changelogData": [
+        {
+            "version": "3.4.6",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "Refactoring der PRO-Vorteile: Die Liste wird jetzt dynamisch aus den Sprachdateien geladen."
+            ],
+            "bugfixes": [
+                "Fix: Fehlende Übersetzungen in der PRO-Upgrade-Ansicht ergänzt (Premium Badge & Vorteile)."
+            ]
+        },
+        {
+            "version": "3.4.5",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "Code-Hygiene: Debug-Logs entfernt, fehlende Übersetzungen ergänzt."
+            ],
+            "bugfixes": [
+                "Fix: Automatische Weiterleitung nach Teamerstellung korrigiert.",
+                "Fix: Profil-Vervollständigung (Onboarding) validiert jetzt die Rollenauswahl."
+            ]
+        },
+        {
+            "version": "3.4.4",
+            "date": "Januar 2026",
+            "features": [
+                "DSGVO-konforme Einwilligungen: Pflicht-Checkboxen für AGB/Datenschutz und Widerrufsverzicht beim Checkout.",
+                "Rechtliche Nachverfolgbarkeit: Einwilligungszeitpunkte werden in Stripe-Abos gespeichert."
+            ],
+            "technical": [
+                "Überarbeitete Lokalisierung der rechtlichen Texte (AGB, Datenschutz, Impressum, AVV)."
+            ],
+            "bugfixes": []
+        },
+        {
+            "version": "3.4.3",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "Verbesserte Unterstützung für direkte Stripe-Coupon-IDs im Backend."
+            ],
+            "bugfixes": [
+                "Fix: Gutscheincodes werden jetzt korrekt erkannt und angewendet.",
+                "Fix: Abos werden nach Kündigung jetzt zuverlässig zurückgesetzt."
+            ]
+        },
+        {
+            "version": "3.4.2",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Das Fenster 'Zahlungsmethode ändern' wird nun korrekt im Dark Mode angezeigt."
+            ]
+        },
+        {
+            "version": "3.4.1",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Die Anzeige passt sich jetzt automatisch an den hellen oder dunklen Modus an."
+            ]
+        },
+        {
+            "version": "3.4.0",
+            "date": "Januar 2026",
+            "features": [
+                "Modernes Design: Die gesamte App wurde optisch überarbeitet.",
+                "Verbesserte Listen: Mobile-optimierte Ansicht und übersichtliche Seitenaufteilung.",
+                "Detailansicht für Termine: Kompakte Karten, die bei Bedarf mehr Infos zeigen.",
+                "Teilnehmer-Privatsphäre: Paddler sehen nur noch relevante Teilnehmerlisten."
+            ],
+            "technical": [
+                "Optimierung der Benutzeroberfläche und der Ladebildschirme."
+            ],
+            "bugfixes": [
+                "Diverse Fehlerkorrekturen bei Überlappungen und Abständen.",
+                "Verbesserte Darstellung auf verschiedenen Bildschirmgrößen."
+            ]
+        },
+        {
+            "version": "3.3.2",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [
+                "Stabilitäts- und Performance-Verbesserungen.",
+                "Optimierung der Datenaktualisierung."
+            ],
+            "bugfixes": [
+                "Fix: Scrollbalken im dunklen Modus korrigiert.",
+                "Fix: Fehler bei der Anzeige des Pro-Status behoben.",
+                "Fix: Fehler bei der Anzeige von Fehlermeldungen behoben."
+            ]
+        },
+        {
+            "version": "3.3.1",
+            "date": "Januar 2026",
+            "features": [
+                "Gutscheincodes: Unterstützung für Aktionscodes beim Upgrade.",
+                "Bessere Abo-Übersicht: Klare Anzeige des Status und der Laufzeit.",
+                "Zahlungsverwaltung: Einfacheres Aktualisieren der Zahlungsdaten."
+            ],
+            "technical": [
+                "Verbesserte Anbindung an den Zahlungsdienstleister."
+            ],
+            "bugfixes": [
+                "Fix: Korrekte Anzeige von Zeiträumen in der Abo-Historie."
+            ]
+        },
+        {
+            "version": "3.3.0",
+            "date": "Januar 2026",
+            "features": [
+                "Bessere Benachrichtigungen: Automatische Infos bei Zahlungsproblemen.",
+                "Erinnerungen: Warnung vor Ablauf von Testphasen.",
+                "Verwaltungs-Portal: Direkter Link zur Abo-Verwaltung."
+            ],
+            "technical": [
+                "Technische Optimierung der Benachrichtigungssysteme."
+            ],
+            "bugfixes": []
+        },
+        {
+            "version": "3.2.0",
+            "date": "Januar 2026",
+            "features": [
+                "Hilfe-Bereich erweitert: Neue Anleitungen für die KI-Integration.",
+                "PRO-Vorteile: KI-Funktionen werden jetzt deutlicher hervorgehoben."
+            ],
+            "technical": [
+                "Stabilitätsverbesserungen bei der KI-Anbindung."
+            ],
+            "bugfixes": [
+                "Diverse Fehler beim Laden von Seiten behoben."
+            ]
+        },
+        {
+            "version": "3.1.0",
+            "date": "Januar 2026",
+            "features": [
+                "KI-Erweiterung: Neue Funktionen für die Bootsplanung.",
+                "Sicherheit: Neue Verwaltung für Team-Schlüssel."
+            ],
+            "technical": [
+                "Überarbeitung der internen Sicherheitsstruktur."
+            ],
+            "bugfixes": [
+                "Kleine Fehlerkorrekturen an der technischen Dokumentation."
+            ]
+        },
+        {
+            "version": "3.0.0",
+            "date": "Januar 2026",
+            "features": [
+                "PRO Mitgliedschaft: Unbegrenzte Mitglieder und exklusive Funktionen.",
+                "Team-Farben: Wähle aus verschiedenen Farben deinen Team-Look.",
+                "Einfache Zahlungen: Unterstützung für Kreditkarte, SEPA, PayPal und mehr.",
+                "Design-Upgrade: Dynamische Farben und modernisierte Symbole.",
+                "Personalisiertes Boot: Dein Team-Logo direkt an der Bootsspitze.",
+                "Schneller Team-Wechsel: Verbesserte Navigation zwischen mehreren Teams.",
+                "Verbesserter Import: Klare Warnungen bei Erreichen von Limits."
+            ],
+            "technical": [
+                "Zentralisiertes Design-System für einheitliche Farben.",
+                "Verbesserte Daten-Synchronisation."
+            ],
+            "bugfixes": [
+                "Fix: Konsistente Farben in der gesamten App.",
+                "Fix: Fehler bei der Anzeige von Verknüpfungen behoben."
+            ]
+        },
         {
             "version": "2.8.0",
             "date": "Dezember 2025",
@@ -435,7 +614,10 @@
     "installPWA": "App installieren",
     "create": "Erstellen",
     "createTeam": "Team erstellen",
-    "teamName": "Team Name",
+    "createNewTeam": "Neues Team erstellen",
+    "upgradeTeam": "Team upgraden",
+    "forTeam": "für",
+    "teamName": "Teamname",
     "selectTeam": "Team wählen",
     "teams": "Teams",
     "manageTeams": "Teams verwalten",
@@ -511,23 +693,6 @@
     "errorSavingPaddler": "Fehler beim Speichern des Paddlers.",
     "warning": "Warnung",
     "info": "Information",
-    "privacy": "Datenschutz",
-    "privacyTitle": "Datenschutzerklärung",
-    "privacyIntro": "Verantwortlicher im Sinne der Datenschutzgesetze, insbesondere der EU-Datenschutzgrundverordnung (DSGVO), ist:",
-    "privacyHosting": "Hosting",
-    "privacyHostingText": "Wir hosten unsere Anwendung bei Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, USA. Der Anbieter ist zertifiziert nach dem EU-US Data Privacy Framework und bietet hierdurch eine Garantie, das europäische Datenschutzrecht einzuhalten. Die Daten werden in Frankfurt (Deutschland) verarbeitet. Vercel erhebt Logfiles mit IP-Adressen, um die Sicherheit und Stabilität des Dienstes zu gewährleisten.",
-    "privacyDatabase": "Datenbank",
-    "privacyDatabaseText": "Unsere Datenbank wird von Prisma (Prisma Data Services GmbH, Berlin) bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
-    "privacyAuth": "Authentifizierung",
-    "privacyAuthText": "Für die Anmeldung nutzen wir NextAuth.js mit den Anbietern Google und GitHub. Wenn Sie sich über diese Dienste einloggen, erhalten wir von diesen Anbietern Ihre E-Mail-Adresse, Ihren Namen und Ihr Profilbild. Wir nutzen diese Daten ausschließlich zur Identifikation und Nutzerverwaltung.",
-    "privacyEmails": "E-Mail Versand",
-    "privacyEmailsText": "Der Versand von Transaktions-E-Mails (z.B. Einladungen) erfolgt über Resend (2261 Market Street #4816, San Francisco, CA 94114, USA). Die Datenverarbeitung findet in Irland statt. Wir haben mit Resend einen Auftragsverarbeitungsvertrag geschlossen.",
-    "privacyRights": "Ihre Rechte",
-    "privacyRightsText": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer gespeicherten Daten. Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen.",
-    "disclaimerTitle": "Haftungsausschluss & Technische Hinweise",
-    "disclaimerSafety": "Sicherheitshinweis: Die in dieser Applikation bereitgestellten Berechnungen (z.B. zur Balance und Trimmung) dienen ausschließlich zur Unterstützung und Orientierung. Sie ersetzen nicht die fachliche Einschätzung und Verantwortung des Bootsführers/Kapitäns. Die Nutzung erfolgt auf eigene Gefahr.",
-    "disclaimerWarranty": "Software-Gewährleistung: Die Software wird 'wie besehen' (as-is) ohne jegliche Gewährleistung, weder ausdrücklich noch stillschweigend, bereitgestellt. Es wird keine Garantie für Fehlerfreiheit oder ständige Verfügbarkeit übernommen.",
-    "techInfo": "Realisiert mit Next.js, Vercel, Prisma & Resend.",
     "emailWelcomeSubject": "Willkommen beim Drachenboot Manager!",
     "emailWelcomeGreeting": "Hallo",
     "emailWelcomeIntro": "Herzlich willkommen beim Drachenboot Manager. Wir freuen uns, dich an Bord zu haben!",
@@ -547,6 +712,18 @@
     "checkEmail": "Check deine E-Mails",
     "emailSentBody": "Wir haben dir einen Login-Link gesendet. Klicke auf den Link in der E-Mail, um dich anzumelden.",
     "emailNotReceived": "Nicht erhalten? Schau auch im Spam-Ordner nach.",
+    "emailPaymentFailedSubject": "Zahlung fehlgeschlagen - Drachenboot Manager",
+    "emailPaymentFailedTitle": "Zahlung erforderlich",
+    "emailPaymentFailedBody": "Wir konnten deine letzte Zahlung für das PRO-Abo leider nicht abbuchen. Bitte aktualisiere deine Zahlungsdaten, um weiterhin alle Vorteile nutzen zu können.",
+    "emailPaymentFailedAction": "Zahlungsdaten aktualisieren",
+    "emailPaymentActionRequiredSubject": "Handlung erforderlich - Zahlungsinformationen",
+    "emailPaymentActionRequiredTitle": "Bestätigung erforderlich",
+    "emailPaymentActionRequiredBody": "Deine letzte Zahlung benötigt eine zusätzliche Bestätigung (3D Secure). Bitte schließe den Vorgang ab, um die PRO-Vorteile nicht zu verlieren.",
+    "emailPaymentActionRequiredAction": "Zahlung bestätigen",
+    "emailTrialEndingSubject": "Deine Testphase endet bald",
+    "emailTrialEndingTitle": "Testphase endet bald",
+    "emailTrialEndingBody": "Wir hoffen, dir gefällt Drachenboot Manager PRO! Deine Testphase endet in Kürze. Dein Abo wird automatisch verlängert, sofern du nicht kündigst.",
+    "emailTrialEndingAction": "Abo verwalten",
     "orDivider": "oder",
     "welcomeTitle": "Willkommen beim Drachenboot Manager!",
     "welcomeSubtitle": "Plane Trainings, verwalte dein Team und finde die perfekte Bootsbesetzung – alles an einem Ort.",
@@ -567,6 +744,7 @@
     "emailOptional": "E-Mail (optional)",
     "inviteEmailHint": "Falls angegeben, wird eine Einladungs-E-Mail versendet",
     "addMember": "Mitglied hinzufügen",
+    "invite": "Einladen",
     "inviteMember": "Einladen",
     "email": "E-Mail",
     "inviteDescription": "Die Person wird zum Team hinzugefügt. Falls sie noch keinen Account hat, kann sie sich registrieren und ist dann automatisch Teil des Teams.",
@@ -579,6 +757,9 @@
     "onboardingBody": "Damit dein Trainer das Boot optimal planen und ausbalancieren kann, benötigen wir noch ein paar Angaben von dir.",
     "weightReason": "Dein Gewicht ist nur für dich und den Trainer sichtbar. Es ist essentiell für die Berechnung der Balance (Trim) des Bootes.",
     "skillsReason": "Deine Position (links/rechts/Trommel/Steuer) hilft beim Erstellen der Sitzordnung.",
+    "nameRequired": "Name ist erforderlich.",
+    "weightRequired": "Bitte gib ein gültiges Gewicht an.",
+    "skillRequired": "Bitte wähle mindestens eine Seite/Rolle aus.",
     "completeProfile": "Profil vervollständigen",
     "thankYou": "Danke!",
     "sending": "Wird gesendet...",
@@ -659,6 +840,7 @@
     "onlyCaptainsCanEditTeam": "Nur Team-Kapitäne können Teameinstellungen ändern und Mitglieder verwalten.",
     "backToDashboard": "Zurück zum Dashboard",
     "importData": "Daten importieren",
+    "importType": "Import-Typ",
     "paddlers": "Paddler",
     "events": "Termine",
     "dragDropOrClick": "Klicken zum Hochladen oder Drag & Drop",
@@ -680,5 +862,285 @@
     "errorHome": "Startseite",
     "errorGlobalTitle": "Kritischer Fehler",
     "errorGlobalMessage": "Ein kritischer Fehler ist aufgetreten und die Anwendung konnte nicht geladen werden.",
-    "errorReload": "Neu laden"
+    "errorReload": "Neu laden",
+    "pro": {
+        "premiumUpgrade": "Premium Upgrade",
+        "upgradeTitle": "Upgrade auf PRO",
+        "upgradeDescription": "Erhalte unbegrenzte Mitglieder, MCP-Zugriff für KI und werbefreie Exporte.",
+        "upgradeButton": "Jetzt upgraden",
+        "unlockFeaturesTitle": "Pro-Features freischalten",
+        "unlockFeaturesDescription": "Erhalte unbegrenzte Mitglieder, Import/Export Funktionen und bevorzugten Support.",
+        "billingAddress": "Rechnungsadresse",
+        "payNow": "Zahlungspflichtig bestellen",
+        "vatIncluded": "inkl. MwSt.",
+        "processing": "Verarbeite...",
+        "priceLabel": "Preis",
+        "intervalYearly": "Jährlich",
+        "freeUpgradeTitle": "Upgrade bereit",
+        "freeUpgradeDescription": "Dein Gutschein deckt 100% der Kosten ab. Keine Zahlungsmethode erforderlich.",
+        "activateNow": "Jetzt aktivieren",
+        "loading": "Lädt...",
+        "initializingCheckout": "Checkout wird vorbereitet...",
+        "intervalMonthly": "Monatlich",
+        "productName": "Drachenboot Manager PRO",
+        "promotionCode": "Gutscheincode",
+        "enterPromoCode": "Gutschein eingeben",
+        "discountApplied": "Rabatt angewendet",
+        "invalidCode": "Ungültiger Code",
+        "invalidPromoCode": "Ungültiger Gutscheincode",
+        "benefits": {
+            "title": "Warum Pro?",
+            "items": [
+                "Unbegrenzte Mitgliederzahl",
+                "Eigene Team-Farben & Branding",
+                "Export ohne Wasserzeichen",
+                "Bevorzugter Support",
+                "Unterstütze die Weiterentwicklung",
+                "MCP Server für KI-Integration"
+            ]
+        },
+        "manageSubscription": "Abo verwalten",
+        "manageSubscriptionDesc": "Dein Team ist PRO! Hier kannst du Rechnungen einsehen und Zahlungsdaten ändern.",
+        "upgradeSuccessTitle": "🎉 Willkommen bei PRO!",
+        "upgradeSuccessMessage": "Dein Team wurde erfolgreich auf PRO upgegradet. Viel Spaß mit den neuen Features!",
+        "period": "Zeitraum",
+        "subscription": "Abo",
+        "subscriptionStatus": "Abo-Status",
+        "nextBillingDate": "Nächste Abrechnung",
+        "validUntil": "Gültig bis",
+        "status_canceled_pending": "Kündigung vorgemerkt",
+        "cancelSubscription": "Abo kündigen",
+        "reactivateSubscription": "Kündigung zurücknehmen",
+        "viewInvoices": "Rechnungen anzeigen",
+        "updatePaymentMethod": "Zahlungsmethode ändern",
+        "canceledAtPeriodEnd": "Wird zum Ende der Laufzeit gekündigt",
+        "perMonth": "/Monat",
+        "perYear": "/Jahr",
+        "paymentMethod": "Zahlungsmethode",
+        "noSubscription": "Kein aktives Abo",
+        "noSubscriptionDesc": "Dieses Team hat aktuell kein aktives PRO-Abo.",
+        "confirmCancel": "Bist du sicher, dass du das Abo kündigen möchtest?",
+        "cancelInfo": "Du kannst die Funktionen bis zum Ende der Laufzeit weiter nutzen.",
+        "subscriptionCanceled": "Abo wird gekündigt",
+        "subscriptionReactivated": "Kündigung zurückgenommen",
+        "managedByOther": "Das Abo wird von einem anderen Teammitglied verwaltet.",
+        "invoice": "Rechnung",
+        "amount": "Betrag",
+        "status": "Status",
+        "status_paid": "Bezahlt",
+        "status_open": "Offen",
+        "status_void": "Storniert",
+        "status_uncollectible": "Uneinbringlich",
+        "noInvoices": "Keine Rechnungen gefunden.",
+        "noPaymentMethod": "Keine Zahlungsmethode hinterlegt.",
+        "subscriptionHistory": "Abo-Historie",
+        "startsAt": "Startet am",
+        "endsAt": "Endet am",
+        "endsSoon": "Endet bald",
+        "status_active": "Aktiv",
+        "status_past_due": "Zahlung überfällig",
+        "status_canceled": "Gekündigt",
+        "status_trialing": "Probezeit",
+        "status_unpaid": "Unbezahlt",
+        "status_incomplete": "Unvollständig",
+        "status_incomplete_expired": "Abgelaufen",
+        "socialMedia": "Social Media",
+        "instagramPlaceholder": "Instagram Nutzername/URL",
+        "facebookPlaceholder": "Facebook URL",
+        "twitterPlaceholder": "Twitter/X Handle",
+        "contactEmail": "Kontakt E-Mail",
+        "proCustomization": "PRO Anpassung",
+        "website": "Webseite",
+        "icon": "Logo",
+        "remove": "Entfernen",
+        "imageTooLarge": "Bild zu groß (max 5MB)",
+        "imageFormats": "Max. 5MB. Formate: JPG, PNG, GIF, WebP.",
+        "accentColor": "Akzentfarbe",
+        "showProBadge": "PRO-Badge anzeigen",
+        "showProBadgeDesc": "Zeigt das PRO-Badge in der Kopfzeile und im Team-Switcher an.",
+        "showPremiumRing": "Premium Logo Ring anzeigen",
+        "showPremiumRingDesc": "Zeigt einen schimmernden goldenen Ring um dein Team-Logo.",
+        "showWatermark": "Branding auf Exports anzeigen",
+        "showWatermarkDesc": "Zeigt \"Erstellt mit Drachenboot Manager\" auf Bild-Exports an. Kann für PRO-Teams deaktiviert werden.",
+        "themes": {
+            "amber": "Bernstein",
+            "blue": "Ozeanblau",
+            "rose": "Rosé",
+            "emerald": "Smaragd",
+            "violet": "Violett",
+            "slate": "Schiefer",
+            "teal": "Blaugrün",
+            "indigo": "Indigo",
+            "orange": "Orange",
+            "zinc": "Zink"
+        },
+        "helpCategoryPro": "PRO Funktionen",
+        "helpCategoryProDesc": "Alles über die PRO-Mitgliedschaft und exklusive Features.",
+        "helpProFeatures": "Exklusive PRO-Features",
+        "helpProFeaturesDesc": "Als PRO-Team stehen dir folgende Funktionen zur Verfügung:",
+        "helpProFeature1": "Unbegrenzte Mitgliederzahl: Verwalte beliebig viele Paddler ohne Einschränkungen.",
+        "helpProFeature2": "PDF & Bild Export: Speichere deine Bootsaufstellungen in hoher Qualität für den Druck oder zum Teilen.",
+        "helpProFeature3": "Team-Individualisierung: Wähle eine eigene Akzentfarbe und aktiviere den Premium Logo Ring.",
+        "helpProFeature4": "iCal Integration: Synchronisiere deine Termine direkt mit deinem persönlichen Kalender (Outlook, Google, Apple).",
+        "helpProBilling": "Abo & Abrechnung",
+        "helpProBillingDesc": "Du kannst dein Abo jederzeit in den Team-Einstellungen verwalten. Dort findest du auch deine Rechnungen und kannst deine Zahlungsmethode aktualisieren.",
+        "stripe": {
+            "errors": {
+                "card_declined": "Deine Karte wurde abgelehnt. Bitte kontaktiere deine Bank.",
+                "expired_card": "Deine Karte ist abgelaufen.",
+                "incorrect_cvc": "Der Sicherheitscode deiner Karte ist falsch.",
+                "processing_error": "Beim Verarbeiten deiner Karte ist ein Fehler aufgetreten.",
+                "incorrect_number": "Die Kartennummer ist falsch.",
+                "insufficient_funds": "Deine Karte verfügt nicht über ausreichende Deckung.",
+                "generic_decline": "Deine Karte wurde abgelehnt.",
+                "lost_card": "Deine Karte wurde als verloren gemeldet.",
+                "stolen_card": "Deine Karte wurde als gestohlen gemeldet.",
+                "fraudulent": "Die Zahlung wurde als betrügerisch markiert.",
+                "missingConfig": "Interner Fehler: Konfiguration fehlt.",
+                "default": "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen."
+            }
+        },
+        "errors": {
+            "failedToStartCheckout": "Checkout konnte nicht gestartet werden.",
+            "failedToFetchPrice": "Preis konnte nicht abgerufen werden.",
+            "subscriptionFailed": "Abonnement fehlgeschlagen."
+        },
+        "securePayment": "SSL Verschlüsselt & Sichere Zahlung"
+    },
+    "api": {
+        "access": "API Zugriff",
+        "title": "MCP Server API",
+        "description": "Model Context Protocol Server für AI-Integration",
+        "generateKey": "Neuen Key generieren",
+        "keyName": "Key Name",
+        "keyNamePlaceholder": "z.B. Claude Desktop, Development",
+        "keyGenerated": "API Key generiert",
+        "saveKeyWarning": "Speichere diesen Key jetzt! Er wird nur einmal angezeigt.",
+        "yourKey": "Dein API Key",
+        "copyKey": "Kopieren",
+        "copied": "Kopiert!",
+        "revokeKey": "Löschen",
+        "lastUsed": "Zuletzt verwendet",
+        "never": "Nie",
+        "created": "Erstellt",
+        "noKeys": "Noch keine API Keys",
+        "noKeysDesc": "Erstelle einen Key, um mit der MCP Integration zu starten.",
+        "proRequired": "MCP API Zugriff ist ein PRO Feature",
+        "proRequiredDesc": "Upgrade auf PRO für programmatischen API-Zugriff und Integration mit AI Assistenten wie Claude Desktop.",
+        "upgradeBtn": "Auf PRO upgraden",
+        "learnMore": "Mehr über MCP erfahren",
+        "aboutTitle": "Über MCP API Zugriff",
+        "aboutDesc": "Das Model Context Protocol (MCP) ermöglicht es AI-Assistenten wie Claude Desktop, programmatisch mit deinen Team-Daten zu interagieren. Generiere einen API Key, um diese Integration zu aktivieren.",
+        "nextSteps": "Nächste Schritte: Claude Desktop konfigurieren",
+        "loading": "Lade...",
+        "revokeConfirm": "Möchtest du diesen API Key wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+        "done": "Fertig"
+    },
+    "legal": {
+        "common": {
+            "imprint": "Impressum",
+            "tos": "AGB",
+            "privacy": "Datenschutz",
+            "avv": "AVV"
+        },
+        "imprint": {
+            "title": "Impressum",
+            "legal": "Angaben gemäß § 5 TMG",
+            "name": "Jan Hartje",
+            "address": "Hamburger Allee 6, 30161 Hannover",
+            "contact": "Kontakt",
+            "email": "support@janhartje.com",
+            "ustId": "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+            "responsible": "Redaktionell verantwortlich",
+            "liability_content": "Haftung für Inhalte",
+            "liability_content_text": "Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen. Verpflichtungen zur Entfernung oder Sperrung der Nutzung von Informationen nach den allgemeinen Gesetzen bleiben hiervon unberührt. Eine diesbezügliche Haftung ist jedoch erst ab dem Zeitpunkt der Kenntnis einer konkreten Rechtsverletzung möglich. Bei Bekanntwerden von entsprechenden Rechtsverletzungen werden wir diese Inhalte umgehend entfernen.",
+            "liability_links": "Haftung für Links",
+            "liability_links_text": "Unser Angebot enthält Links zu externen Websites Dritter, auf deren Inhalte wir keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar. Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist jedoch ohne konkrete Anhaltspunkte einer Rechtsverletzung nicht zumutbar. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Links umgehend entfernen.",
+            "copyright": "Urheberrecht",
+            "copyright_text": "Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers. Downloads und Kopien dieser Seite sind nur für den privaten, nicht kommerziellen Gebrauch gestattet. Soweit die Inhalte auf dieser Seite nicht vom Betreiber erstellt wurden, werden die Urheberrechte Dritter beachtet. Insbesondere werden Inhalte Dritter als solche gekennzeichnet. Sollten Sie trotzdem auf eine Urheberrechtsverletzung aufmerksam werden, bitten wir um einen entsprechenden Hinweis. Bei Bekanntwerden von Rechtsverletzungen werden wir derartige Inhalte umgehend entfernen."
+        },
+        "privacy": {
+            "title": "Datenschutzerklärung",
+            "intro": "1. Datenschutz auf einen Blick",
+            "intro_text": "Diese Datenschutzerklärung informiert Sie darüber, wie Jan Hartje (nachfolgend „wir“) personenbezogene Daten im Rahmen der Nutzung des „Drachenboot Manager“ verarbeitet.",
+            "responsible": "2. Verantwortlicher",
+            "hosting": "Hosting & CDN",
+            "hosting_text": "Wir hosten unsere Website bei Vercel. Anbieter ist die Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA. Serverstandort: Frankfurt, Deutschland. Vercel ist unter dem EU-US Data Privacy Framework zertifiziert.",
+            "database": "Datenbank",
+            "database_text": "Unsere Datenbank wird von Vercel Postgres bereitgestellt und ebenfalls in Frankfurt gehostet. Hier werden Ihre Nutzerdaten (Name, E-Mail, Team-Daten) gespeichert.",
+            "auth": "Registrierung & Login (NextAuth)",
+            "auth_text": "Sie können sich über Google oder GitHub anmelden. Dabei werden Daten vom jeweiligen Provider an uns übermittelt (E-Mail, Name, Profilbild). Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung).",
+            "emails": "E-Mail Versand",
+            "emails_text": "Wir nutzen Resend für den Versand von System-E-Mails. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an zuverlässiger Kommunikation).",
+            "payments": "Zahlungsabwicklung (Stripe)",
+            "payments_text": "Für kostenpflichtige Funktionen nutzen wir Stripe. Stripe verarbeitet Zahlungsdaten und Informationen zur Betrugsprävention. Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO.",
+            "analytics": "4. Analyse-Tools",
+            "analytics_text": "Wir nutzen Vercel Analytics und Speed Insights, um die Nutzung unserer Website statistisch auszuwerten. Hierbei werden Daten i.d.R. anonymisiert erhoben.",
+            "rights": "5. Ihre Rechte",
+            "rights_text": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung und Einschränkung der Verarbeitung Ihrer Daten sowie das Recht auf Datenübertragbarkeit."
+        },
+        "tos": {
+            "title": "Allgemeine Geschäftsbedingungen (AGB)",
+            "scope": "1. Geltungsbereich",
+            "scope_text": "Diese AGB gelten für alle Verträge zwischen Jan Hartje (nachfolgend „Anbieter“) und seinen Kunden über die Nutzung der Software „Drachenboot Manager“ (nachfolgend „Software“).",
+            "subject": "2. Vertragsgegenstand und Leistungen",
+            "subject_text": "Der Anbieter stellt dem Kunden die Software als SaaS-Lösung zur Verfügung. Der Funktionsumfang ergibt sich aus der Leistungsbeschreibung auf der Website. In der kostenlosen Version („Free“) ist der Funktionsumfang eingeschränkt. Die kostenpflichtige Version („PRO“) bietet erweiterte Funktionen.",
+            "conclusion": "3. Vertragsschluss",
+            "conclusion_text": "Der Vertrag kommt durch Abschluss des Registrierungsvorgangs und (bei kostenpflichtigen Abos) durch Abschluss des Zahlungsvorgangs zustande.",
+            "withdrawal": "4. Widerrufsrecht für Verbraucher (B2C)",
+            "withdrawal_policy": "Widerrufsbelehrung",
+            "withdrawal_text": "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsabschlusses. Um Ihr Widerrufsrecht auszuüben, müssen Sie uns (Jan Hartje, Hamburger Allee 6, 30161 Hannover, support@janhartje.com) mittels einer eindeutigen Erklärung über Ihren Entschluss informieren.",
+            "withdrawal_expiry": "Besonderer Hinweis zum Erlöschen des Widerrufsrechts:",
+            "withdrawal_expiry_text": "Das Widerrufsrecht erlischt bei einem Vertrag über die Lieferung von nicht auf einem körperlichen Datenträger befindlichen digitalen Inhalten, wenn wir mit der Ausführung des Vertrags begonnen haben, nachdem Sie ausdrücklich zugestimmt haben, dass wir mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist beginnen, und Sie Ihre Kenntnis davon bestätigt haben, dass Sie durch Ihre Zustimmung mit Beginn der Ausführung des Vertrags Ihr Widerrufsrecht verlieren.",
+            "prices": "5. Preise und Zahlungsbedingungen",
+            "prices_text": "Es gelten die zum Zeitpunkt des Vertragsschlusses angegebenen Preise. Der Anbieter ist Kleinunternehmer im Sinne des § 19 UStG; daher wird keine Umsatzsteuer berechnet und diese auch nicht ausgewiesen. Die Zahlungsabwicklung erfolgt über den Dienstleister Stripe.",
+            "term": "6. Laufzeit und Kündigung",
+            "term_text1": "1. Die kostenlose Version kann jederzeit durch Löschung des Accounts beendet werden.",
+            "term_text2": "2. Kostenpflichtige Abonnements haben die gewählte Laufzeit (monatlich/jährlich) und verlängern sich automatisch, sofern sie nicht vor Ablauf der jeweiligen Periode gekündigt werden.",
+            "liability": "7. Haftung",
+            "liability_text1": "1. Der Anbieter haftet unbeschränkt bei Vorsatz oder grober Fahrlässigkeit.",
+            "liability_text2": "2. Bei leichter Fahrlässigkeit haftet der Anbieter nur bei Verletzung einer wesentlichen Vertragspflicht (Kardinalpflicht). In diesem Fall ist die Haftung auf den vertragstypischen, vorhersehbaren Schaden begrenzt."
+        },
+        "avv": {
+            "title": "AVV-Hinweis (Data Processing)",
+            "note": "Hinweis zur Auftragsverarbeitung (AVV)",
+            "note_text": "Wenn Sie „Drachenboot Manager“ für Ihren Verein, Ihr Unternehmen oder eine sonstige Organisation nutzen und dabei personenbezogene Daten Dritter (z.B. Teammitglieder) verarbeiten, erfolgt dies im Rahmen einer Auftragsverarbeitung gemäß Art. 28 DSGVO.",
+            "subject": "Gegenstand der Verarbeitung:",
+            "subject_text": "Nutzung der Software zur Organisation von Drachenboot-Teams, Verwaltung von Teilnehmerlisten, Gewichtsangaben und Rollenzuweisungen.",
+            "conclusion": "Abschluss des AVV:",
+            "conclusion_text": "Mit der Registrierung und Nutzung des Dienstes akzeptieren Sie unsere AGB. In diesen ist der Abschluss einer Vereinbarung zur Auftragsverarbeitung (AVV) enthalten bzw. referenziert.",
+            "tom": "Technisch-organisatorische Maßnahmen (TOM):",
+            "tom_text": "Wir setzen moderne Sicherheitsstandards ein, um Ihre Daten zu schützen, unter anderem: Verschlüsselung (SSL/TLS), Hosting in Frankfurt, regelmäßige Backups und Zugriffsbeschränkungen."
+        },
+        "disclaimer": {
+            "title": "Haftungsausschluss & Technische Hinweise",
+            "safety": "Sicherheitshinweis: Die in dieser Applikation bereitgestellten Berechnungen (z.B. zur Balance und Trimmung) dienen ausschließlich zur Unterstützung und Orientierung. Sie ersetzen nicht die fachliche Einschätzung und Verantwortung des Bootsführers/Kapitäns. Die Nutzung erfolgt auf eigene Gefahr.",
+            "warranty": "Software Gewährleistung: Die Software wird 'wie besehen' (as-is) ohne jegliche Gewährleistung, weder ausdrücklich noch stillschweigend, bereitgestellt. Es wird keine Garantie für Fehlerfreiheit oder ständige Verfügbarkeit übernommen.",
+            "tech_info": "Realisiert mit Next.js, Vercel, Prisma & Resend."
+        },
+        "revocation": {
+            "title": "Widerrufsbelehrung für digitale Inhalte",
+            "intro": "Verbraucher haben ein vierzehntägiges Widerrufsrecht.",
+            "right": {
+                "title": "Widerrufsrecht",
+                "content": "Sie haben das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen."
+            },
+            "expiry": {
+                "title": "Vorzeitiges Erlöschen",
+                "content": "Das Widerrufsrecht erlischt bei einem Vertrag über die Lieferung von digitalen Inhalten vorzeitig, wenn Sie ausdrücklich zugestimmt haben, dass wir mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist beginnen, und Sie Ihre Kenntnis davon bestätigt haben, dass Sie dadurch Ihr Widerrufsrecht verlieren."
+            },
+            "form": {
+                "title": "Muster-Widerrufsformular",
+                "content": "Wenn Sie den Vertrag widerrufen wollen, senden Sie uns bitte eine E-Mail mit folgenden Daten: Hiermit widerrufe(n) ich/wir den Vertrag über den Kauf der folgenden Waren/Dienstleistung, Bestellt am/Erhalten am, Name, Anschrift, Datum."
+            }
+        },
+        "agbConsent": "Ich stimme den [AGB] und der [Datenschutzerklärung] zu.",
+        "revocationWaiver": "Ich stimme zu, dass mit der Ausführung des Vertrags vor Ablauf der Widerrufsfrist begonnen wird. Ich weiß, dass ich dadurch mein Widerrufsrecht verliere.",
+        "backToHome": "Zurück",
+        "stand": "Stand: Januar 2026"
+    },
+    "common": {
+        "apply": "Einlösen",
+        "retry": "Erneut versuchen"
+    }
 }

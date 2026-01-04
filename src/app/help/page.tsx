@@ -173,6 +173,37 @@ export default function HelpPage() {
                </div>
             </details>
 
+            {/* PRO Guide */}
+            <details className="group bg-white dark:bg-slate-900 rounded-xl border border-amber-200 dark:border-amber-900/30 shadow-sm overflow-hidden">
+               <summary className="flex items-center justify-between p-6 cursor-pointer hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
+                 <div className="flex items-center gap-3">
+                    <span className="bg-amber-100 dark:bg-amber-900 text-amber-600 dark:text-amber-400 p-2 rounded-lg">✨</span>
+                    <h3 className="font-bold text-slate-900 dark:text-white">{t('pro.helpCategoryPro')}</h3>
+                 </div>
+                 <span className="text-slate-400 group-open:rotate-180 transition-transform">▼</span>
+               </summary>
+               <div className="px-6 pb-6 text-slate-600 dark:text-slate-400 text-sm leading-relaxed border-t border-slate-100 dark:border-slate-800 pt-6 space-y-6">
+                  
+                  {/* PRO Features */}
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">{t('pro.helpProFeatures')}</h4>
+                    <p className="mb-2">{t('pro.helpProFeaturesDesc')}</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1">
+                      <li>{t('pro.helpProFeature1')}</li>
+                      <li>{t('pro.helpProFeature2')}</li>
+                      <li>{t('pro.helpProFeature3')}</li>
+                      <li>{t('pro.helpProFeature4')}</li>
+                    </ul>
+                  </div>
+
+                  {/* Billing */}
+                  <div>
+                    <h4 className="font-bold text-slate-900 dark:text-white mb-2">{t('pro.helpProBilling')}</h4>
+                    <p>{t('pro.helpProBillingDesc')}</p>
+                  </div>
+               </div>
+            </details>
+
           </div>
         </section>
 

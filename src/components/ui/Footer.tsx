@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 
-import { ImprintModal, ChangelogModal, PrivacyModal } from './Modals';
+import { ImprintModal, ChangelogModal, PrivacyModal, TermsModal, AVVModal } from './Modals';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { useSession } from 'next-auth/react';
 
@@ -16,6 +16,8 @@ const Footer: React.FC<FooterProps> = ({ variant = 'full' }) => {
   const { t } = useLanguage();
   const [showImprint, setShowImprint] = useState<boolean>(false);
   const [showPrivacy, setShowPrivacy] = useState<boolean>(false);
+  const [showTerms, setShowTerms] = useState<boolean>(false);
+  const [showAVV, setShowAVV] = useState<boolean>(false);
   const [showChangelog, setShowChangelog] = useState<boolean>(false);
   const { canInstall, promptInstall } = usePWAInstall();
 
@@ -30,11 +32,19 @@ const Footer: React.FC<FooterProps> = ({ variant = 'full' }) => {
             </div>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4 text-sm items-center">
               <button onClick={() => setShowImprint(true)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-                {t('imprint')}
+                {t('legal.common.imprint')}
+              </button>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <button onClick={() => setShowTerms(true)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                {t('legal.common.tos')}
               </button>
               <span className="text-slate-300 dark:text-slate-600">•</span>
               <button onClick={() => setShowPrivacy(true)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
-                {t('privacy')}
+                {t('legal.common.privacy')}
+              </button>
+              <span className="text-slate-300 dark:text-slate-600">•</span>
+              <button onClick={() => setShowAVV(true)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+                {t('legal.common.avv')}
               </button>
               <span className="text-slate-300 dark:text-slate-600">•</span>
               <button onClick={() => setShowChangelog(true)} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
@@ -58,6 +68,8 @@ const Footer: React.FC<FooterProps> = ({ variant = 'full' }) => {
 
         {showImprint && <ImprintModal onClose={() => setShowImprint(false)} />}
         {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
+        {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
+        {showAVV && <AVVModal onClose={() => setShowAVV(false)} />}
         {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
       </>
     );
@@ -67,9 +79,21 @@ const Footer: React.FC<FooterProps> = ({ variant = 'full' }) => {
     <>
       <footer className="mt-12 text-center text-xs text-slate-500 dark:text-slate-400 pb-8">
         <div className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-2 items-center">
-          <button onClick={() => setShowImprint(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">{t('imprint')}</button>
+          <button onClick={() => setShowImprint(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+            {t('legal.common.imprint')}
+          </button>
           <span>•</span>
-          <button onClick={() => setShowPrivacy(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">{t('privacy')}</button>
+          <button onClick={() => setShowTerms(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+            {t('legal.common.tos')}
+          </button>
+          <span>•</span>
+          <button onClick={() => setShowPrivacy(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+            {t('legal.common.privacy')}
+          </button>
+          <span>•</span>
+          <button onClick={() => setShowAVV(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">
+            {t('legal.common.avv')}
+          </button>
           <span>•</span>
           <button onClick={() => setShowChangelog(true)} className="hover:text-slate-800 dark:hover:text-slate-200 transition-colors">{t('changelog')}</button>
           <span>•</span>
@@ -96,6 +120,8 @@ const Footer: React.FC<FooterProps> = ({ variant = 'full' }) => {
 
       {showImprint && <ImprintModal onClose={() => setShowImprint(false)} />}
       {showPrivacy && <PrivacyModal onClose={() => setShowPrivacy(false)} />}
+      {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
+      {showAVV && <AVVModal onClose={() => setShowAVV(false)} />}
       {showChangelog && <ChangelogModal onClose={() => setShowChangelog(false)} />}
     </>
   );

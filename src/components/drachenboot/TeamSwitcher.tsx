@@ -1,16 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ChevronDown, Plus, Users, Check, Settings } from 'lucide-react';
+import { ChevronDown, Plus, Users, Check, Settings, CreditCard, Sparkles } from 'lucide-react';
 import { CreateTeamModal } from '../ui/modals/CreateTeamModal';
 import { useSession } from 'next-auth/react';
+import { ProBadge } from './pro/ProBadge';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
 const TeamSwitcher: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
-  const { teams, currentTeam, switchTeam, createTeam } = useDrachenboot();
+  const { teams, currentTeam, switchTeam, createTeam, userRole } = useDrachenboot();
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -26,10 +29,15 @@ const TeamSwitcher: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleCreateTeam = (name: string) => {
-    createTeam(name);
+  const handleCreateTeam = async (name: string) => {
+    const newTeam = await createTeam(name);
     setShowCreateModal(false);
     setIsOpen(false);
+
+    if (newTeam && pathname.includes('/app/teams/')) {
+      const tab = searchParams.get('tab') || 'general';
+      router.push(`/app/teams/${newTeam.id}?tab=${tab}`);
+    }
   };
 
   if (!currentTeam && teams.length === 0) {
@@ -77,26 +85,22 @@ const TeamSwitcher: React.FC = () => {
             sm:absolute sm:top-auto sm:left-0 sm:translate-x-0 sm:translate-y-0 sm:mt-2 sm:w-64
             bg-white dark:bg-slate-900 rounded-xl shadow-2xl sm:shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="p-2">
-              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-2 py-1 uppercase tracking-wider flex justify-between items-center">
+              <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-2 py-1 uppercase tracking-wider">
                 <span>{t('teams') || 'Teams'}</span>
-                <button 
-                  onClick={() => {
-                    router.push('/app/teams');
-                    setIsOpen(false);
-                  }}
-                  className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
-                  title={t('manageTeams') || 'Manage Teams'}
-                >
-                  <Settings size={14} />
-                </button>
               </div>
-              <div className="max-h-60 overflow-y-auto mt-1">
+              <div className="max-h-60 overflow-y-auto mt-1 scrollbar-thin">
                 {teams.map((team) => (
                   <button
                     key={team.id}
                     onClick={() => {
                       switchTeam(team.id);
                       setIsOpen(false);
+
+                      // If we are on a team details page, redirect to the new team
+                      if (pathname.includes('/app/teams/')) {
+                        const tab = searchParams.get('tab') || 'general';
+                        router.push(`/app/teams/${team.id}?tab=${tab}`);
+                      }
                     }}
                     className={`w-full text-left px-3 py-3 sm:py-2 rounded-lg flex items-center justify-between transition-colors ${
                       currentTeam?.id === team.id
@@ -104,11 +108,67 @@ const TeamSwitcher: React.FC = () => {
                         : 'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200'
                     }`}
                   >
-                    <span className="truncate text-base sm:text-sm">{team.name}</span>
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <span className="truncate text-base sm:text-sm">{team.name}</span>
+                      {team.plan === 'PRO' && team.showProBadge !== false && <ProBadge size="sm" color={team.primaryColor} />}
+                    </div>
                     {currentTeam?.id === team.id && <Check size={18} className="sm:w-4 sm:h-4" />}
                   </button>
                 ))}
               </div>
+              
+              {/* Current Team Actions - ONLY FOR CAPTAIN */}
+              {currentTeam && userRole === 'CAPTAIN' && (
+                <>
+                  <div className="h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
+                  <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 px-2 py-1 uppercase tracking-wider">
+                    {t('teamSettings') || 'Team Settings'}
+                  </div>
+                  <button
+                    onClick={() => {
+                      router.push(`/app/teams/${currentTeam.id}?tab=general`);
+                      setIsOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm"
+                  >
+                    <Settings size={16} />
+                    {t('general') || 'Allgemein'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      router.push(`/app/teams/${currentTeam.id}?tab=members`);
+                      setIsOpen(false);
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm"
+                  >
+                    <Users size={16} />
+                    {t('members') || 'Mitglieder'}
+                  </button>
+                  {currentTeam.plan === 'PRO' ? (
+                    <button
+                      onClick={() => {
+                        router.push(`/app/teams/${currentTeam.id}?tab=subscription`);
+                        setIsOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm"
+                    >
+                      <CreditCard size={16} />
+                      {t('pro.subscription') || 'Abo'}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        router.push(`/app/teams/${currentTeam.id}?tab=subscription`);
+                        setIsOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 text-amber-700 dark:text-amber-400 font-bold hover:from-amber-200 hover:to-orange-200 dark:hover:from-amber-900/60 dark:hover:to-orange-900/60 transition-all text-sm mb-1 mt-1"
+                    >
+                      <Sparkles size={16} />
+                      {t('pro.upgradeTitle') || 'Upgrade to PRO'}
+                    </button>
+                  )}
+                </>
+              )}
               
               <div className="h-px bg-slate-200 dark:bg-slate-700 my-2"></div>
               

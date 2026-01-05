@@ -149,6 +149,15 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.4.9",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Corrected account balance display (credit is now positive, debt is negative)."
+            ]
+        },
+        {
             "version": "3.4.8",
             "date": "January 2026",
             "features": [

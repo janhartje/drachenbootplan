@@ -38,7 +38,6 @@ describe('iCal Service', () => {
     prismaMock.team.findUnique.mockResolvedValue({
       id: teamId,
       icalUrl: icalUrl,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as unknown as any); // Mocking deep partial is hard, casting to any for mock simplicity
 
     // 2. Mock iCal Response

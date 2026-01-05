@@ -14,6 +14,9 @@ DROP INDEX "ApiKey_key_idx";
 -- DropIndex
 DROP INDEX "ApiKey_key_key";
 
+-- Delete existing rows to avoid null value errors for new NOT NULL columns
+DELETE FROM "ApiKey";
+
 -- AlterTable
 ALTER TABLE "ApiKey" DROP COLUMN "key",
 ADD COLUMN     "displayKey" TEXT NOT NULL,

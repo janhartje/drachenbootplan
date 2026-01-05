@@ -103,12 +103,15 @@ model Event {
   canisterCount Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  externalUid   String? // UID from iCal
 
   attendances Attendance[]
   assignments Assignment[]
 
   @@index([teamId])
   @@index([date])
+  @@unique([teamId, externalUid])
 }
 
 model Attendance {
@@ -171,6 +174,9 @@ model Team {
 
   // MCP Server API Keys
   apiKeys            ApiKey[]
+
+  // iCal Integration
+  icalUrl            String?
 }
 
 model EmailQueue {

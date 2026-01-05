@@ -110,7 +110,7 @@ export async function findExistingSubscription(
   const subscriptions = await stripe.subscriptions.list({
     customer: customerId,
     limit: 10,
-    expand: ['data.latest_invoice.payment_intent', 'data.pending_setup_intent', 'data.default_payment_method', 'data.discount', 'data.customer'],
+    expand: ['data.latest_invoice.payment_intent', 'data.pending_setup_intent', 'data.default_payment_method', 'data.discount', 'data.customer.invoice_settings.default_payment_method'],
   });
   
   // Priority: active/trialing > incomplete > nothing
@@ -422,7 +422,7 @@ export async function getSubscriptionDetails(
           return baseAmount;
       })(),
       currency: price?.currency,
-      paymentMethod: (() => {
+      paymentMethod: await (async () => {
         // 1. Try Subscription default payment method
         const subPM = subscription.default_payment_method;
         if (subPM && typeof subPM === 'object' && subPM.card) {
@@ -438,8 +438,19 @@ export async function getSubscriptionDetails(
         // Since we expanded 'customer' in findExistingSubscription, we can use it here
         const customer = subscription.customer;
         if (customer && typeof customer === 'object' && !('deleted' in customer)) {
-          const custPM = customer.invoice_settings?.default_payment_method;
-          if (custPM && typeof custPM === 'object' && custPM.card) {
+          let custPM = customer.invoice_settings?.default_payment_method;
+          
+          // If it's just an ID, fetch the full object
+          if (custPM && typeof custPM === 'string') {
+              try {
+                  custPM = await stripe.paymentMethods.retrieve(custPM);
+              } catch (e) {
+                  console.error('Failed to retrieve fallback payment method:', e);
+                  return null;
+              }
+          }
+
+            if (custPM && typeof custPM === 'object' && custPM.card) {
              return {
               brand: custPM.card.brand,
               last4: custPM.card.last4,
@@ -447,6 +458,35 @@ export async function getSubscriptionDetails(
               expYear: custPM.card.exp_year,
              };
           }
+        }
+
+        // 3. Fallback: List all payment methods for customer
+        try {
+            // We need the customer ID. If subscription.customer is an object, use .id, else it's the string itself
+            const custId = typeof subscription.customer === 'object' ? subscription.customer.id : subscription.customer;
+            
+            console.log('[STRIPE FIX] Searching for any payment method for customer:', custId);
+            
+            const paymentMethods = await stripe.paymentMethods.list({
+                customer: custId,
+                type: 'card',
+                limit: 1,
+            });
+
+            if (paymentMethods.data.length > 0) {
+                const pm = paymentMethods.data[0];
+                console.log('[STRIPE FIX] Found payment method via list:', pm.id);
+                if (pm.card) {
+                    return {
+                        brand: pm.card.brand,
+                        last4: pm.card.last4,
+                        expMonth: pm.card.exp_month,
+                        expYear: pm.card.exp_year,
+                    };
+                }
+            }
+        } catch (e) {
+            console.error('[STRIPE FIX] Error listing payment methods:', e);
         }
         
         return null;

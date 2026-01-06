@@ -56,7 +56,7 @@
     "stripe": "^20.1.0",
     "swagger-ui-react": "^5.31.0",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.4"
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",

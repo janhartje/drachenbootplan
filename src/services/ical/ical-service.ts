@@ -92,59 +92,59 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<
       }
     }
 
-    // Wrap DB writes in a transaction
-    return await prisma.$transaction(async (tx) => {
-        // Batch Fetch Existing Events
-        const existingEvents = await tx.event.findMany({
-            where: {
-                teamId,
-                externalUid: { in: Array.from(validUids) }
-            },
-            select: { id: true, externalUid: true, title: true, date: true }
-        });
+    // Batch Fetch Existing Events (Read Phase - Outside Transaction)
+    const existingEvents = await prisma.event.findMany({
+        where: {
+            teamId,
+            externalUid: { in: Array.from(validUids) }
+        },
+        select: { id: true, externalUid: true, title: true, date: true }
+    });
 
-        const existingMap = new Map(existingEvents.map(e => [e.externalUid, e]));
-        
-        // Use correct Prisma input type
-        const eventsToCreate: Prisma.EventCreateManyInput[] = [];
-        const eventsToUpdate: { id: string, title: string, date: Date }[] = [];
+    const existingMap = new Map(existingEvents.map(e => [e.externalUid, e]));
+    
+    // Use correct Prisma input type
+    const eventsToCreate: Prisma.EventCreateManyInput[] = [];
+    const eventsToUpdate: { id: string, title: string, date: Date }[] = [];
 
-        for (const p of parsedEvents) {
-            const existing = existingMap.get(p.uid);
+    for (const p of parsedEvents) {
+        const existing = existingMap.get(p.uid);
 
-            if (existing) {
-                // Check if update is needed
-                if (existing.title !== p.title || existing.date.getTime() !== p.date.getTime()) {
-                    eventsToUpdate.push({
-                        id: existing.id,
-                        title: p.title,
-                        date: p.date
-                    });
-                    if (syncDetails.length < 50) {
-                        syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
-                    } else if (syncDetails.length === 50) {
-                        syncDetails.push('... and more updates');
-                    }
-                    updatedCount++;
-                }
-            } else {
-                eventsToCreate.push({
-                    teamId,
+        if (existing) {
+            // Check if update is needed
+            if (existing.title !== p.title || existing.date.getTime() !== p.date.getTime()) {
+                eventsToUpdate.push({
+                    id: existing.id,
                     title: p.title,
-                    date: p.date,
-                    externalUid: p.uid,
-                    type: p.type,
-                    boatSize: p.boatSize
+                    date: p.date
                 });
                 if (syncDetails.length < 50) {
-                    syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
+                    syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
                 } else if (syncDetails.length === 50) {
-                    syncDetails.push('... and more creations');
+                    syncDetails.push('... and more updates');
                 }
-                createdCount++;
+                updatedCount++;
             }
+        } else {
+            eventsToCreate.push({
+                teamId,
+                title: p.title,
+                date: p.date,
+                externalUid: p.uid,
+                type: p.type,
+                boatSize: p.boatSize
+            });
+            if (syncDetails.length < 50) {
+                syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
+            } else if (syncDetails.length === 50) {
+                syncDetails.push('... and more creations');
+            }
+            createdCount++;
         }
+    }
 
+    // Wrap DB writes in a transaction (Write Phase)
+    return await prisma.$transaction(async (tx) => {
         // Bulk Create
         if (eventsToCreate.length > 0) {
             await tx.event.createMany({
@@ -164,8 +164,9 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<
 
         // Handle Deletions
         // We need to fetch ALL events with externalUid for this team to find deletions
-        // We can't rely just on 'existingEvents' because that was filtered by validUids (IN clause)
-        // But we can just query for events NOT IN validUids
+        // This read is still inside to ensure we delete what is currently in DB (closest to consistency)
+        // Optimization: We could move this out too, but "delete" is destructive so being in TX feels safer to capture state at write time?
+        // Actually, for "cleanup" of stale events, mostly fine. But let's keep it here for now as planned.
         const eventsToDelete = await tx.event.findMany({
             where: {
                 teamId,
@@ -197,7 +198,7 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<
             teamId,
             status: 'SUCCESS',
             createdCount,
-            updatedCount,
+            updatedCount, // These counts are computed outside but valid
             deletedCount: deletedCount, 
             details: syncDetails
           },

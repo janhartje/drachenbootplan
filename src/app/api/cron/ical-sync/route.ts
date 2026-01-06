@@ -5,8 +5,14 @@ import { syncTeamEvents } from '@/services/ical/ical-service';
 
 export async function GET(req: NextRequest) {
   // Verify Vercel Cron Secret
+  const CRON_SECRET = process.env.CRON_SECRET;
+  if (!CRON_SECRET) {
+    console.error('CRON_SECRET is not set');
+    return new Response('Server Configuration Error', { status: 500 });
+  }
+
   const authHeader = req.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 });
   }
 
@@ -30,7 +36,7 @@ export async function GET(req: NextRequest) {
     try {
       const result = await syncTeamEvents(team.id);
       return { team: team.name, ...result };
-    } catch (error) {
+    } catch (error: unknown) {
        console.error(`Failed to sync team ${team.name}:`, error);
        return { team: team.name, success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }

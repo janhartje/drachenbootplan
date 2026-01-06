@@ -152,14 +152,14 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<
             });
         }
 
-        // Sequential Update to prevent connection pool starvation
+        // Parallel Updates to prevent connection pool starvation and reduce transaction time
         if (eventsToUpdate.length > 0) {
-            for (const e of eventsToUpdate) {
-                await tx.event.update({
+            await Promise.all(eventsToUpdate.map(e => 
+                tx.event.update({
                     where: { id: e.id },
                     data: { title: e.title, date: e.date }
-                });
-            }
+                })
+            ));
         }
 
         // Handle Deletions

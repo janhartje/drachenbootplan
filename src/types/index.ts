@@ -17,6 +17,7 @@ export interface Team {
   showProRing?: boolean;
   showProBadge?: boolean;
   showWatermark?: boolean;
+  icalUrl?: string;
 }
 
 export interface Paddler {

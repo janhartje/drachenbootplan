@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Team } from '@/types';
-import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Check, Palette, Sparkles } from 'lucide-react';
+import { Save, Globe, Instagram, Facebook, Twitter, Mail, Image as ImageIcon, Check, Palette, Sparkles, Calendar, RefreshCw } from 'lucide-react';
 import { useAlert } from '@/context/AlertContext';
+import { SyncHistoryList } from './SyncHistoryList';
 
 import { FormInput } from '@/components/ui/FormInput';
 import { Toggle } from '@/components/ui/core/Toggle';
@@ -19,7 +20,9 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
   const { showAlert } = useAlert();
   const [formData, setFormData] = useState<Partial<Team>>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [refreshHistory, setRefreshHistory] = useState(0);
 
   useEffect(() => {
     if (initialData) {
@@ -45,6 +48,31 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
       console.error('Failed to save team settings', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!formData.id) return;
+    setIsSyncing(true);
+    try {
+        const res = await fetch(`/api/teams/${formData.id}/import/ical`, { method: 'POST' });
+        if (!res.ok) throw new Error('Sync failed');
+        const data = await res.json();
+        
+        let successMsg = t('icalSyncResult') || `Success: ${data.created} created, ${data.updated} updated, ${data.deleted} deleted.`;
+        successMsg = successMsg
+            .replace('{created}', data.created.toString())
+            .replace('{updated}', data.updated.toString())
+            .replace('{deleted}', (data.deleted || 0).toString());
+
+        showAlert(successMsg, 'success');
+        setRefreshHistory(prev => prev + 1);
+    } catch (error) {
+        console.error(error);
+        showAlert(t('icalSyncError') || 'Sync failed', 'error');
+        setRefreshHistory(prev => prev + 1);
+    } finally {
+        setIsSyncing(false);
     }
   };
 
@@ -283,6 +311,52 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
           </div>
         </div>
       )}
+
+      {/* iCal Integration */}
+      <div className="pt-2 border-t border-slate-200 dark:border-slate-800">
+        <h3 className="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider flex items-center gap-2">
+            <Calendar size={16} /> iCal Integration
+        </h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+            {t('icalDescription') || 'Synchronize training sessions automatically from an external calendar (e.g. Kadermanager).'}
+        </p>
+
+        <div className="flex gap-2">
+            <div className="flex-1">
+                <FormInput
+                    type="url"
+                    value={formData.icalUrl || ''}
+                    onChange={(e) => handleChange('icalUrl', e.target.value)}
+                    placeholder="https://.../calendar.ics"
+                    className="focus:ring-amber-500"
+                />
+            </div>
+            {formData.icalUrl && formData.icalUrl === initialData.icalUrl && (
+                 <button
+                    type="button"
+                    onClick={handleSync}
+                    disabled={isSyncing}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                 >
+                    <RefreshCw size={16} className={isSyncing ? 'animate-spin' : ''} />
+                    {isSyncing ? (t('icalSyncing') || 'Syncing...') : (t('icalSyncButton') || 'Sync Now')}
+                 </button>
+            )}
+        </div>
+        {formData.icalUrl !== initialData.icalUrl && formData.icalUrl && (
+            <p className="text-xs text-amber-600 mt-1">
+                {t('icalSaveToSync') || 'Please save changes before syncing.'}
+            </p>
+        )}
+        
+        {formData.id && (
+            <SyncHistoryList 
+                teamId={formData.id} 
+                refreshTrigger={refreshHistory} 
+                t={t} 
+            />
+        )}
+      </div>
 
       <div className="pt-4 flex justify-end gap-3">
         {onCancel && (

@@ -85,7 +85,7 @@
     "jest-mock-extended": "^4.0.0",
     "postcss": "^8",
     "prisma": "^7.2.0",
-    "react-email": "^5.1.0",
+    "react-email": "^5.1.1",
     "tailwindcss": "^4.1.18",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",

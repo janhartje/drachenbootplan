@@ -3,8 +3,18 @@ import { Prisma } from '@prisma/client';
 import ical from 'node-ical';
 import { validateUrl } from '@/utils/url-validation';
 
-// Returns { created: number, updated: number }
-export async function syncTeamEvents(teamId: string, icalUrl?: string) {
+const MAX_ICAL_SIZE_BYTES = 5 * 1024 * 1024;
+
+export interface SyncResult {
+  success: boolean;
+  count: number;
+  created: number;
+  updated: number;
+  deleted: number;
+}
+
+// Returns SyncResult
+export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<SyncResult> {
   const syncDetails: string[] = [];
   const validUids = new Set<string>();
   
@@ -31,14 +41,17 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
 
     let events: ical.CalendarResponse;
     try {
-        const response = await fetch(urlToUse, { signal: controller.signal });
+        const response = await fetch(urlToUse, { 
+            signal: controller.signal,
+            redirect: 'manual' 
+        });
         if (!response.ok) {
             throw new Error(`Failed to fetch iCal: ${response.status} ${response.statusText}`);
         }
         const text = await response.text();
         
         // Safety: Prevent processing excessively large files (limit to 5MB)
-        if (text.length > 5 * 1024 * 1024) {
+        if (text.length > MAX_ICAL_SIZE_BYTES) {
             throw new Error('iCal file too large (max 5MB)');
         }
 
@@ -61,7 +74,7 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
       if (event.type === 'VEVENT') {
         const vevent = event as ical.VEvent;
         
-        const title = vevent.summary;
+        const title = vevent.summary?.replace(/<[^>]*>?/g, '').trim();
         const date = vevent.start; // node-ical returns Date object
         const uid = vevent.uid;
         
@@ -79,116 +92,119 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
       }
     }
 
-    // Batch Fetch Existing Events
-    const existingEvents = await prisma.event.findMany({
-        where: {
-            teamId,
-            externalUid: { in: Array.from(validUids) }
-        },
-        select: { id: true, externalUid: true, title: true, date: true }
-    });
+    // Wrap DB writes in a transaction
+    return await prisma.$transaction(async (tx) => {
+        // Batch Fetch Existing Events
+        const existingEvents = await tx.event.findMany({
+            where: {
+                teamId,
+                externalUid: { in: Array.from(validUids) }
+            },
+            select: { id: true, externalUid: true, title: true, date: true }
+        });
 
-    const existingMap = new Map(existingEvents.map(e => [e.externalUid, e]));
-    
-    // Use correct Prisma input type
-    const eventsToCreate: Prisma.EventCreateManyInput[] = [];
-    const eventsToUpdate: { id: string, title: string, date: Date }[] = [];
+        const existingMap = new Map(existingEvents.map(e => [e.externalUid, e]));
+        
+        // Use correct Prisma input type
+        const eventsToCreate: Prisma.EventCreateManyInput[] = [];
+        const eventsToUpdate: { id: string, title: string, date: Date }[] = [];
 
-    for (const p of parsedEvents) {
-        const existing = existingMap.get(p.uid);
+        for (const p of parsedEvents) {
+            const existing = existingMap.get(p.uid);
 
-        if (existing) {
-            // Check if update is needed
-            if (existing.title !== p.title || existing.date.getTime() !== p.date.getTime()) {
-                eventsToUpdate.push({
-                    id: existing.id,
+            if (existing) {
+                // Check if update is needed
+                if (existing.title !== p.title || existing.date.getTime() !== p.date.getTime()) {
+                    eventsToUpdate.push({
+                        id: existing.id,
+                        title: p.title,
+                        date: p.date
+                    });
+                    if (syncDetails.length < 50) {
+                        syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
+                    } else if (syncDetails.length === 50) {
+                        syncDetails.push('... and more updates');
+                    }
+                    updatedCount++;
+                }
+            } else {
+                eventsToCreate.push({
+                    teamId,
                     title: p.title,
-                    date: p.date
+                    date: p.date,
+                    externalUid: p.uid,
+                    type: p.type,
+                    boatSize: p.boatSize
                 });
                 if (syncDetails.length < 50) {
-                    syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
+                    syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
                 } else if (syncDetails.length === 50) {
-                    syncDetails.push('... and more updates');
+                    syncDetails.push('... and more creations');
                 }
-                updatedCount++;
+                createdCount++;
             }
-        } else {
-            eventsToCreate.push({
+        }
+
+        // Bulk Create
+        if (eventsToCreate.length > 0) {
+            await tx.event.createMany({
+                data: eventsToCreate
+            });
+        }
+
+        // Sequential Update to prevent connection pool starvation
+        if (eventsToUpdate.length > 0) {
+            for (const e of eventsToUpdate) {
+                await tx.event.update({
+                    where: { id: e.id },
+                    data: { title: e.title, date: e.date }
+                });
+            }
+        }
+
+        // Handle Deletions
+        // We need to fetch ALL events with externalUid for this team to find deletions
+        // We can't rely just on 'existingEvents' because that was filtered by validUids (IN clause)
+        // But we can just query for events NOT IN validUids
+        const eventsToDelete = await tx.event.findMany({
+            where: {
                 teamId,
-                title: p.title,
-                date: p.date,
-                externalUid: p.uid,
-                type: p.type,
-                boatSize: p.boatSize
-            });
-            if (syncDetails.length < 50) {
-                syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
-            } else if (syncDetails.length === 50) {
-                syncDetails.push('... and more creations');
-            }
-            createdCount++;
-        }
-    }
-
-    // Bulk Create
-    if (eventsToCreate.length > 0) {
-        await prisma.event.createMany({
-            data: eventsToCreate
+                externalUid: { not: null, notIn: Array.from(validUids) }
+            },
+            select: { id: true, title: true, date: true }
         });
-    }
+        
+        const deletedCount = eventsToDelete.length;
 
-    // Sequential Update to prevent connection pool starvation
-    if (eventsToUpdate.length > 0) {
-        for (const e of eventsToUpdate) {
-            await prisma.event.update({
-                where: { id: e.id },
-                data: { title: e.title, date: e.date }
-            });
+        if (deletedCount > 0) {
+          await tx.event.deleteMany({
+            where: {
+              id: { in: eventsToDelete.map(e => e.id) }
+            }
+          });
+          eventsToDelete.forEach(e => {
+            if (syncDetails.length < 50) {
+              syncDetails.push(`Deleted: "${e.title}" (${e.date.toISOString().split('T')[0]})`);
+            } else if (syncDetails.length === 50) {
+              syncDetails.push('... and more deletions');
+            }
+          });
         }
-    }
 
-    // Handle Deletions
-    // We need to fetch ALL events with externalUid for this team to find deletions
-    // We can't rely just on 'existingEvents' because that was filtered by validUids (IN clause)
-    // But we can just query for events NOT IN validUids
-    const eventsToDelete = await prisma.event.findMany({
-        where: {
+        // Log success
+        await tx.syncLog.create({
+          data: {
             teamId,
-            externalUid: { not: null, notIn: Array.from(validUids) }
-        },
-        select: { id: true, title: true, date: true }
+            status: 'SUCCESS',
+            createdCount,
+            updatedCount,
+            deletedCount: deletedCount, 
+            details: syncDetails
+          },
+        });
+
+        return { success: true, count: createdCount + updatedCount, created: createdCount, updated: updatedCount, deleted: deletedCount };
     });
-    
-    const deletedCount = eventsToDelete.length;
-
-    if (deletedCount > 0) {
-      await prisma.event.deleteMany({
-        where: {
-          id: { in: eventsToDelete.map(e => e.id) }
-        }
-      });
-      eventsToDelete.forEach(e => {
-        if (syncDetails.length < 50) {
-          syncDetails.push(`Deleted: "${e.title}" (${e.date.toISOString().split('T')[0]})`);
-        } else if (syncDetails.length === 50) {
-          syncDetails.push('... and more deletions');
-        }
-      });
-    }
-
-    // Log success
-    await prisma.syncLog.create({
-      data: {
-        teamId,
-        status: 'SUCCESS',
-        createdCount,
-        updatedCount,
-        deletedCount: deletedCount, 
-        details: syncDetails
-      },
-    });
-
-    return { success: true, count: createdCount + updatedCount, created: createdCount, updated: updatedCount, deleted: deletedCount };
 
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);

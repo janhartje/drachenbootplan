@@ -40,6 +40,8 @@ describe('iCal Service', () => {
     mockReset(prismaMock);
     jest.clearAllMocks();
     (validateUrl as jest.Mock).mockReturnValue(true);
+    // Mock transaction to immediately execute callback with the prismaMock
+    prismaMock.$transaction.mockImplementation((callback: any) => callback(prismaMock));
   });
 
   it('should fetch iCal feed and upsert events', async () => {
@@ -96,7 +98,8 @@ describe('iCal Service', () => {
     expect(result.updated).toBe(1); // uid-1
 
     expect(mockFetch).toHaveBeenCalledWith(icalUrl, expect.objectContaining({
-        signal: expect.any(AbortSignal)
+        signal: expect.any(AbortSignal),
+        redirect: 'manual'
     }));
     expect(ical.parseICS).toHaveBeenCalledWith('BEGIN:VCALENDAR...');
 
@@ -164,6 +167,21 @@ describe('iCal Service', () => {
       });
   
       await expect(syncTeamEvents(teamId)).rejects.toThrow('Failed to fetch iCal: 404 Not Found');
+  });
+
+  it('should fail on redirect when redirect: manual is set', async () => {
+      prismaMock.team.findUnique.mockResolvedValue({
+          id: teamId,
+          icalUrl: icalUrl,
+      } as any);
+  
+      mockFetch.mockResolvedValue({
+          ok: false,
+          status: 301,
+          statusText: 'Moved Permanently'
+      });
+  
+      await expect(syncTeamEvents(teamId)).rejects.toThrow('Failed to fetch iCal: 301 Moved Permanently');
   });
 
   it('should throw error if iCal file is too large', async () => {

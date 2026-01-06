@@ -57,7 +57,7 @@ describe('iCal Service', () => {
         end: new Date('2024-02-01T18:00:00Z'),
       },
     };
-    (ical.async.fromURL as jest.Mock).mockResolvedValue(mockEvents);
+    (ical.async.fromURL as jest.MockedFunction<typeof ical.async.fromURL>).mockResolvedValue(mockEvents as unknown as ical.CalendarResponse);
     
     // Mock finding existing events (one exists, one new)
     prismaMock.event.findMany

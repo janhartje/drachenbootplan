@@ -79,7 +79,11 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
                     title: p.title,
                     date: p.date
                 });
-                syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
+                if (syncDetails.length < 50) {
+                    syncDetails.push(`Updated: "${p.title}" on ${p.date.toLocaleDateString()}`);
+                } else if (syncDetails.length === 50) {
+                    syncDetails.push('... and more updates');
+                }
                 updatedCount++;
             }
         } else {
@@ -91,7 +95,11 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
                 type: p.type,
                 boatSize: p.boatSize
             });
-            syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
+            if (syncDetails.length < 50) {
+                syncDetails.push(`Created: "${p.title}" on ${p.date.toLocaleDateString()}`);
+            } else if (syncDetails.length === 50) {
+                syncDetails.push('... and more creations');
+            }
             createdCount++;
         }
     }
@@ -103,15 +111,14 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
         });
     }
 
-    // Sequential Update (Prisma doesn't support bulk update with different data yet efficiently without raw SQL)
-    // We use Promise.all to parallelize at least the network requests
+    // Sequential Update to prevent connection pool starvation
     if (eventsToUpdate.length > 0) {
-        await Promise.all(eventsToUpdate.map(e => 
-            prisma.event.update({
+        for (const e of eventsToUpdate) {
+            await prisma.event.update({
                 where: { id: e.id },
                 data: { title: e.title, date: e.date }
-            })
-        ));
+            });
+        }
     }
 
     // Handle Deletions
@@ -135,7 +142,11 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string) {
         }
       });
       eventsToDelete.forEach(e => {
-        syncDetails.push(`Deleted: "${e.title}" (${e.date.toISOString().split('T')[0]})`);
+        if (syncDetails.length < 50) {
+          syncDetails.push(`Deleted: "${e.title}" (${e.date.toISOString().split('T')[0]})`);
+        } else if (syncDetails.length === 50) {
+          syncDetails.push('... and more deletions');
+        }
       });
     }
 

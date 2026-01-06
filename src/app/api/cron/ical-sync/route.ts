@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import pLimit from 'p-limit';
 import prisma from '@/lib/prisma';
 import { syncTeamEvents } from '@/services/ical/ical-service';
 
@@ -23,7 +24,9 @@ export async function GET(req: NextRequest) {
   });
 
   // Sync in parallel with Promise.allSettled to ensure one failure doesn't stop others
-  const promises = teams.map(async (team) => {
+  // Sync in parallel with limit to ensure database safety
+  const limit = pLimit(5);
+  const promises = teams.map((team) => limit(async () => {
     try {
       const result = await syncTeamEvents(team.id);
       return { team: team.name, ...result };
@@ -31,12 +34,9 @@ export async function GET(req: NextRequest) {
        console.error(`Failed to sync team ${team.name}:`, error);
        return { team: team.name, success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
-  });
+  }));
 
-  const results = (await Promise.allSettled(promises)).map(p => {
-    if (p.status === 'fulfilled') return p.value;
-    return { success: false, error: 'Promise rejected' }; // Should not happen with try-catch block above
-  });
+  const results = await Promise.all(promises);
 
   return Response.json({ success: true, results });
 }

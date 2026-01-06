@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client';
 import ical from 'node-ical';
+import pLimit from 'p-limit'; /* // turbo */
 import { validateUrl } from '@/utils/url-validation';
 
 const MAX_ICAL_SIZE_BYTES = 5 * 1024 * 1024;
@@ -164,11 +165,12 @@ export async function syncTeamEvents(teamId: string, icalUrl?: string): Promise<
 
         // Parallel Updates to prevent connection pool starvation and reduce transaction time
         if (eventsToUpdate.length > 0) {
+            const limit = pLimit(10);
             await Promise.all(eventsToUpdate.map(e => 
-                tx.event.update({
+                limit(() => tx.event.update({
                     where: { id: e.id },
                     data: { title: e.title, date: e.date }
-                })
+                }))
             ));
         }
 

@@ -18,7 +18,7 @@ export function validateUrl(url: string): boolean {
     // 2. Localhost & Loopback check
     if (
       hostname === 'localhost' ||
-      hostname === '127.0.0.1' ||
+      hostname.startsWith('127.') ||
       hostname === '[::1]' ||
       hostname === '0.0.0.0' ||
       hostname === '[::]'

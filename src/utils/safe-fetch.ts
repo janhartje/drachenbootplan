@@ -46,6 +46,8 @@ interface SafeFetchOptions extends RequestInit {
  * vulnerable to DNS Rebinding if the attacker controls the DNS and changes
  * the IP between the check and the fetch (Time-of-Check to Time-of-Use).
  * However, this is a significant improvement over no check.
+ * 
+ * SECURITY NOTICE: Mitigated but not solved. Known Risk: DNS Rebinding.
  */
 export async function safeFetch(url: string, options: SafeFetchOptions = {}): Promise<Response> {
   // 1. Basic URL String Validation

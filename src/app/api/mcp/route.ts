@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const args = isJsonRpc ? body.params?.arguments : body.arguments;
 
     if (!toolName) {
-       return NextResponse.json({ error: 'Tool name required' }, { status: 400 });
+      return NextResponse.json({ error: 'Tool name required' }, { status: 400 });
     }
 
     const tool = tools.find((t) => t.name === toolName);
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const result = await tool.execute(apiKey, validatedInput as any);
 
     if (isJsonRpc) {
-       return NextResponse.json({
+      return NextResponse.json({
         jsonrpc: '2.0',
         id: body.id,
         result: {
@@ -83,21 +83,21 @@ export async function GET(request: Request) {
 
   const sessionId = randomUUID();
   const encoder = new TextEncoder();
-  
+
   // Create a readable stream that we control
   const stream = new ReadableStream({
-    start(controller) {
+    async start(controller) {
       // Register the session immediately when stream starts
-      createSession(sessionId, controller, apiKey);
-      
+      await createSession(sessionId, controller, apiKey);
+
       // Send the 'endpoint' event to tell client where to POST messages
       const origin = new URL(request.url).origin;
       const endpoint = `${origin}/api/mcp/messages?sessionId=${sessionId}`;
       const initEvent = `event: endpoint\ndata: ${endpoint}\n\n`;
       controller.enqueue(encoder.encode(initEvent));
     },
-    cancel() {
-      removeSession(sessionId);
+    async cancel() {
+      await removeSession(sessionId);
     }
   });
 

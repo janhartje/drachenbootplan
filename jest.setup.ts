@@ -1,4 +1,7 @@
 import '@testing-library/jest-dom'
+import { TextEncoder, TextDecoder } from 'util';
+
+Object.assign(global, { TextDecoder, TextEncoder });
 
 jest.mock('next-auth/react', () => {
   const mockSession = {

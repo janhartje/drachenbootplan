@@ -149,6 +149,19 @@
     "clBugfixes": "Bug Fixes",
     "changelogData": [
         {
+            "version": "3.7.0",
+            "date": "January 2026",
+            "features": [],
+            "technical": [
+                "MCP Session Store: Sessions are now persisted in the database for multi-server compatibility.",
+                "Automatic Cleanup: Daily cronjob removes expired MCP sessions (older than 24h).",
+                "Performance Cache: 10-second in-memory cache for session lookups reduces database queries.",
+                "Error Resilience: Retry logic for transient database errors (connection timeout, etc.).",
+                "Security: API keys are hashed (SHA256) before storing in the session table."
+            ],
+            "bugfixes": []
+        },
+        {
             "version": "3.6.1",
             "date": "January 2026",
             "features": [],

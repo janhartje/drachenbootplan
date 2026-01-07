@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getSession, getSessionByApiKey, waitForSession, sendSseEvent } from '@/lib/mcp-streams';
+import { sendMessageOrBuffer } from '@/lib/mcp-streams';
 import { tools } from '@/mcp/tools';
 
 // Return 202 Accepted for SSE-based message handling
@@ -9,25 +9,12 @@ function accepted() {
 
 export async function POST(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId');
+    // sessionId from URL is no longer used; we rely on apiKey for stream identification
     const apiKey = request.headers.get('x-api-key');
 
-    // Try to find session by sessionId first, fall back to API key
-    let session = sessionId ? getSession(sessionId) : null;
-    
-    if (!session && apiKey) {
-      // Try immediate lookup first
-      session = getSessionByApiKey(apiKey);
-      
-      if (!session) {
-        // Wait for session to be established (SSE connection is happening in parallel)
-        session = await waitForSession(apiKey, 3000);
-      }
-    }
-
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found. SSE connection not established.' }, { status: 404 });
+    // We require an API key to identify the stream buffer
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Missing x-api-key header' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -35,7 +22,7 @@ export async function POST(request: Request) {
 
     // Handle basic JSON-RPC methods
     if (method === 'initialize') {
-      sendSseEvent(session.controller, 'message', {
+      sendMessageOrBuffer(apiKey, 'message', {
         jsonrpc: '2.0',
         id,
         result: {
@@ -58,7 +45,7 @@ export async function POST(request: Request) {
     }
 
     if (method === 'tools/list') {
-      sendSseEvent(session.controller, 'message', {
+      sendMessageOrBuffer(apiKey, 'message', {
         jsonrpc: '2.0',
         id,
         result: {
@@ -69,15 +56,15 @@ export async function POST(request: Request) {
               type: 'object',
               properties: tool.inputSchema.shape
                 ? Object.entries(tool.inputSchema.shape).reduce(
-                    (acc, [key, value]) => {
-                      acc[key] = {
-                        type: 'string', 
-                        description: (value as { description?: string }).description || '',
-                      };
-                      return acc;
-                    },
-                    {} as Record<string, { type: string; description: string }>
-                  )
+                  (acc, [key, value]) => {
+                    acc[key] = {
+                      type: 'string',
+                      description: (value as { description?: string }).description || '',
+                    };
+                    return acc;
+                  },
+                  {} as Record<string, { type: string; description: string }>
+                )
                 : {},
             },
           })),
@@ -88,7 +75,7 @@ export async function POST(request: Request) {
 
     if (method === 'prompts/list') {
       // We don't have prompts, return empty list
-      sendSseEvent(session.controller, 'message', {
+      sendMessageOrBuffer(apiKey, 'message', {
         jsonrpc: '2.0',
         id,
         result: {
@@ -100,7 +87,7 @@ export async function POST(request: Request) {
 
     if (method === 'resources/list') {
       // We don't have resources, return empty list
-      sendSseEvent(session.controller, 'message', {
+      sendMessageOrBuffer(apiKey, 'message', {
         jsonrpc: '2.0',
         id,
         result: {
@@ -115,7 +102,7 @@ export async function POST(request: Request) {
       const tool = tools.find((t) => t.name === name);
 
       if (!tool) {
-        sendSseEvent(session.controller, 'message', {
+        sendMessageOrBuffer(apiKey, 'message', {
           jsonrpc: '2.0',
           id,
           error: {
@@ -132,9 +119,9 @@ export async function POST(request: Request) {
           const validatedInput = tool.inputSchema.parse(args || {});
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const result = await tool.execute(session.apiKey, validatedInput as any);
+          const result = await tool.execute(apiKey, validatedInput as any);
 
-          sendSseEvent(session.controller, 'message', {
+          sendMessageOrBuffer(apiKey, 'message', {
             jsonrpc: '2.0',
             id,
             result: {
@@ -147,7 +134,7 @@ export async function POST(request: Request) {
             },
           });
         } catch (error) {
-          sendSseEvent(session.controller, 'message', {
+          sendMessageOrBuffer(apiKey, 'message', {
             jsonrpc: '2.0',
             id,
             error: {
@@ -162,7 +149,7 @@ export async function POST(request: Request) {
     }
 
     if (method === 'ping') {
-      sendSseEvent(session.controller, 'message', {
+      sendMessageOrBuffer(apiKey, 'message', {
         jsonrpc: '2.0',
         id,
         result: {},
@@ -171,7 +158,7 @@ export async function POST(request: Request) {
     }
 
     // Default: Method not found
-    sendSseEvent(session.controller, 'message', {
+    sendMessageOrBuffer(apiKey, 'message', {
       jsonrpc: '2.0',
       id,
       error: {

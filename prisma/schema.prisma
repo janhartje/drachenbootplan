@@ -240,3 +240,17 @@ model ApiKey {
   @@index([teamId])
   @@index([hashedKey])
 }
+
+model McpSession {
+  id        String   @id // The Session UUID (provided by client or generated on server)
+  apiKeyHash String   @map("api_key_hash") // Hashed version of the API Key for security lookups
+  
+  // Note: We avoid relation to ApiKey model for performance/simplicity in this high-throughput table,
+  // preventing a JOIN on every heartbeat if not strictly needed. 
+  // But verifying the key is valid is done via `validateApiKey`.
+  
+  createdAt DateTime @default(now())
+  expiresAt DateTime? // Optional: for cleanup jobs
+
+  @@index([apiKeyHash])
+}

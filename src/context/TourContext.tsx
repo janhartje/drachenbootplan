@@ -1,5 +1,7 @@
 "use client";
 
+import { usePathname } from 'next/navigation';
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { driver, Driver } from 'driver.js';
 import 'driver.js/dist/driver.css';
@@ -240,16 +242,18 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [driverObj, startTour, seenTours, isLoaded]);
 
   // Check on mount if we should start welcome tour
+  const pathname = usePathname();
+
   useEffect(() => {
     if (driverObj && currentTeam && isLoaded) {
       const timer = setTimeout(() => {
-        if (window.location.pathname === '/app') {
+        if (pathname === '/app') {
           checkAndStartTour('welcome');
         }
       }, 1000); // Increased timeout slightly to ensure UI is settled
       return () => clearTimeout(timer);
     }
-  }, [driverObj, checkAndStartTour, currentTeam, isLoaded]);
+  }, [driverObj, checkAndStartTour, currentTeam, isLoaded, pathname]);
 
   return (
     <TourContext.Provider value={{ startTour, checkAndStartTour }}>

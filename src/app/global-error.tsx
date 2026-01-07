@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect } from 'react';
-
 // Inline SVG icons to avoid lucide-react context issues during prerendering
 function AlertTriangleIcon({ className }: { className?: string }) {
   return (
@@ -47,16 +45,11 @@ function RefreshCwIcon({ className }: { className?: string }) {
 }
 
 export default function GlobalError({
-  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
   return (
     <html lang="de">
       <body>
@@ -150,7 +143,7 @@ export default function GlobalError({
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               Kritischer Fehler / Critical Error
             </h2>
-            
+
             <p className="text-slate-600 dark:text-slate-400 mb-4 text-lg">
               Ein kritischer Fehler ist aufgetreten und die Anwendung konnte nicht geladen werden.
             </p>

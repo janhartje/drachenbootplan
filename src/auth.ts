@@ -1,4 +1,5 @@
 import NextAuth from "next-auth"
+import React from 'react';
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import prisma from "@/lib/prisma"
 import Google from "next-auth/providers/google"
@@ -57,6 +58,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         // Try to detect user's language preference
         let lang: Language = 'de'; // Default to German
+
+        // Detect from callbackUrl (reflects current UI state)
+        try {
+          const magicLinkUrl = new URL(url);
+          const callbackUrl = magicLinkUrl.searchParams.get('callbackUrl');
+          if (callbackUrl) {
+            // Check path segments
+            const isEnPath = /\/en(\/|\?|$)/.test(callbackUrl);
+            const isDePath = /\/de(\/|\?|$)/.test(callbackUrl);
+            
+            // Check query params
+            const isEnQuery = /[?&](lang|locale)=en(&|$)/.test(callbackUrl);
+            const isDeQuery = /[?&](lang|locale)=de(&|$)/.test(callbackUrl);
+
+            if (isEnPath || isEnQuery) lang = 'en';
+            else if (isDePath || isDeQuery) lang = 'de';
+          }
+        } catch (e) {
+          console.error("Error detecting language from URL:", e);
+        }
 
         // Check if there is a pending invite for this email (Paddler with inviteEmail)
         // OR if the user is a member of a team (to send welcome back email)
@@ -132,8 +153,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const ReactEmailComponent = shouldUseTeamInvite
-          ? TeamInviteEmail({ url, teamName, lang }) // inviterName unavailable here efficiently
-          : MagicLinkEmail({ url, lang });
+          ? React.createElement(TeamInviteEmail, { url, teamName, lang })
+          : React.createElement(MagicLinkEmail, { url, lang });
 
 
 

@@ -89,6 +89,7 @@ const LoginView: React.FC = () => {
               </div>
               <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
                 {t('welcomeBack') || 'Willkommen zurück'}
+                <span className="text-slate-400 font-normal"> — {t('noPasswordNeeded')}</span>
               </h1>
               <p className="text-slate-600 dark:text-slate-400">
                 {t('loginSubtitle') || 'Bitte melden Sie sich an, um fortzufahren.'}
@@ -120,7 +121,7 @@ const LoginView: React.FC = () => {
                 </button>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 text-left">
-                {t('signInEmail') || 'Mit E-Mail anmelden'} — kein Passwort nötig!
+                {t('signInEmail') || 'Mit E-Mail anmelden'} — {t('noPasswordNeeded')}
               </p>
             </form>
 

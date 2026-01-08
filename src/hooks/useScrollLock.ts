@@ -7,6 +7,8 @@ export const useScrollLock = (isOpen: boolean) => {
   const id = useId();
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+
     if (isOpen) {
       lockedIds.add(id);
       document.body.style.overflow = 'hidden';

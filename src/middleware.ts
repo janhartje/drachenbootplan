@@ -1,7 +1,16 @@
 import createMiddleware from 'next-intl/middleware';
 import {routing} from './i18n/routing';
 
-export default createMiddleware(routing);
+import { NextRequest } from 'next/server';
+
+const intlMiddleware = createMiddleware(routing);
+
+export default function middleware(req: NextRequest) {
+  // 1. Security Headers / Auth Check could be added here in the future
+  
+  // 2. Internationalization
+  return intlMiddleware(req);
+}
 
 export const config = {
   // Match all pathnames except for

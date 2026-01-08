@@ -64,13 +64,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const magicLinkUrl = new URL(url);
           const callbackUrl = magicLinkUrl.searchParams.get('callbackUrl');
           if (callbackUrl) {
+            let urlToScan = callbackUrl;
+            // Decode potential double-encoding (common in OAuth/Redirect flows)
+            if (urlToScan.includes('%')) {
+               try {
+                 urlToScan = decodeURIComponent(urlToScan);
+               } catch {
+                 // ignore decoding errors
+               }
+            }
+
             // Check path segments
-            const isEnPath = /\/en(\/|\?|$)/.test(callbackUrl);
-            const isDePath = /\/de(\/|\?|$)/.test(callbackUrl);
+            const isEnPath = /\/en(\/|\?|$)/.test(urlToScan);
+            const isDePath = /\/de(\/|\?|$)/.test(urlToScan);
             
             // Check query params
-            const isEnQuery = /[?&](lang|locale)=en(&|$)/.test(callbackUrl);
-            const isDeQuery = /[?&](lang|locale)=de(&|$)/.test(callbackUrl);
+            const isEnQuery = /[?&](lang|locale)=en(&|$)/.test(urlToScan);
+            const isDeQuery = /[?&](lang|locale)=de(&|$)/.test(urlToScan);
 
             if (isEnPath || isEnQuery) lang = 'en';
             else if (isDePath || isDeQuery) lang = 'de';

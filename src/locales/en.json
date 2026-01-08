@@ -70,6 +70,18 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.7.1",
+            "date": "January 2026",
+            "features": [],
+            "technical": [
+                "Drag & Drop Performance: Optimized rendering cycles by implementing React.memo and useCallback.",
+                "Reduced re-renders in planner mode for smoother mobile experience."
+            ],
+            "bugfixes": [
+                "Fix: Resolved scroll lock issue where scrolling remained blocked after closing modals (e.g., Add Guest)."
+            ]
+        },
+        {
             "version": "3.7.0",
             "date": "January 2026",
             "features": [],
@@ -697,8 +709,10 @@
     "errorNotFoundMessage": "The page you are looking for does not exist or has been moved.",
     "errorNotFoundTitle": "Page not found",
     "errorReload": "Reload",
+    "errorRemovingCanister": "Error removing canister. Please try again.",
     "errorSavingPaddler": "Error saving paddler.",
     "errorTryAgain": "Try again",
+    "errorUpdateBoatSize": "Error updating boat size. Please try again.",
     "errorUserAlreadyMember": "User is already a member.",
     "errorUserNotFound": "User not found. Please ask them to sign up first.",
     "eventPlaceholder": "Training / Race",

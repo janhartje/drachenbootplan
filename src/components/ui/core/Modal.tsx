@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useId } from 'react';
+import { useScrollLock } from '@/hooks/useScrollLock';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 
@@ -27,13 +28,8 @@ export const Modal: React.FC<ModalProps> = ({
   showCloseButton = true,
   padding = 'p-5'
 }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-  }, [isOpen]);
+  const dialogId = useId();
+  useScrollLock(isOpen);
 
   if (!isOpen) return null;
 
@@ -47,7 +43,12 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className={cn(
+      <div 
+        id={dialogId}
+        data-is-modal="true"
+        role="dialog"
+        aria-modal="true"
+        className={cn(
         "bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]",
         sizeClasses[size],
         className

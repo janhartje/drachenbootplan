@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { useRouter, Link } from '@/i18n/routing';
 import { ArrowLeft, Box } from 'lucide-react';
 import { toPng } from 'html-to-image';
@@ -138,6 +138,19 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     return [...regular, ...canisters, ...uniqueGuests].sort((a, b) => a.name.localeCompare(b.name));
   }, [paddlers, activeEvent, t]);
 
+  // Refs for stable callbacks
+  const assignmentsRef = useRef(assignments);
+  const lockedSeatsRef = useRef(lockedSeats);
+  const selectedPaddlerIdRef = useRef(selectedPaddlerId);
+  const activePaddlerPoolRef = useRef(activePaddlerPool);
+
+  useEffect(() => {
+    assignmentsRef.current = assignments;
+    lockedSeatsRef.current = lockedSeats;
+    selectedPaddlerIdRef.current = selectedPaddlerId;
+    activePaddlerPoolRef.current = activePaddlerPool;
+  }, [assignments, lockedSeats, selectedPaddlerId, activePaddlerPool]);
+
 
   const rows = boatSize === 'small' ? 5 : 10;
   const boatConfig = useMemo(() => {
@@ -188,41 +201,63 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
 
   const goHome = () => router.push('/app');
 
-  const handleAddCanister = async () => {
+  const handleAddCanister = useCallback(async () => {
     if (isReadOnly) return;
-    const canisterId = await addCanister(activeEventId);
-    if (canisterId) setSelectedPaddlerId(canisterId);
-  };
+    try {
+      const canisterId = await addCanister(activeEventId);
+      if (canisterId) setSelectedPaddlerId(canisterId);
+    } catch (error) {
+      console.error('Failed to add canister', error);
+    }
+  }, [isReadOnly, addCanister, activeEventId]);
 
-  const handleRemoveCanister = async (canisterId: string) => {
+  const handleRemoveCanister = useCallback(async (canisterId: string) => {
     if (isReadOnly) return;
-    await removeCanister(activeEventId, canisterId);
-  };
+    try {
+      await removeCanister(activeEventId, canisterId);
+    } catch (error) {
+      console.error('Failed to remove canister', error);
+      alert(t('errorRemovingCanister') || 'Fehler beim Entfernen des Kanisters');
+    }
+  }, [isReadOnly, removeCanister, activeEventId, t]);
 
-  const handleAddGuest = async (guestData: Pick<Paddler, 'name' | 'weight' | 'skills'>) => {
+  const handleAddGuest = useCallback(async (guestData: Pick<Paddler, 'name' | 'weight' | 'skills'>) => {
     if (isReadOnly) return;
-    const guestId = await addGuest(activeEventId, guestData);
-    if (guestId) setSelectedPaddlerId(guestId);
-    setShowGuestModal(false);
-  };
+    try {
+      const guestId = await addGuest(activeEventId, guestData);
+      if (guestId) setSelectedPaddlerId(guestId);
+      setShowGuestModal(false);
+    } catch (error) {
+      console.error('Failed to add guest', error);
+    }
+  }, [isReadOnly, addGuest, activeEventId]);
 
-  const handleRemoveGuest = async (guestId: string) => {
+  const handleRemoveGuest = useCallback(async (guestId: string) => {
     if (isReadOnly) return;
-    await removeGuest(activeEventId, guestId);
-  };
+    try {
+      await removeGuest(activeEventId, guestId);
+    } catch (error) {
+      console.error('Failed to remove guest', error);
+    }
+  }, [isReadOnly, removeGuest, activeEventId]);
 
-  const handleUpdateBoatSize = (size: 'standard' | 'small') => {
+  const handleUpdateBoatSize = useCallback(async (size: 'standard' | 'small') => {
     if (isReadOnly) return;
     if (size === boatSize) return;
 
-    // Check if boat has assignments
-    if (Object.keys(assignments).length > 0) {
-      setPendingBoatSize(size);
-      setShowBoatSizeConfirm(true);
-    } else {
-      updateEvent(activeEventId, { boatSize: size });
+    try {
+      // Check if boat has assignments
+      if (Object.keys(assignments).length > 0) {
+        setPendingBoatSize(size);
+        setShowBoatSizeConfirm(true);
+      } else {
+        await updateEvent(activeEventId, { boatSize: size });
+      }
+    } catch (error) {
+      console.error('Failed to update boat size', error);
+      alert(t('errorUpdateBoatSize') || 'Fehler beim Aktualisieren der Bootsgröße');
     }
-  };
+  }, [isReadOnly, boatSize, assignments, updateEvent, activeEventId, t]);
 
   const confirmBoatSizeChange = () => {
     if (pendingBoatSize) {
@@ -234,19 +269,23 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
     }
   };
 
-  const handleSeatClick = (sid: string) => {
+  const handleSeatClick = useCallback((sid: string) => {
     if (isReadOnly) return;
-    if (lockedSeats.includes(sid)) return;
+    const currentLockedSeats = lockedSeatsRef.current;
+    if (currentLockedSeats.includes(sid)) return;
 
-    if (selectedPaddlerId) {
+    const currentSelectedPaddlerId = selectedPaddlerIdRef.current;
+    const currentAssignments = assignmentsRef.current;
+
+    if (currentSelectedPaddlerId) {
       // Check if selectedPaddlerId is actually a paddler currently in a seat (for swapping)
-      const sourceSeatId = Object.keys(assignments).find(key => assignments[key] === selectedPaddlerId);
+      const sourceSeatId = Object.keys(currentAssignments).find(key => currentAssignments[key] === currentSelectedPaddlerId);
 
-      const nAss = { ...assignments };
+      const nAss = { ...currentAssignments };
 
       if (sourceSeatId) {
         // SWAP LOGIC
-        const targetPaddlerId = assignments[sid];
+        const targetPaddlerId = currentAssignments[sid];
 
         if (targetPaddlerId) {
           // Target is occupied -> Swap
@@ -255,50 +294,54 @@ const PlannerView: React.FC<PlannerViewProps> = ({ eventId }) => {
           delete nAss[sid];
 
           nAss[sourceSeatId] = targetPaddlerId;
-          nAss[sid] = selectedPaddlerId;
+          nAss[sid] = currentSelectedPaddlerId;
         } else {
           // Target is empty -> Move
           delete nAss[sourceSeatId];
-          nAss[sid] = selectedPaddlerId;
+          nAss[sid] = currentSelectedPaddlerId;
         }
       } else {
         // Standard assignment from pool
         // Ensure paddler is not already in another seat
         Object.keys(nAss).forEach((k) => {
-          if (nAss[k] === selectedPaddlerId) delete nAss[k];
+          if (nAss[k] === currentSelectedPaddlerId) delete nAss[k];
         });
-        nAss[sid] = selectedPaddlerId;
+        nAss[sid] = currentSelectedPaddlerId;
       }
 
       updateAssignments(assignmentKey, nAss);
       setSelectedPaddlerId(null);
-    } else if (assignments[sid]) {
-      setSelectedPaddlerId(assignments[sid]);
+    } else if (currentAssignments[sid]) {
+      setSelectedPaddlerId(currentAssignments[sid]);
     }
-  };
+  }, [isReadOnly, updateAssignments, assignmentKey]);
 
-  const handleUnassign = (sid: string, e: React.MouseEvent) => {
+  const handleUnassign = useCallback((sid: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isReadOnly) return;
-    if (lockedSeats.includes(sid)) return;
-    const paddlerId = assignments[sid];
-    const paddler = activePaddlerPool.find((p) => p.id === paddlerId);
+    const currentLockedSeats = lockedSeatsRef.current;
+    if (currentLockedSeats.includes(sid)) return;
+    
+    const currentAssignments = assignmentsRef.current;
+    const paddlerId = currentAssignments[sid];
+    const paddler = activePaddlerPoolRef.current.find((p) => p.id === paddlerId);
 
-    const nAss = { ...assignments };
+    const nAss = { ...currentAssignments };
     delete nAss[sid];
     updateAssignments(assignmentKey, nAss);
 
     if (paddler && paddler.isCanister) {
       setPaddlers((prev) => prev.filter((p) => p.id !== paddlerId));
     }
-  };
+  }, [isReadOnly, updateAssignments, assignmentKey, setPaddlers]);
 
-  const toggleLock = (sid: string, e: React.MouseEvent) => {
+  const toggleLock = useCallback((sid: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (isReadOnly) return;
-    if (!assignments[sid]) return;
+    const currentAssignments = assignmentsRef.current;
+    if (!currentAssignments[sid]) return;
     setLockedSeats((prev) => prev.includes(sid) ? prev.filter((i) => i !== sid) : [...prev, sid]);
-  };
+  }, [isReadOnly]);
 
   const clearBoat = () => {
     if (isReadOnly) return;

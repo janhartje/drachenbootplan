@@ -28,6 +28,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [status, session, locale]);
 
   const changeLanguage = async (lang: string) => {
+    if (lang !== 'de' && lang !== 'en') {
+        console.error(`Invalid locale: ${lang}`);
+        return;
+    }
     if (lang === locale) return;
     
     // Use next-intl router to switch locale
@@ -53,19 +57,24 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   };
 
   // Helper helper to safely access nested properties
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const getNestedValue = (obj: any, path: string): any => {
-    return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined) ? acc[part] : undefined, obj);
+  const getNestedValue = <T = unknown>(obj: Record<string, unknown>, path: string): T | undefined => {
+    return path.split('.').reduce<unknown>((acc, part) => {
+      if (acc && typeof acc === 'object' && acc !== null && part in acc) {
+        return (acc as Record<string, unknown>)[part];
+      }
+      return undefined;
+    }, obj) as T;
   };
 
   const t = <T = string>(key: string): T => {
     try {
         // Fallback to manual lookup in messages object to support arrays/objects (legacy behavior)
         // next-intl's t() is strict about returning strings.
-        const msg = getNestedValue(messages, key);
+        const msg = getNestedValue(messages as Record<string, unknown>, key);
         if (msg !== undefined) return msg as T;
         return key as unknown as T;
-    } catch {
+    } catch (error) {
+        console.warn(`Translation missing for key: ${key}`, error);
         return key as unknown as T;
     }
   };

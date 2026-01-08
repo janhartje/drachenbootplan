@@ -11,6 +11,7 @@
     "build": "NODE_ENV=production prisma migrate deploy && next build --webpack",
     "start": "NODE_ENV=production next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "test": "NODE_ENV=test jest --maxWorkers=10",
     "test:watch": "jest --watch --maxWorkers=1",
     "email": "email dev --dir src/emails --port 3010",

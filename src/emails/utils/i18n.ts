@@ -5,13 +5,29 @@ export type Language = 'de' | 'en';
 
 const locales: Record<Language, Record<string, unknown>> = { de, en };
 
+type Translations = typeof de;
+
+// Recursive type to extract all valid paths that resolve to a string
+type StringKeys<T> = T extends object 
+  ? { [K in keyof T]: K extends string 
+      ? T[K] extends string 
+        ? K 
+        : T[K] extends Record<string, unknown> // Ensure we only recurse into objects, not arrays
+          ? T[K] extends unknown[] ? never : `${K}.${StringKeys<T[K]>}` 
+          : never
+      : never 
+    }[keyof T] 
+  : never;
+
+export type TxKeyPath = StringKeys<Translations>;
+
 /**
  * Simple translation function for emails.
  * @param lang - The language code ('de' or 'en')
- * @param key - The translation key
+ * @param key - The translation key (strictly typed)
  * @returns The translated string, or the key if not found
  */
-export const t = (lang: Language, key: string): string => {
+export const t = (lang: Language, key: TxKeyPath): string => {
   const locale = locales[lang];
   if (!locale) return key;
 

@@ -11,7 +11,15 @@
         "signInEmail": "Mit E-Mail anmelden",
         "signInGithub": "Anmelden mit GitHub",
         "signInGoogle": "Anmelden mit Google",
-        "welcomeBack": "Willkommen zurück"
+        "welcomeBack": "Willkommen zurück",
+        "verify": {
+            "title": "Verifiziere deinen Login",
+            "body": "Bitte klicke auf den Button unten, um den Login-Vorgang abzuschließen. Dies stellt sicher, dass du ein echter Nutzer bist.",
+            "cta": "Jetzt einloggen",
+            "errorTitle": "Ungültiger Link",
+            "errorBody": "Der Login-Link ist ungültig oder abgelaufen. Bitte fordere einen neuen Link an.",
+            "backToLogin": "Zurück zum Login"
+        }
     },
     "accessDenied": "Zutritt verweigert",
     "accountLinked": "Account verknüpft",

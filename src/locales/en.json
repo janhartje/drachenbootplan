@@ -1004,6 +1004,14 @@
     "loadMore": "Load More",
     "login": "Login",
     "loginSubtitle": "Please sign in to continue.",
+    "loginVerify": {
+        "title": "Verify your login",
+        "body": "Please click the button below to complete the login process. This ensures that you are a real user.",
+        "cta": "Sign in now",
+        "errorTitle": "Invalid Link",
+        "errorBody": "The login link is invalid or has expired. Please request a new link.",
+        "backToLogin": "Back to login"
+    },
     "logout": "Log out",
     "madeWithLove": "Made with ❤️ in Hannover.",
     "magicAI": "Magic AI: Auto Fill",

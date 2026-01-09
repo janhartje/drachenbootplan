@@ -67,17 +67,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             let urlToScan = callbackUrl;
             // Decode potential double-encoding (common in OAuth/Redirect flows)
             if (urlToScan.includes('%')) {
-               try {
-                 urlToScan = decodeURIComponent(urlToScan);
-               } catch {
-                 // ignore decoding errors
-               }
+              try {
+                urlToScan = decodeURIComponent(urlToScan);
+              } catch {
+                // ignore decoding errors
+              }
             }
 
             // Check path segments
             const isEnPath = /\/en(\/|\?|$)/.test(urlToScan);
             const isDePath = /\/de(\/|\?|$)/.test(urlToScan);
-            
+
             // Check query params
             const isEnQuery = /[?&](lang|locale)=en(&|$)/.test(urlToScan);
             const isDeQuery = /[?&](lang|locale)=de(&|$)/.test(urlToScan);
@@ -90,11 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         // Check if there is a pending invite for this email (Paddler with inviteEmail)
-        // OR if the user is a member of a team (to send welcome back email)
-        // OR if the user is a member of a team (to send welcome back email)
-        // We prioritize the TeamInviteEmail if we find a pending invite
         let teamName = '';
-
         let shouldUseTeamInvite = false;
         let invitedPaddlerFound = false;
 
@@ -122,11 +118,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               shouldUseTeamInvite = true;
 
               // FORCE the redirect to the invited team
-              // We modify the magic link URL to ensure the callbackUrl points to the specific team
               try {
                 const targetUrl = new URL(url);
                 const baseUrl = getBaseUrl();
-                // Redirect to main app with teamId param
                 const teamRedirect = `${baseUrl}/${lang}/app?teamId=${invitedPaddler.teamId}`;
 
                 targetUrl.searchParams.set('callbackUrl', teamRedirect);
@@ -143,7 +137,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // If no invited paddler was found, try to get user's language preference
         if (!invitedPaddlerFound) {
           try {
-            // Case-insensitive user lookup
             const user = await prisma.user.findFirst({
               where: {
                 email: {
@@ -162,15 +155,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
 
+        // Wrap the magic link URL with a verification landing page
+        // to prevent email scanners from consuming the token.
+        const baseUrl = getBaseUrl();
+        const verificationUrl = `${baseUrl}/${lang}/login/verify?url=${encodeURIComponent(url)}`;
+        const emailUrl = verificationUrl;
+
+        // Use emailUrl for the email template
         const ReactEmailComponent = shouldUseTeamInvite
-          ? React.createElement(TeamInviteEmail, { url, teamName, lang })
-          : React.createElement(MagicLinkEmail, { url, lang });
+          ? TeamInviteEmail({ url: emailUrl, teamName, lang })
+          : MagicLinkEmail({ url: emailUrl, lang });
 
-
-
-        // If team invite, append team name to subject?
-        // t(lang, 'emailTeamInviteSubject') is "Du wurdest zum Team eingeladen"
-        // Let's manually construct subject for Team Invite to match previous one
         const subject = shouldUseTeamInvite
           ? (lang === 'en' ? `You've been invited to join "${teamName}" 🐉` : `Du wurdest zum Team "${teamName}" eingeladen 🐉`)
           : t(lang, 'emailMagicLinkSubject');
@@ -180,7 +175,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           subject: subject,
           react: ReactEmailComponent,
           template: shouldUseTeamInvite ? 'TeamInviteEmail' : 'MagicLinkEmail',
-          props: { url, lang, teamName },
+          props: { url: emailUrl, lang, teamName },
         });
 
         if (!result.success) {
@@ -189,7 +184,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       },
     }),
-    // Test User Provider (Development/Test only)
     Credentials({
       id: 'credentials',
       name: 'Test Credentials',
@@ -198,7 +192,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        // ONLY allow in development or test environment
         const isDev = process.env.NODE_ENV === 'development';
         const isTest = process.env.NODE_ENV === 'test';
         const isLocalProduction = process.env.ENABLE_TEST_USER === 'true';
@@ -214,7 +207,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        // Create or update the test user
         const user = await prisma.user.upsert({
           where: { email: testEmail },
           update: {
@@ -225,35 +217,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             email: testEmail,
             name: "Test User",
             emailVerified: new Date(),
-            weight: 85, // Default weight for test user
+            weight: 85,
             language: 'de',
           }
         });
 
-        // FORCE ONBOARDING:
-        // 1. Update all existing records to have valid weight but empty skills
-        //    This ensures that for ANY team the user is in, they trigger onboarding
-        const updateResult = await prisma.paddler.updateMany({
+        await prisma.paddler.updateMany({
           where: { userId: user.id },
           data: { skills: [] }
         });
-
-        // 2. If no records updated (user is new to all teams), create one in the first team
-        if (updateResult.count === 0) {
-          const firstTeam = await prisma.team.findFirst();
-          if (firstTeam) {
-            await prisma.paddler.create({
-              data: {
-                name: "Test User",
-                weight: 85,
-                skills: [],
-                userId: user.id,
-                teamId: firstTeam.id,
-                role: 'PADDLER'
-              }
-            });
-          }
-        }
 
         return user;
       }
@@ -276,12 +248,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           token.isAdmin = true;
         }
       }
-
-      // Handle updates (e.g. when user updates profile)
       if (trigger === "update" && session?.user) {
         token.weight = session.user.weight;
       }
-
       return token
     },
     session({ session, token }) {
@@ -294,15 +263,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   events: {
-    // Link invited paddlers when a new user is created or signs in
     async signIn({ user }) {
       if (user.email && user.id) {
-        // Fetch full user to get weight (as it might not be in the session user object)
         const fullUser = await prisma.user.findUnique({
           where: { id: user.id },
         });
 
-        // Check if there are any paddlers with this email in inviteEmail field (case-insensitive)
         const invitedPaddlers = await prisma.paddler.findMany({
           where: {
             inviteEmail: {
@@ -312,15 +278,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        // Link all invited paddlers to this user
         for (const paddler of invitedPaddlers) {
           await prisma.paddler.update({
             where: { id: paddler.id },
             data: {
               userId: user.id,
-              inviteEmail: null, // Clear the invite email
-              name: fullUser?.name || user.name || paddler.name, // Use user's name if available
-              weight: fullUser?.weight || paddler.weight, // Sync weight
+              inviteEmail: null,
+              name: fullUser?.name || user.name || paddler.name,
+              weight: fullUser?.weight || paddler.weight,
             },
           });
         }
@@ -328,12 +293,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async createUser({ user }) {
       if (user.email && user.id) {
-        // Fetch full user to get weight
         const fullUser = await prisma.user.findUnique({
           where: { id: user.id },
         });
 
-        // Check if there are any paddlers with this email in inviteEmail field (case-insensitive)
         const invitedPaddlers = await prisma.paddler.findMany({
           where: {
             inviteEmail: {
@@ -343,15 +306,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        // Link all invited paddlers to this user
         for (const paddler of invitedPaddlers) {
           await prisma.paddler.update({
             where: { id: paddler.id },
             data: {
               userId: user.id,
-              inviteEmail: null, // Clear the invite email
-              name: fullUser?.name || user.name || paddler.name, // Use user's name if available
-              weight: fullUser?.weight || paddler.weight, // Sync weight
+              inviteEmail: null,
+              name: fullUser?.name || user.name || paddler.name,
+              weight: fullUser?.weight || paddler.weight,
             },
           });
         }

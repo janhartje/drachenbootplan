@@ -168,10 +168,15 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setIsUploadingImage(true)
     try {
       await deleteProfileImage()
+      
       // Reload profile to get updated image (should be null or OAuth image)
       const userProfile = await getUserProfile()
       if (userProfile) {
+        // After delete, show OAuth image or null (which will show fallback)
         setImagePreview(userProfile.image || null)
+      } else {
+        // If no profile, clear the image preview
+        setImagePreview(null)
       }
       
       // Trigger refresh in all useUserProfile hooks (e.g., UserMenu)

@@ -268,8 +268,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id
         token.weight = user.weight
-        // @ts-expect-error - customImage exists in DB but not in default User type
-        token.customImage = user.customImage
+        // Fetch fresh user data to ensure we have customImage
+        const freshUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { weight: true, customImage: true, image: true }
+        })
+        if (freshUser) {
+          token.weight = freshUser.weight
+          token.customImage = freshUser.customImage
+        }
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
         if (user.email && adminEmails.includes(user.email.toLowerCase())) {
           token.isAdmin = true;

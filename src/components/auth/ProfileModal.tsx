@@ -48,12 +48,16 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     if (session?.user?.name) {
       setName(session.user.name)
     }
-    // Set image preview to custom image or OAuth image
+  }, [session?.user?.id, session?.user?.name, paddlers, isOpen])
+
+  // Separate effect for image preview to handle session updates
+  useEffect(() => {
     if (session?.user) {
       // @ts-expect-error - customImage is added to session
-      setImagePreview(session.user.customImage || session.user.image || null)
+      const currentImage = session.user.customImage || session.user.image || null
+      setImagePreview(currentImage)
     }
-  }, [session?.user?.id, session?.user?.name, session?.user, paddlers, isOpen])
+  }, [session?.user])
 
   useEffect(() => {
     if (success) {
@@ -148,8 +152,10 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setIsUploadingImage(true)
     try {
       await deleteProfileImage()
-      setImagePreview(session?.user?.image || null) // Fall back to OAuth image
+      // Update session to refresh customImage field
       await update()
+      // Set preview to OAuth image after session update
+      setImagePreview(session?.user?.image || null)
     } catch (error) {
       console.error('Failed to delete image', error)
       alert(t('imageDeleteFailed') || 'Failed to delete image')
@@ -181,7 +187,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   const isFormValid = name.trim() !== '' && weight.trim() !== ''
   // @ts-expect-error - customImage is added to session
-  const hasCustomImage = !!session.user?.customImage
+  const sessionHasCustomImage = !!session.user?.customImage
+  // Show delete button if there's a custom image in session OR if preview is set and different from OAuth image
+  const hasCustomImage = sessionHasCustomImage || (imagePreview !== null && imagePreview !== session?.user?.image && imagePreview?.startsWith('data:image/'))
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">

@@ -80,6 +80,15 @@
     "changelog": "Versionshistorie",
     "changelogData": [
         {
+            "version": "3.7.3",
+            "date": "Januar 2026",
+            "features": [
+                "Kader-Liste: Suche, Filter nach Fähigkeiten und Sortierung hinzugefügt für bessere Verwaltung großer Teams."
+            ],
+            "technical": [],
+            "bugfixes": []
+        },
+        {
             "version": "3.7.2",
             "date": "Januar 2026",
             "features": [

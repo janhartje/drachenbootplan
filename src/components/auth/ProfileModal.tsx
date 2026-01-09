@@ -12,6 +12,7 @@ import { FormInput } from "@/components/ui/FormInput"
 import { WeightInput } from "@/components/ui/WeightInput"
 import { SkillSelector, SkillsState } from "@/components/ui/SkillSelector"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { ConfirmModal, AlertModal } from "@/components/ui/Modals"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -30,6 +31,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [success, setSuccess] = useState(false)
   const [isUploadingImage, setIsUploadingImage] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showErrorAlert, setShowErrorAlert] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load current user's data from their paddler record
@@ -79,13 +83,15 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert(t('invalidFileType') || 'Please select an image file')
+      setErrorMessage(t('invalidFileType') || 'Please select an image file')
+      setShowErrorAlert(true)
       return
     }
 
     // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
-      alert(t('fileTooLarge') || 'Image must be less than 2MB')
+      setErrorMessage(t('fileTooLarge') || 'Image must be less than 2MB')
+      setShowErrorAlert(true)
       return
     }
 
@@ -138,25 +144,24 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       reader.readAsDataURL(file)
     } catch (error) {
       console.error('Failed to upload image', error)
-      alert(t('imageUploadFailed') || 'Failed to upload image')
+      setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+      setShowErrorAlert(true)
       setIsUploadingImage(false)
     }
   }
 
   const handleDeleteImage = async () => {
-    if (!confirm(t('confirmDeleteImage') || 'Are you sure you want to delete your profile picture?')) {
-      return
-    }
-
+    setShowDeleteConfirm(false)
     setIsUploadingImage(true)
     try {
       await deleteProfileImage()
       // Update session to refresh customImage field
-      // The useEffect watching session?.user will automatically update imagePreview
+      // The useEffect watching session will automatically update imagePreview
       await update()
     } catch (error) {
       console.error('Failed to delete image', error)
-      alert(t('imageDeleteFailed') || 'Failed to delete image')
+      setErrorMessage(t('imageDeleteFailed') || 'Failed to delete image')
+      setShowErrorAlert(true)
     } finally {
       setIsUploadingImage(false)
     }
@@ -245,7 +250,7 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
               {hasCustomImage && (
                 <button
                   type="button"
-                  onClick={handleDeleteImage}
+                  onClick={() => setShowDeleteConfirm(true)}
                   disabled={isUploadingImage}
                   className="text-xs px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
                 >
@@ -327,6 +332,25 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </div>
         </form>
       </div>
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteImage}
+        title={t('confirmDeleteImage') || 'Delete Profile Picture'}
+        message={t('confirmDeleteImageMessage') || 'Are you sure you want to delete your profile picture? This action cannot be undone.'}
+        isDestructive
+        isLoading={isUploadingImage}
+      />
+
+      <AlertModal
+        isOpen={showErrorAlert}
+        onClose={() => setShowErrorAlert(false)}
+        title={t('error') || 'Error'}
+        message={errorMessage}
+        type="error"
+      />
     </div>
   )
 }

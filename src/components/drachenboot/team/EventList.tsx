@@ -8,6 +8,7 @@ import { THEME_MAP, ThemeKey } from '@/constants/themes';
 import { Card } from '@/components/ui/core/Card';
 import { IconButton } from '@/components/ui/core/IconButton';
 import { Badge } from '@/components/ui/core/Badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 // --- Sub-Component: EventCard ---
 // Extracting this allows each card to manage its own "expanded" state independently,
@@ -208,10 +209,13 @@ const EventCard: React.FC<EventCardProps> = memo(({
                 return (
                   <div key={p.id} className="flex items-center justify-between py-1">
                     <div className="flex items-center gap-3">
-                      {/* Placeholder Avatar - or just name */}
-                      <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center text-xs text-slate-500 dark:text-slate-400">
-                        {p.name.substring(0, 2).toUpperCase()}
-                      </div>
+                      {/* Avatar with profile picture or initials fallback */}
+                      <Avatar className="w-8 h-8 border border-slate-300 dark:border-slate-700">
+                        {p.user?.image && <AvatarImage src={p.user.image} alt={p.name} />}
+                        <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
+                          {p.name.substring(0, 2).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
                       <span className={`font-medium ${status === 'no' ? 'text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'}`}>
                         {p.name}
                       </span>

@@ -80,6 +80,15 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.7.3",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Profile pictures are now displayed in the event participant list (e.g., Google profile picture)."
+            ]
+        },
+        {
             "version": "3.7.2",
             "date": "January 2026",
             "features": [

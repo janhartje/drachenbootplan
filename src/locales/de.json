@@ -80,6 +80,15 @@
     "changelog": "Versionshistorie",
     "changelogData": [
         {
+            "version": "3.7.3",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Profilbilder werden jetzt in der Teilnehmerliste von Events angezeigt (z.B. Google-Profilbild)."
+            ]
+        },
+        {
             "version": "3.7.2",
             "date": "Januar 2026",
             "features": [

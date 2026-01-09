@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma"
 
 export interface PublicTeam {
+  id: string;
   name: string;
   icon?: string;
   website?: string;
@@ -10,8 +11,13 @@ export interface PublicTeam {
 
 /**
  * Fetch teams that have opted-in to be displayed on the public landing page.
- * Only returns minimal public data (name, logo, website).
+ * Only returns minimal public data (id, name, logo, website).
  * Limited to 50 teams to prevent performance issues.
+ * 
+ * This is the single source of truth for the public teams query.
+ * Used by:
+ * - Landing page server component
+ * - Public API endpoint
  */
 export async function getPublicTeams(): Promise<PublicTeam[]> {
   try {
@@ -21,6 +27,7 @@ export async function getPublicTeams(): Promise<PublicTeam[]> {
         showOnWebsite: true,
       },
       select: {
+        id: true,
         name: true,
         icon: true,
         website: true,
@@ -35,6 +42,7 @@ export async function getPublicTeams(): Promise<PublicTeam[]> {
 
     // Convert null values to undefined to match TypeScript interface
     return teams.map(team => ({
+      id: team.id,
       name: team.name,
       icon: team.icon ?? undefined,
       website: team.website ?? undefined,

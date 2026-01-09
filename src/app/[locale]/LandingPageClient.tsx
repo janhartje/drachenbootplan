@@ -8,12 +8,7 @@ import DragonLogo from "@/components/ui/DragonLogo";
 import Footer from "@/components/ui/Footer";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-interface PublicTeam {
-  name: string;
-  icon: string | null;
-  website: string | null;
-}
+import { PublicTeam } from "@/app/actions/public";
 
 interface LandingPageClientProps {
   publicTeams: PublicTeam[];
@@ -307,7 +302,7 @@ export default function LandingPageClient({ publicTeams }: LandingPageClientProp
                   
                   return (
                     <div
-                      key={team.name}
+                      key={team.id}
                       className="group p-6 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 dark:hover:border-blue-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 flex flex-col items-center justify-center text-center"
                     >
                       {team.icon ? (

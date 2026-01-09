@@ -1,27 +1,13 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { getPublicTeams } from '@/app/actions/public';
 
+/**
+ * Public API endpoint to fetch teams that opted-in to be displayed.
+ * Uses the shared getPublicTeams() function to avoid code duplication.
+ */
 export async function GET() {
   try {
-    // Limit to 50 teams to prevent DoS via memory exhaustion
-    const teams = await prisma.team.findMany({
-      take: 50,
-      where: {
-        showOnWebsite: true,
-      },
-      select: {
-        name: true,
-        icon: true,
-        website: true,
-      },
-      orderBy: [
-        // Sort teams with logos first (icon IS NOT NULL)
-        { icon: 'desc' },
-        // Then by name alphabetically
-        { name: 'asc' },
-      ],
-    });
-
+    const teams = await getPublicTeams();
     return NextResponse.json(teams);
   } catch (error) {
     // Only log in development to avoid exposing sensitive information in production

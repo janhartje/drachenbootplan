@@ -301,6 +301,10 @@
                                     "items": {
                                         "type": "object",
                                         "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "description": "Team ID (unique identifier)"
+                                            },
                                             "name": {
                                                 "type": "string",
                                                 "description": "Team name"
@@ -316,7 +320,7 @@
                                                 "description": "Team website URL"
                                             }
                                         },
-                                        "required": ["name"]
+                                        "required": ["id", "name"]
                                     }
                                 }
                             }

@@ -31,7 +31,12 @@ export async function getPublicTeams(): Promise<PublicTeam[]> {
       ],
     })
 
-    return teams
+    // Convert null values to undefined to match TypeScript interface
+    return teams.map(team => ({
+      name: team.name,
+      icon: team.icon ?? undefined,
+      website: team.website ?? undefined,
+    }))
   } catch (error) {
     console.error("Failed to fetch public teams:", error)
     return []

@@ -11,10 +11,12 @@ export interface PublicTeam {
 /**
  * Fetch teams that have opted-in to be displayed on the public landing page.
  * Only returns minimal public data (name, logo, website).
+ * Limited to 50 teams to prevent performance issues.
  */
 export async function getPublicTeams(): Promise<PublicTeam[]> {
   try {
     const teams = await prisma.team.findMany({
+      take: 50,
       where: {
         showOnWebsite: true,
       },

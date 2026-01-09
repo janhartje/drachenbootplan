@@ -287,7 +287,7 @@
         "/api/public/teams": {
             "get": {
                 "summary": "Get Public Teams",
-                "description": "Fetches teams that have opted-in to be displayed on the public landing page. No authentication required.",
+                "description": "Fetches teams that have opted-in to be displayed on the public landing page. Limited to 50 teams. No authentication required.",
                 "tags": [
                     "Public"
                 ],

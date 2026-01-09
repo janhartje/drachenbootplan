@@ -211,7 +211,7 @@ const EventCard: React.FC<EventCardProps> = memo(({
                     <div className="flex items-center gap-3">
                       {/* Avatar with profile picture or initials fallback */}
                       <Avatar className="w-8 h-8 border border-slate-300 dark:border-slate-700">
-                        {p.user?.image && <AvatarImage src={p.user.image} alt={p.name} />}
+                        {(p.user?.customImage || p.user?.image) && <AvatarImage src={p.user.customImage || p.user.image || ''} alt={p.name} />}
                         <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
                           {p.name.substring(0, 2).toUpperCase()}
                         </AvatarFallback>

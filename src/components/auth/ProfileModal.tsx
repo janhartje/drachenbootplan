@@ -1,16 +1,17 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
-import { updateProfile } from "@/app/actions/user"
-import { Save, X, Info } from "lucide-react"
+import { updateProfile, uploadProfileImage, deleteProfileImage } from "@/app/actions/user"
+import { Save, X, Info, Upload, Trash2, Camera } from "lucide-react"
 import { useTranslations } from 'next-intl';
 import { useDrachenboot } from "@/context/DrachenbootContext"
 import { useTeam } from '@/context/TeamContext';
 import { FormInput } from "@/components/ui/FormInput"
 import { WeightInput } from "@/components/ui/WeightInput"
 import { SkillSelector, SkillsState } from "@/components/ui/SkillSelector"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -18,7 +19,7 @@ interface ProfileModalProps {
 }
 
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
-  const { data: session } = useSession()
+  const { data: session, update } = useSession()
   const t = useTranslations()
   const { currentTeam } = useTeam();
   const { paddlers, refetchPaddlers } = useDrachenboot()
@@ -27,6 +28,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [skills, setSkills] = useState<SkillsState>({ left: false, right: false, drum: false, steer: false })
   const [isSaving, setIsSaving] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load current user's data from their paddler record
   useEffect(() => {
@@ -44,7 +48,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     if (session?.user?.name) {
       setName(session.user.name)
     }
-  }, [session?.user?.id, session?.user?.name, paddlers, isOpen])
+    // Set image preview to custom image or OAuth image
+    if (session?.user) {
+      // @ts-expect-error - customImage is added to session
+      setImagePreview(session.user.customImage || session.user.image || null)
+    }
+  }, [session?.user?.id, session?.user?.name, session?.user, paddlers, isOpen])
 
   useEffect(() => {
     if (success) {
@@ -58,6 +67,95 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   const handleSkillChange = (skill: keyof SkillsState) => {
     setSkills(prev => ({ ...prev, [skill]: !prev[skill] }))
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert(t('invalidFileType') || 'Please select an image file')
+      return
+    }
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert(t('fileTooLarge') || 'Image must be less than 2MB')
+      return
+    }
+
+    setIsUploadingImage(true)
+
+    try {
+      // Convert to base64
+      const reader = new FileReader()
+      reader.onloadend = async () => {
+        const base64String = reader.result as string
+        
+        // Create a temporary image to resize
+        const img = new Image()
+        img.onload = async () => {
+          // Resize to max 400x400
+          const canvas = document.createElement('canvas')
+          let width = img.width
+          let height = img.height
+          const maxSize = 400
+
+          if (width > height) {
+            if (width > maxSize) {
+              height *= maxSize / width
+              width = maxSize
+            }
+          } else {
+            if (height > maxSize) {
+              width *= maxSize / height
+              height = maxSize
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          ctx?.drawImage(img, 0, 0, width, height)
+
+          // Convert to base64
+          const resizedBase64 = canvas.toDataURL(file.type, 0.9)
+          
+          // Upload to server
+          await uploadProfileImage(resizedBase64)
+          setImagePreview(resizedBase64)
+          
+          // Update session
+          await update()
+          setIsUploadingImage(false)
+        }
+        img.src = base64String
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Failed to upload image', error)
+      alert(t('imageUploadFailed') || 'Failed to upload image')
+      setIsUploadingImage(false)
+    }
+  }
+
+  const handleDeleteImage = async () => {
+    if (!confirm(t('confirmDeleteImage') || 'Are you sure you want to delete your profile picture?')) {
+      return
+    }
+
+    setIsUploadingImage(true)
+    try {
+      await deleteProfileImage()
+      setImagePreview(session?.user?.image || null) // Fall back to OAuth image
+      await update()
+    } catch (error) {
+      console.error('Failed to delete image', error)
+      alert(t('imageDeleteFailed') || 'Failed to delete image')
+    } finally {
+      setIsUploadingImage(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +180,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   if (!isOpen || !session) return null
 
   const isFormValid = name.trim() !== '' && weight.trim() !== ''
+  // @ts-expect-error - customImage is added to session
+  const hasCustomImage = !!session.user?.customImage
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -101,6 +201,58 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Profile Picture Section */}
+          <div className="flex flex-col items-center gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="relative">
+              <Avatar className="w-24 h-24 border-2 border-slate-300 dark:border-slate-700">
+                {imagePreview && <AvatarImage src={imagePreview} alt={name} />}
+                <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-2xl text-slate-500 dark:text-slate-400">
+                  {name ? name.substring(0, 2).toUpperCase() : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="absolute bottom-0 right-0 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors disabled:opacity-50"
+              >
+                <Camera size={16} />
+              </button>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="text-xs px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+              >
+                <Upload size={12} />
+                {isUploadingImage ? t('uploading') || 'Uploading...' : t('uploadImage') || 'Upload'}
+              </button>
+              {hasCustomImage && (
+                <button
+                  type="button"
+                  onClick={handleDeleteImage}
+                  disabled={isUploadingImage}
+                  className="text-xs px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                >
+                  <Trash2 size={12} />
+                  {t('delete') || 'Delete'}
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+              {t('profileImageHint') || 'Max 2MB, JPEG/PNG/WebP/GIF'}
+            </p>
+          </div>
+
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="flex justify-between items-baseline mb-1">

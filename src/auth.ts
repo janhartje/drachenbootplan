@@ -268,13 +268,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id
         token.weight = user.weight
+        // @ts-expect-error - customImage exists in DB but not in default User type
+        token.customImage = user.customImage
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
         if (user.email && adminEmails.includes(user.email.toLowerCase())) {
           token.isAdmin = true;
         }
       }
-      if (trigger === "update" && session?.user) {
-        token.weight = session.user.weight;
+      if (trigger === "update") {
+        // Refresh customImage from database
+        if (token.id) {
+          const freshUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { weight: true, customImage: true }
+          })
+          if (freshUser) {
+            token.weight = freshUser.weight
+            token.customImage = freshUser.customImage
+          }
+        }
+        if (session?.user) {
+          token.weight = session.user.weight;
+        }
       }
       return token
     },
@@ -283,6 +298,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.weight = token.weight as number | null
         session.user.isAdmin = token.isAdmin as boolean
+        // @ts-expect-error - customImage is not in default Session type
+        session.user.customImage = token.customImage as string | null
       }
       return session
     },

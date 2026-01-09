@@ -33,7 +33,7 @@ export async function GET(request: Request) {
         paddlers = await prisma.paddler.findMany({
             where: { teamId },
             orderBy: { name: 'asc' },
-            include: { user: { select: { email: true, name: true, image: true } } },
+            include: { user: { select: { email: true, name: true, image: true, customImage: true } } },
             skip: !isNaN(Number(skip)) ? skip : undefined,
             take: !isNaN(Number(take)) ? take : undefined,
         });
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
                 where: { teamId },
                 orderBy: { name: 'asc' },
                 include: {
-                    user: { select: { email: true, name: true, image: true } }
+                    user: { select: { email: true, name: true, image: true, customImage: true } }
                 },
                 skip: !isNaN(Number(skip)) ? skip : undefined,
                 take: !isNaN(Number(take)) ? take : undefined,
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
                 where: { teamId: { in: teamIds } },
                 orderBy: { name: 'asc' },
                 include: {
-                    user: { select: { email: true, name: true, image: true } }
+                    user: { select: { email: true, name: true, image: true, customImage: true } }
                 },
                 skip: !isNaN(Number(skip)) ? skip : undefined,
                 take: !isNaN(Number(take)) ? take : undefined,

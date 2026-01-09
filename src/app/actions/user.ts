@@ -3,6 +3,32 @@
 import { auth } from "@/auth"
 import prisma from "@/lib/prisma"
 
+/**
+ * Get current user's profile data including custom image
+ * This is separate from session to avoid JWT token size issues with base64 images
+ */
+export async function getUserProfile() {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return null
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+      customImage: true,
+      weight: true
+    }
+  })
+
+  return user
+}
+
 export async function updateProfile(data: { name: string; weight: number; skills?: string[] }, teamId?: string) {
   const session = await auth()
   

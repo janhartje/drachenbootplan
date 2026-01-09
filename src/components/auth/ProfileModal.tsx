@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
-import { updateProfile, uploadProfileImage, deleteProfileImage } from "@/app/actions/user"
+import { updateProfile, uploadProfileImage, deleteProfileImage, getUserProfile } from "@/app/actions/user"
 import { Save, X, Info, Upload, Trash2, Camera } from "lucide-react"
 import { useTranslations } from 'next-intl';
 import { useDrachenboot } from "@/context/DrachenbootContext"
@@ -54,14 +54,19 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
   }, [session?.user?.id, session?.user?.name, paddlers, isOpen])
 
-  // Separate effect for image preview to handle session updates
+  // Separate effect for image preview - fetch from server
   useEffect(() => {
-    if (session?.user) {
-      // @ts-expect-error - customImage is added to session
-      const currentImage = session.user.customImage || session.user.image || null
-      setImagePreview(currentImage)
+    const loadImage = async () => {
+      if (session?.user?.id && isOpen) {
+        const userProfile = await getUserProfile()
+        if (userProfile) {
+          const currentImage = userProfile.customImage || userProfile.image || null
+          setImagePreview(currentImage)
+        }
+      }
     }
-  }, [session])
+    loadImage()
+  }, [session?.user?.id, isOpen])
 
   useEffect(() => {
     if (success) {
@@ -135,8 +140,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           // Upload to server
           await uploadProfileImage(resizedBase64)
           
-          // Update session - this will trigger useEffect to update preview
-          await update()
+          // Reload profile to get updated image
+          const userProfile = await getUserProfile()
+          if (userProfile) {
+            setImagePreview(userProfile.customImage || userProfile.image || null)
+          }
           setIsUploadingImage(false)
         }
         img.src = base64String
@@ -155,9 +163,11 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     setIsUploadingImage(true)
     try {
       await deleteProfileImage()
-      // Update session to refresh customImage field
-      // The useEffect watching session will automatically update imagePreview
-      await update()
+      // Reload profile to get updated image (should be null or OAuth image)
+      const userProfile = await getUserProfile()
+      if (userProfile) {
+        setImagePreview(userProfile.image || null)
+      }
     } catch (error) {
       console.error('Failed to delete image', error)
       setErrorMessage(t('imageDeleteFailed') || 'Failed to delete image')
@@ -189,10 +199,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   if (!isOpen || !session) return null
 
   const isFormValid = name.trim() !== '' && weight.trim() !== ''
-  // @ts-expect-error - customImage is added to session
-  const sessionHasCustomImage = !!session.user?.customImage
-  // Show delete button if there's a custom image in session OR if preview is set and different from OAuth image
-  const hasCustomImage = sessionHasCustomImage || (imagePreview !== null && imagePreview !== session?.user?.image && imagePreview?.startsWith('data:image/'))
+  // Show delete button if there's a custom image in preview that's different from OAuth image
+  const hasCustomImage = imagePreview !== null && imagePreview !== session?.user?.image && imagePreview?.startsWith('data:image/')
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">

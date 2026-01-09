@@ -267,15 +267,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
-        token.weight = user.weight
-        // Fetch fresh user data to ensure we have customImage
+        // Fetch fresh user data to get weight
         const freshUser = await prisma.user.findUnique({
           where: { id: user.id },
-          select: { weight: true, customImage: true, image: true }
+          select: { weight: true }
         })
         if (freshUser) {
           token.weight = freshUser.weight
-          token.customImage = freshUser.customImage
         }
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
         if (user.email && adminEmails.includes(user.email.toLowerCase())) {
@@ -283,15 +281,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
       if (trigger === "update") {
-        // Refresh customImage from database
+        // Refresh weight from database
         if (token.id) {
           const freshUser = await prisma.user.findUnique({
             where: { id: token.id as string },
-            select: { weight: true, customImage: true }
+            select: { weight: true }
           })
           if (freshUser) {
             token.weight = freshUser.weight
-            token.customImage = freshUser.customImage
           }
         }
         if (session?.user) {
@@ -305,8 +302,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.id as string
         session.user.weight = token.weight as number | null
         session.user.isAdmin = token.isAdmin as boolean
-        // @ts-expect-error - customImage is not in default Session type
-        session.user.customImage = token.customImage as string | null
       }
       return session
     },

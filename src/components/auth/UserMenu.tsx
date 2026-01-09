@@ -10,9 +10,11 @@ import { useDrachenboot } from "@/context/DrachenbootContext"
 import { useTeam } from '@/context/TeamContext';
 import { ConfirmModal } from "@/components/ui/Modals"
 import { ProfileModal } from "./ProfileModal"
+import { useUserProfile } from "@/hooks/useUserProfile"
 
 export function UserMenu() {
   const { data: session } = useSession()
+  const { profileImage } = useUserProfile()
   const router = useRouter()
   const t = useTranslations();
   const { userRole, deletePaddler, paddlers } = useDrachenboot()
@@ -64,8 +66,7 @@ export function UserMenu() {
           className="relative h-9 w-9 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-blue-500"
         >
           <Avatar className="h-full w-full">
-            {/* @ts-expect-error - customImage is added to session */}
-            <AvatarImage src={session.user.customImage || session.user.image || ""} alt={session.user.name || ""} />
+            <AvatarImage src={profileImage || session.user.image || ""} alt={session.user.name || ""} />
             <AvatarFallback>{session.user.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
         </button>

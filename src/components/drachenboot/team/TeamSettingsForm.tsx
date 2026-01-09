@@ -325,8 +325,8 @@ const TeamSettingsForm: React.FC<TeamSettingsFormProps> = ({ initialData, onSave
           <Toggle 
             enabled={formData.showOnWebsite === true} 
             onChange={(enabled) => handleChange('showOnWebsite', enabled)}
-            activeColor="bg-blue-500"
-            focusColor="focus:ring-blue-500"
+            activeColor="bg-amber-500"
+            focusColor="focus:ring-amber-500"
           />
         </SettingsItem>
       </div>

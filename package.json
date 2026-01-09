@@ -8,7 +8,7 @@
     "db:reset": "docker compose down -v && docker compose up -d && sleep 2 && npx prisma migrate dev",
     "db:studio": "npx prisma studio",
     "dev": "next dev --turbo",
-    "build": "NODE_ENV=production prisma migrate deploy && NODE_ENV=production next build",
+    "build": "NODE_ENV=production prisma migrate deploy && NODE_ENV=production next build --turbo",
     "start": "NODE_ENV=production next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

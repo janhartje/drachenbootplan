@@ -157,7 +157,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Wrap the magic link URL with a verification landing page
         // to prevent email scanners from consuming the token.
         const baseUrl = getBaseUrl();
-        const verificationUrl = `${baseUrl}/${lang}/login/verify?url=${encodeURIComponent(url)}`;
+
+        // Convert the target URL to a relative path to ensure origin-independence
+        // This solves issues with localhost vs 127.0.0.1 and Vercel Preview URLs
+        const targetUrlObj = new URL(url);
+        const relativeTarget = targetUrlObj.pathname + targetUrlObj.search + targetUrlObj.hash;
+
+        const verificationUrl = `${baseUrl}/${lang}/login/verify?url=${encodeURIComponent(relativeTarget)}`;
         const emailUrl = verificationUrl;
 
         // Use emailUrl for the email template

@@ -50,35 +50,36 @@ export default function VerifyView() {
         setIsLoading(true);
         setIsRedirectError(false);
 
-        // Safe relative URL check
-        // Must start with / and NOT start with // (protocol relative) to avoid open redirects
-        if (url.startsWith('/') && !url.startsWith('//')) {
-            window.location.href = url;
-            return;
-        }
-
         try {
-            const baseUrl = new URL(window.location.origin);
-            // new URL(url, base) resolves relative paths against base, 
-            // and simply parses absolute paths (ignoring base)
-            const targetUrl = new URL(url, window.location.origin);
+            const currentOrigin = window.location.origin;
+            // 🛡️ Safe Parsing: Resolve EVERYTHING against current origin.
+            // If url is absolute, it ignores currentOrigin.
+            // If url is relative, it appends correctly.
+            const targetUrl = new URL(url, currentOrigin);
 
-            if (targetUrl.origin === baseUrl.origin) {
-                window.location.href = targetUrl.toString();
-                return;
-            } else {
-                console.error('Blocked suspicious redirect. Origin mismatch:', {
+            // 1. Strict Origin Check (Defensive)
+            if (targetUrl.origin !== currentOrigin) {
+                console.error('Security Alert: Cross-origin redirect attempt blocked.', {
                     target: targetUrl.origin,
-                    current: baseUrl.origin,
-                    url: url
+                    current: currentOrigin
                 });
+                throw new Error('Origin mismatch');
             }
-        } catch (e) {
-            console.error('Invalid URL during verification:', e);
-        }
 
-        setIsRedirectError(true);
-        setIsLoading(false);
+            // 2. Protocol Whitelist (No javascript/data URIs)
+            if (!['http:', 'https:'].includes(targetUrl.protocol)) {
+                console.error('Security Alert: Unsafe protocol blocked.', targetUrl.protocol);
+                throw new Error('Unsafe protocol');
+            }
+
+            // ✅ Safe to redirect
+            window.location.href = targetUrl.toString();
+
+        } catch (e) {
+            console.error('Redirect validation failed:', e);
+            setIsRedirectError(true);
+            setIsLoading(false);
+        }
     };
 
     return (

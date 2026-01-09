@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Drachenboot Manager API",
-        "version": "2.5.0",
-        "description": "API documentation for the Drachenboot Manager application with multi-team support."
+        "version": "2.6.0",
+        "description": "API documentation for the Drachenboot Manager application with multi-team support.\n\n## Custom Profile Pictures\n\nThe application supports custom profile picture uploads through Next.js Server Actions (not REST endpoints):\n\n### Upload Profile Image\n- **Action**: `uploadProfileImage(base64Image: string)`\n- **Description**: Upload a custom profile picture stored as base64 in the database\n- **Authentication**: Required (JWT session)\n- **Validation**: \n  - Max file size: 2MB\n  - Allowed formats: JPEG, PNG, WebP, GIF\n  - Auto-resize: Images are resized to max 400x400px on the client\n- **Priority**: Custom images take priority over OAuth provider images\n\n### Delete Profile Image\n- **Action**: `deleteProfileImage()`\n- **Description**: Remove custom profile picture (falls back to OAuth provider image)\n- **Authentication**: Required (JWT session)\n\n### Paddler API Extension\nThe `/api/paddlers` endpoint now returns the `customImage` field in the user object alongside the OAuth `image` field."
     },
     "servers": [
         {
@@ -3057,7 +3057,13 @@
                             },
                             "image": {
                                 "type": "string",
-                                "nullable": true
+                                "nullable": true,
+                                "description": "OAuth provider profile image URL (Google/GitHub)"
+                            },
+                            "customImage": {
+                                "type": "string",
+                                "nullable": true,
+                                "description": "Custom uploaded profile picture (base64 encoded). Takes priority over OAuth image."
                             }
                         },
                         "nullable": true

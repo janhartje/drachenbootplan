@@ -153,9 +153,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     try {
       await deleteProfileImage()
       // Update session to refresh customImage field
+      // The useEffect watching session?.user will automatically update imagePreview
       await update()
-      // Set preview to OAuth image after session update
-      setImagePreview(session?.user?.image || null)
     } catch (error) {
       console.error('Failed to delete image', error)
       alert(t('imageDeleteFailed') || 'Failed to delete image')

@@ -286,6 +286,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session
     },
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+
+      // Allows callback URLs on the same origin
+      if (new URL(url).origin === baseUrl) return url
+
+      // For Vercel Previews or cross-origin mismatches where we want to keep the path
+      // but stay on the current domain (to ensure session cookie validity).
+      // We accept the pathname from the callbackUrl but force the current baseUrl.
+      try {
+        const urlObj = new URL(url);
+        return `${baseUrl}${urlObj.pathname}${urlObj.search}${urlObj.hash}`;
+      } catch {
+        return baseUrl;
+      }
+    },
   },
   events: {
     async signIn({ user }) {

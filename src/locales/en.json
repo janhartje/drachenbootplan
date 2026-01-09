@@ -80,6 +80,19 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.7.4",
+            "date": "January 2026",
+            "features": [],
+            "technical": [
+                "SEO: Converted landing page to Server Component for better search engine indexing.",
+                "Performance: Implemented Next.js Image Component for automatic image optimization.",
+                "Security: Improved production logging and added URL validation for team websites."
+            ],
+            "bugfixes": [
+                "Build: Fixed next-intl API import (setRequestLocale instead of unstable_setRequestLocale)."
+            ]
+        },
+        {
             "version": "3.7.3",
             "date": "January 2026",
             "features": [

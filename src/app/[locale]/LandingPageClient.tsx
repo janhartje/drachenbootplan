@@ -301,42 +301,47 @@ export default function LandingPageClient({ publicTeams }: LandingPageClientProp
               </div>
               
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-                {publicTeams.map((team, index) => (
-                  <div
-                    key={index}
-                    className="group p-6 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 dark:hover:border-blue-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 flex flex-col items-center justify-center text-center"
-                  >
-                    {team.icon ? (
-                      <div className="relative w-16 h-16 rounded-full overflow-hidden mb-4 border-2 border-slate-200 dark:border-slate-700 group-hover:border-blue-500/50 transition-colors">
-                        <Image 
-                          src={team.icon} 
-                          alt={team.name}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-16 h-16 rounded-full mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl">
-                        {team.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    {team.website ? (
-                      <a
-                        href={team.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                      >
-                        {team.name}
-                      </a>
-                    ) : (
-                      <span className="font-semibold text-slate-900 dark:text-slate-100">
-                        {team.name}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                {publicTeams.map((team) => {
+                  // Validate that website URL uses a safe protocol
+                  const isSafeUrl = team.website && (team.website.startsWith('http://') || team.website.startsWith('https://'));
+                  
+                  return (
+                    <div
+                      key={team.name}
+                      className="group p-6 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 dark:hover:border-blue-400/30 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 flex flex-col items-center justify-center text-center"
+                    >
+                      {team.icon ? (
+                        <div className="relative w-16 h-16 rounded-full overflow-hidden mb-4 border-2 border-slate-200 dark:border-slate-700 group-hover:border-blue-500/50 transition-colors">
+                          <Image 
+                            src={team.icon} 
+                            alt={team.name}
+                            fill
+                            className="object-cover"
+                            sizes="64px"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 rounded-full mb-4 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl">
+                          {team.name.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {isSafeUrl ? (
+                        <a
+                          href={team.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                        >
+                          {team.name}
+                        </a>
+                      ) : (
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
+                          {team.name}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </section>

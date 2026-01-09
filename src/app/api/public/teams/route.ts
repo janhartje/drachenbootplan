@@ -24,7 +24,10 @@ export async function GET() {
 
     return NextResponse.json(teams);
   } catch (error) {
-    console.error('Failed to fetch public teams:', error);
+    // Only log in development to avoid exposing sensitive information in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Failed to fetch public teams:', error);
+    }
     return NextResponse.json([], { status: 500 });
   }
 }

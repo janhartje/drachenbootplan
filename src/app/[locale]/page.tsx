@@ -1,4 +1,4 @@
-import { unstable_setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import LandingPageClient from './LandingPageClient';
 import prisma from '@/lib/prisma';
 
@@ -31,14 +31,17 @@ async function getPublicTeams(): Promise<PublicTeam[]> {
 
     return teams;
   } catch (error) {
-    console.error("Failed to fetch public teams:", error);
+    // Only log in development to avoid exposing sensitive information in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("Failed to fetch public teams:", error);
+    }
     return [];
   }
 }
 
 export default async function LandingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  unstable_setRequestLocale(locale);
+  setRequestLocale(locale);
   
   // Fetch public teams server-side for SEO and performance
   const publicTeams = await getPublicTeams();

@@ -40,7 +40,10 @@ export async function getPublicTeams(): Promise<PublicTeam[]> {
       website: team.website ?? undefined,
     }))
   } catch (error) {
-    console.error("Failed to fetch public teams:", error)
+    // Only log in development to avoid exposing sensitive information in production
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("Failed to fetch public teams:", error)
+    }
     return []
   }
 }

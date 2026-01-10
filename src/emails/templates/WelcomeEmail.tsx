@@ -33,7 +33,7 @@ export const WelcomeEmail = ({
       </Text>
 
       <Section className="text-center my-8">
-        <Button href={loginUrl || "https://dragonboatmanager.com/app"} className="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg text-center no-underline">
+        <Button href={loginUrl} className="bg-blue-600 text-white font-bold px-6 py-3 rounded-lg text-center no-underline">
           {t(lang, 'emailWelcomeCTA')}
         </Button>
       </Section>

@@ -80,6 +80,26 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.8.0",
+            "date": "January 2026",
+            "features": [
+                "Team Visibility: New 'Show on Website' setting allows teams to be displayed on the public landing page as a reference."
+            ],
+            "technical": [
+                "Database: Added 'showOnWebsite' field to Team model.",
+                "API: New public function to retrieve visible teams.",
+                "SEO: Converted landing page to Server Component for better search engine indexing.",
+                "Performance: Implemented Next.js Image Component for automatic image optimization.",
+                "Security: Implemented DoS protection (50-team limit), production logging, and URL validation for team websites.",
+                "Architecture: Eliminated code duplication by consolidating public teams query logic."
+            ],
+            "bugfixes": [
+                "Build: Fixed next-intl API import (setRequestLocale instead of unstable_setRequestLocale).",
+                "Fix: Resolved React key collisions by using team.id instead of team.name.",
+                "Fix: Corrected TypeScript null-safety for team.website attribute."
+            ]
+        },
+        {
             "version": "3.7.3",
             "date": "January 2026",
             "features": [
@@ -926,6 +946,8 @@
     "landingHeroTitle": "Your Team.\nPerfectly Organized.",
     "landingLearnMore": "Learn More",
     "landingStartApp": "Start App",
+    "landingTeamsUsing": "These Teams are on Board",
+    "landingTeamsUsingSubtitle": "Paddlers worldwide rely on Drachenboot Manager",
     "landingTrustedBy": "Trusted by dragon boat teams",
     "leaveTeam": "Leave Team",
     "left": "Left",
@@ -1155,9 +1177,12 @@
         "processing": "Processing...",
         "productName": "Dragon Boat Manager Pro",
         "promotionCode": "Promotion Code",
+        "publicVisibility": "Public Visibility",
         "reactivateSubscription": "Reactivate Subscription",
         "remove": "Remove",
         "securePayment": "SSL Encrypted & Secure Payment",
+        "showOnWebsite": "Show on Website",
+        "showOnWebsiteDesc": "Display your team logo and name on the public landing page as a reference for other teams.",
         "showPremiumRing": "Show Premium Logo Ring",
         "showPremiumRingDesc": "Show a shimmering golden ring around your team logo.",
         "showProBadge": "Show PRO Badge",

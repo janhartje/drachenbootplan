@@ -299,7 +299,14 @@ describe('getUserProfile', () => {
     })
     expect(prisma.user.findUnique).toHaveBeenCalledWith({
       where: { id: 'user-789' },
-      select: { customImage: true, image: true },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        image: true,
+        customImage: true,
+        weight: true,
+      },
     })
   })
 

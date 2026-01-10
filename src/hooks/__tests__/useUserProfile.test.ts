@@ -170,7 +170,7 @@ describe('useUserProfile', () => {
   it('should handle missing session gracefully', async () => {
     mockUseSession.mockReturnValue({ data: null })
 
-    const { result } = renderHook(() => useUserProfile())
+    renderHook(() => useUserProfile())
 
     // Should not call getUserProfile without session
     await waitFor(() => {

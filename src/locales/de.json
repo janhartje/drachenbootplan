@@ -80,10 +80,9 @@
     "changelog": "Versionshistorie",
     "changelogData": [
         {
-            "version": "3.7.5",
+            "version": "3.8.0",
             "date": "Januar 2026",
             "features": [
-                "Kader-Liste: Suche, Filter nach Fähigkeiten und Sortierung hinzugefügt für bessere Verwaltung großer Teams.",
                 "Team-Sichtbarkeit: Neue Einstellung 'Auf Webseite anzeigen' ermöglicht Teams, auf der öffentlichen Startseite als Referenz angezeigt zu werden."
             ],
             "technical": [
@@ -99,6 +98,15 @@
                 "Fix: React Key-Kollisionen behoben durch Verwendung von team.id statt team.name.",
                 "Fix: TypeScript Null-Safety für team.website Attribut korrigiert."
             ]
+        },
+        {
+            "version": "3.7.3",
+            "date": "Januar 2026",
+            "features": [
+                "Kader-Liste: Suche, Filter nach Fähigkeiten und Sortierung hinzugefügt für bessere Verwaltung großer Teams."
+            ],
+            "technical": [],
+            "bugfixes": []
         },
         {
             "version": "3.7.2",

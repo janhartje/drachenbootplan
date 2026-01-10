@@ -8,6 +8,8 @@ import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useTeam } from '@/context/TeamContext';
 import { useSession } from 'next-auth/react';
 import { THEME_MAP, ThemeKey } from '@/constants/themes';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { getAvatarUrl, getInitials } from '@/lib/avatar-utils';
 
 interface PaddlerListProps {
   paddlers: Paddler[];
@@ -103,7 +105,18 @@ const PaddlerList: React.FC<PaddlerListProps> = ({ paddlers, editingId, onEdit, 
                       }`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-8 h-8 border border-slate-200 dark:border-slate-700">
+                          {p.user?.id && (
+                            <AvatarImage 
+                              src={getAvatarUrl(p.user.id, p.user.image) || ''} 
+                              alt={p.name} 
+                            />
+                          )}
+                          <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs">
+                            {getInitials(p.name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                           {p.name}
                           {isLinked && <LinkIcon size={14} className={theme?.text || 'text-blue-500'} />}

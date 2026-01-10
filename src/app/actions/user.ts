@@ -163,7 +163,7 @@ export async function uploadProfileImage(base64Image: string) {
     })
 
     return { success: true }
-  } catch (_error) {
+  } catch {
     // Sharp will throw if the file is not a valid image
     throw new Error("Failed to process image. Please ensure the file is a valid image")
   }

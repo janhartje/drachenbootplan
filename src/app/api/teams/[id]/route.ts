@@ -93,7 +93,21 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, icalUrl } = body;
+    const { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, showOnWebsite, icalUrl } = body;
+
+    // Validate boolean fields to prevent type confusion attacks
+    if (typeof showOnWebsite !== 'undefined' && typeof showOnWebsite !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid type for showOnWebsite' }, { status: 400 });
+    }
+    if (typeof showProRing !== 'undefined' && typeof showProRing !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid type for showProRing' }, { status: 400 });
+    }
+    if (typeof showProBadge !== 'undefined' && typeof showProBadge !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid type for showProBadge' }, { status: 400 });
+    }
+    if (typeof showWatermark !== 'undefined' && typeof showWatermark !== 'boolean') {
+      return NextResponse.json({ error: 'Invalid type for showWatermark' }, { status: 400 });
+    }
 
     // Check payload size (approximate)
     const payloadSize = JSON.stringify(body).length;
@@ -103,7 +117,7 @@ export async function PUT(
 
     const team = await prisma.team.update({
       where: { id },
-      data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, icalUrl },
+      data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, showOnWebsite, icalUrl },
     });
     return NextResponse.json(team);
   } catch (error) {

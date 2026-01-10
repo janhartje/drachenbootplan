@@ -89,6 +89,35 @@
             ]
         },
         {
+            "version": "3.8.0",
+            "date": "Januar 2026",
+            "features": [
+                "Team-Sichtbarkeit: Neue Einstellung 'Auf Webseite anzeigen' ermöglicht Teams, auf der öffentlichen Startseite als Referenz angezeigt zu werden."
+            ],
+            "technical": [
+                "Datenbank: 'showOnWebsite' Feld zum Team-Modell hinzugefügt.",
+                "API: Neue öffentliche Funktion zum Abrufen von sichtbaren Teams.",
+                "SEO: Landing Page zu Server Component konvertiert für bessere Suchmaschinen-Indexierung.",
+                "Performance: Next.js Image Component für automatische Bildoptimierung implementiert.",
+                "Sicherheit: DoS-Schutz (50-Team-Limit), Produktions-Logging und URL-Validierung für Team-Webseiten implementiert.",
+                "Architektur: Code-Duplikation eliminiert durch Konsolidierung der Public-Teams-Logik."
+            ],
+            "bugfixes": [
+                "Build: next-intl API-Import korrigiert (setRequestLocale statt unstable_setRequestLocale).",
+                "Fix: React Key-Kollisionen behoben durch Verwendung von team.id statt team.name.",
+                "Fix: TypeScript Null-Safety für team.website Attribut korrigiert."
+            ]
+        },
+        {
+            "version": "3.7.3",
+            "date": "Januar 2026",
+            "features": [
+                "Kader-Liste: Suche, Filter nach Fähigkeiten und Sortierung hinzugefügt für bessere Verwaltung großer Teams."
+            ],
+            "technical": [],
+            "bugfixes": []
+        },
+        {
             "version": "3.7.2",
             "date": "Januar 2026",
             "features": [
@@ -637,6 +666,8 @@
     "clFeatures": "Neue Funktionen",
     "clTechnical": "Technische Änderungen",
     "clearBoat": "Boot leeren",
+    "clear": "Zurücksetzen",
+    "clearFilters": "Filter zurücksetzen",
     "close": "Schließen",
     "comment": "Kommentar",
     "commentPlaceholder": "Infos zum Training...",
@@ -754,6 +785,8 @@
     "eventTemplateColumns": "Titel | Datum | Zeit | Typ | Bootsgröße | Kommentar",
     "events": "Termine",
     "exportImage": "Bild speichern",
+    "filter": "Filtern",
+    "filterBySkills": "Nach Fähigkeiten filtern",
     "faqCreateTeamAnswer": "Klicke im Hauptmenü (oben links auf den Team-Namen) auf 'Team wechseln' und dann auf das '+' Symbol.",
     "faqCreateTeamTitle": "Wie erstelle ich ein neues Team?",
     "faqLeaveTeamAnswer": "Du kannst ein Team jederzeit über dein Benutzer-Profil verlassen:",
@@ -930,6 +963,8 @@
     "landingHeroTitle": "Dein Team.\nPerfekt Organisiert.",
     "landingLearnMore": "Mehr erfahren",
     "landingStartApp": "App Starten",
+    "landingTeamsUsing": "Diese Teams sind dabei",
+    "landingTeamsUsingSubtitle": "Paddler weltweit setzen auf Drachenboot Manager",
     "landingTrustedBy": "Vertraut von Drachenboot-Teams",
     "leaveTeam": "Team verlassen",
     "left": "Links",
@@ -1159,9 +1194,12 @@
         "processing": "Verarbeite...",
         "productName": "Drachenboot Manager PRO",
         "promotionCode": "Gutscheincode",
+        "publicVisibility": "Öffentliche Sichtbarkeit",
         "reactivateSubscription": "Kündigung zurücknehmen",
         "remove": "Entfernen",
         "securePayment": "SSL Verschlüsselt & Sichere Zahlung",
+        "showOnWebsite": "Auf Webseite anzeigen",
+        "showOnWebsiteDesc": "Zeigt dein Team-Logo und Namen auf der öffentlichen Startseite als Referenz für andere Teams.",
         "showPremiumRing": "Premium Logo Ring anzeigen",
         "showPremiumRingDesc": "Zeigt einen schimmernden goldenen Ring um dein Team-Logo.",
         "showProBadge": "PRO-Badge anzeigen",
@@ -1246,6 +1284,7 @@
     "saveProfile": "Profil speichern",
     "saved": "Gespeichert",
     "saving": "Speichere...",
+    "searchPlaceholder": "Nach Name suchen...",
     "selectTeam": "Team wählen",
     "sending": "Wird gesendet...",
     "sent": "Gesendet!",
@@ -1258,6 +1297,10 @@
     "skillsDisclaimer": "Wähle deine Paddel-Skills aus",
     "skillsReason": "Deine Position (links/rechts/Trommel/Steuer) hilft beim Erstellen der Sitzordnung.",
     "smallBoat": "Klein (10)",
+    "sortNameAsc": "Name (A-Z)",
+    "sortNameDesc": "Name (Z-A)",
+    "sortWeightAsc": "Gewicht (Leichteste)",
+    "sortWeightDesc": "Gewicht (Schwerste)",
     "specialRoles": "Spezial-Rollen",
     "squad": "Kader",
     "standardBoat": "Standard (20)",

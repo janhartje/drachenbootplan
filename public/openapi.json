@@ -284,6 +284,61 @@
                 }
             }
         },
+        "/api/public/teams": {
+            "get": {
+                "summary": "Get Public Teams",
+                "description": "Fetches teams that have opted-in to be displayed on the public landing page. Limited to 50 teams. No authentication required.",
+                "tags": [
+                    "Public"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of public teams",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string",
+                                                "description": "Team ID (unique identifier)"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "Team name"
+                                            },
+                                            "icon": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "description": "Team logo/icon (base64 or URL)"
+                                            },
+                                            "website": {
+                                                "type": "string",
+                                                "nullable": true,
+                                                "description": "Team website URL"
+                                            }
+                                        },
+                                        "required": ["id", "name"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Failed to fetch public teams",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/teams/{id}/api-keys": {
             "get": {
                 "summary": "List API Keys",
@@ -544,6 +599,10 @@
                                     },
                                     "showWatermark": {
                                         "type": "boolean"
+                                    },
+                                    "showOnWebsite": {
+                                        "type": "boolean",
+                                        "description": "Display team on public landing page"
                                     }
                                 }
                             }
@@ -2935,6 +2994,11 @@
                     },
                     "showWatermark": {
                         "type": "boolean"
+                    },
+                    "showOnWebsite": {
+                        "type": "boolean",
+                        "description": "Display team on public landing page",
+                        "default": false
                     }
                 },
                 "required": [

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthContext } from '@/lib/api-auth';
 import { auth } from '@/auth'; // Keep for legacy PUT/DELETE for now, or refactor all
+import { submitToIndexNow } from '@/lib/indexnow';
+import { getProductionUrl } from '@/utils/url';
 
 export async function GET(
   request: Request,
@@ -16,16 +18,16 @@ export async function GET(
 
   // Authorization check
   if (auth.type === 'apiKey' && auth.teamId !== id) {
-     return NextResponse.json({ error: 'Unauthorized - API Key does not match team' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized - API Key does not match team' }, { status: 403 });
   }
 
   if (auth.type === 'session' && auth.user?.id) {
     // Check if user is member
     const membership = await prisma.paddler.findFirst({
-        where: { teamId: id, userId: auth.user.id }
+      where: { teamId: id, userId: auth.user.id }
     });
     if (!membership) {
-         return NextResponse.json({ error: 'Unauthorized - Not a member' }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized - Not a member' }, { status: 403 });
     }
   }
 
@@ -115,14 +117,59 @@ export async function PUT(
       return NextResponse.json({ error: 'Payload too large (max 5MB)' }, { status: 413 });
     }
 
+    // Fetch current team state to check if showOnWebsite or relevant public fields are changing
+    const currentTeam = await prisma.team.findUnique({
+      where: { id },
+      select: { 
+        showOnWebsite: true,
+        name: true,
+        icon: true,
+        website: true,
+      },
+    });
+
+    if (!currentTeam) {
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+    }
+
     const team = await prisma.team.update({
       where: { id },
       data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, showOnWebsite, icalUrl },
     });
+
+    // Determine if IndexNow notification is needed
+    const isBecomingVisible = showOnWebsite !== undefined && !currentTeam.showOnWebsite && team.showOnWebsite;
+    
+    // Check if any publicly visible fields changed while team is visible
+    const isVisible = team.showOnWebsite;
+    const publicFieldsChanged = 
+      (name !== undefined && name !== currentTeam.name) ||
+      (icon !== undefined && icon !== currentTeam.icon) ||
+      (website !== undefined && website !== currentTeam.website);
+
+    // Notify IndexNow if the team is becoming visible OR if public fields changed while already visible
+    if (isBecomingVisible || (isVisible && publicFieldsChanged)) {
+      const baseUrl = getProductionUrl();
+      // Submit root URL and locale variants where the team listing appears
+      try {
+        const success = await submitToIndexNow([
+          baseUrl,
+          `${baseUrl}/de`,
+          `${baseUrl}/en`
+        ]);
+        if (!success) {
+          // Log for monitoring, but don't fail the request
+          console.warn('IndexNow notification failed for team update, but team was updated successfully');
+        }
+      } catch (error) {
+        console.error('IndexNow notification threw an error for team update:', error);
+      }
+    }
+
     return NextResponse.json(team);
   } catch (error) {
     console.error('Error updating team:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to update team',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
@@ -190,9 +237,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting team:', error);
-    return NextResponse.json({ 
-      error: 'Failed to delete team', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
+    return NextResponse.json({
+      error: 'Failed to delete team',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

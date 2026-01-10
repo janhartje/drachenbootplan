@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getAuthContext } from '@/lib/api-auth';
 import { auth } from '@/auth'; // Keep for legacy PUT/DELETE for now, or refactor all
+import { submitToIndexNow } from '@/lib/indexnow';
+import { getProductionUrl } from '@/utils/url';
 
 export async function GET(
   request: Request,
@@ -16,16 +18,16 @@ export async function GET(
 
   // Authorization check
   if (auth.type === 'apiKey' && auth.teamId !== id) {
-     return NextResponse.json({ error: 'Unauthorized - API Key does not match team' }, { status: 403 });
+    return NextResponse.json({ error: 'Unauthorized - API Key does not match team' }, { status: 403 });
   }
 
   if (auth.type === 'session' && auth.user?.id) {
     // Check if user is member
     const membership = await prisma.paddler.findFirst({
-        where: { teamId: id, userId: auth.user.id }
+      where: { teamId: id, userId: auth.user.id }
     });
     if (!membership) {
-         return NextResponse.json({ error: 'Unauthorized - Not a member' }, { status: 403 });
+      return NextResponse.json({ error: 'Unauthorized - Not a member' }, { status: 403 });
     }
   }
 
@@ -119,10 +121,22 @@ export async function PUT(
       where: { id },
       data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, showOnWebsite, icalUrl },
     });
+
+    // Notify IndexNow if the team is public
+    if (team.showOnWebsite) {
+      const baseUrl = getProductionUrl();
+      // Submit root URL and locale variants where the team listing appears
+      await submitToIndexNow([
+        baseUrl,
+        `${baseUrl}/de`,
+        `${baseUrl}/en`
+      ]);
+    }
+
     return NextResponse.json(team);
   } catch (error) {
     console.error('Error updating team:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to update team',
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
@@ -190,9 +204,9 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error deleting team:', error);
-    return NextResponse.json({ 
-      error: 'Failed to delete team', 
-      details: error instanceof Error ? error.message : 'Unknown error' 
+    return NextResponse.json({
+      error: 'Failed to delete team',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
   }
 }

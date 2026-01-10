@@ -117,13 +117,23 @@ export async function PUT(
       return NextResponse.json({ error: 'Payload too large (max 5MB)' }, { status: 413 });
     }
 
+    // Fetch current team state to check if showOnWebsite is changing
+    const currentTeam = await prisma.team.findUnique({
+      where: { id },
+      select: { showOnWebsite: true },
+    });
+
+    if (!currentTeam) {
+      return NextResponse.json({ error: 'Team not found' }, { status: 404 });
+    }
+
     const team = await prisma.team.update({
       where: { id },
       data: { name, website, icon, instagram, facebook, twitter, email, primaryColor, showProRing, showProBadge, showWatermark, showOnWebsite, icalUrl },
     });
 
-    // Notify IndexNow if the team is public
-    if (team.showOnWebsite) {
+    // Notify IndexNow only if showOnWebsite is transitioning from false to true
+    if (showOnWebsite !== undefined && !currentTeam.showOnWebsite && team.showOnWebsite) {
       const baseUrl = getProductionUrl();
       // Submit root URL and locale variants where the team listing appears
       await submitToIndexNow([

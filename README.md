@@ -225,6 +225,36 @@ POSTGRES_URL="postgresql://user:password@localhost:5432/drachenboot"
 ADMIN_EMAILS="admin@example.com"
 ```
 
+#### Self-Hosting (Docker / Coolify)
+
+Das Projekt ist für den Betrieb als **Docker-Container** vorbereitet (z.B. für Coolify).
+
+**Voraussetzungen:**
+- Eine PostgreSQL Datenbank (kann auch in Docker laufen)
+- Ein S3-kompatibler Storage oder ähnliches ist *nicht* zwingend erforderlich (Daten liegen in PostgreSQL).
+
+**Docker Compose (Lokal / Einfach):**
+Du kannst die Anwendung und eine Datenbank direkt mit `docker compose` starten:
+
+```bash
+# Startet App (Port 3000) und DB (Port 5432)
+docker compose up -d --build
+```
+Die App ist dann unter `http://localhost:3000` erreichbar. Die Datenbank-Migrationen werden beim Start automatisch ausgeführt.
+
+**GitHub Container Registry (GHCR):**
+Wir erstellen automatisch Docker Images bei jedem Push auf den `main`-Branch und für Releases (Tags).
+
+-   **Image:** `ghcr.io/<dein-username>/drachenbootplan:latest`
+
+**Coolify Setup:**
+1.  Wähle "Docker Image" als Deployment-Source.
+2.  Image: `ghcr.io/janhartje/drachenbootplan:latest` (oder deine Fork-URL).
+3.  **Environment Variables:** Kopiere die Inhalte aus `.env.example` und passe sie an.
+    -   `POSTGRES_URL`: Interne URL zur Postres-Datenbank (z.B. `postgresql://user:pass@db-host:5432/db`).
+    -   `AUTH_SECRET`: Ein zufälliger String (`openssl rand -base64 32`).
+    -   `NEXT_PUBLIC_APP_URL`: Die Domain deiner Coolify-Instanz (z.B. `https://mein-drachenboot.de`).
+
 ### Installation
 
 1.  Repository klonen:

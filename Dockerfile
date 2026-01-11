@@ -61,7 +61,9 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Copy prisma directory (needed for migrations and client)
+# Copy prisma directory (needed for migrations and client)
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 
 # Copy startup script
 COPY --chown=nextjs:nodejs .docker/start.sh ./start.sh

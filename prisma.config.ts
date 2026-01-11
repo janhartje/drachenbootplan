@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import { defineConfig, env } from "prisma/config";
 
+
 export default defineConfig({
   schema: 'prisma/schema.prisma',
   datasource: {
-    url: env('POSTGRES_URL'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    url: (process.env.POSTGRES_URL || process.env.DATABASE_URL) as any,
   },
 });

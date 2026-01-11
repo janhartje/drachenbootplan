@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { Calendar, ChevronRight, Check, HelpCircle, X, Trash2, Pencil, ChevronDown, ChevronUp, ChevronLeft } from 'lucide-react';
 import { Event, Paddler } from '@/types';
 import { useDrachenboot } from '@/context/DrachenbootContext';
@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/core/Card';
 import { IconButton } from '@/components/ui/core/IconButton';
 import { Badge } from '@/components/ui/core/Badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { getAvatarUrl, getInitials } from '@/lib/avatar-utils';
+import { getAvatarUrl, getInitials, onAvatarRefresh } from '@/lib/avatar-utils';
 
 // --- Sub-Component: EventCard ---
 // Extracting this allows each card to manage its own "expanded" state independently,
@@ -43,6 +43,14 @@ const EventCard: React.FC<EventCardProps> = memo(({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [avatarCacheBuster, setAvatarCacheBuster] = useState(Date.now());
+
+  // Listen for avatar refresh events to update cache buster
+  useEffect(() => {
+    return onAvatarRefresh(() => {
+      setAvatarCacheBuster(Date.now());
+    });
+  }, []);
 
   const triggerDelete = () => {
     if (deleteConfirmId === evt.id) {
@@ -212,7 +220,7 @@ const EventCard: React.FC<EventCardProps> = memo(({
                     <div className="flex items-center gap-3">
                       {/* Avatar with profile picture or initials fallback */}
                       <Avatar className="w-8 h-8 border border-slate-300 dark:border-slate-700">
-                        {p.user?.id && <AvatarImage src={getAvatarUrl(p.user.id, p.user.image) || ''} alt={p.name} />}
+                        {p.user?.id && <AvatarImage src={getAvatarUrl(p.user.id, p.user.image, avatarCacheBuster) || ''} alt={p.name} />}
                         <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-xs text-slate-500 dark:text-slate-400">
                           {getInitials(p.name)}
                         </AvatarFallback>

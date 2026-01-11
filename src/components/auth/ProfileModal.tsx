@@ -14,6 +14,7 @@ import { SkillSelector, SkillsState } from "@/components/ui/SkillSelector"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { ConfirmModal, AlertModal } from "@/components/ui/Modals"
 import { triggerProfileRefresh } from "@/hooks/useUserProfile"
+import { triggerAvatarRefresh } from "@/lib/avatar-utils"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -188,6 +189,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
             // Trigger refresh in all useUserProfile hooks (e.g., UserMenu)
             triggerProfileRefresh()
+            
+            // Trigger refresh of avatar images in paddler lists (EventList, PaddlerList)
+            triggerAvatarRefresh()
 
             setIsUploadingImage(false)
 
@@ -235,6 +239,9 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
       // Trigger refresh in all useUserProfile hooks (e.g., UserMenu)
       triggerProfileRefresh()
+      
+      // Trigger refresh of avatar images in paddler lists (EventList, PaddlerList)
+      triggerAvatarRefresh()
     } catch {
       setErrorMessage(t('imageDeleteFailed') || 'Failed to delete image')
       setShowErrorAlert(true)

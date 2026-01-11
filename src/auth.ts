@@ -267,14 +267,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
-        token.weight = user.weight
+        // Fetch fresh user data to get weight
+        const freshUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { weight: true }
+        })
+        if (freshUser) {
+          token.weight = freshUser.weight
+        }
         const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(e => e.trim().toLowerCase()) || [];
         if (user.email && adminEmails.includes(user.email.toLowerCase())) {
           token.isAdmin = true;
         }
       }
-      if (trigger === "update" && session?.user) {
-        token.weight = session.user.weight;
+      if (trigger === "update") {
+        // Refresh weight from session if provided, otherwise from database
+        if (session?.user?.weight !== undefined) {
+          token.weight = session.user.weight;
+        } else if (token.id) {
+          const freshUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { weight: true }
+          })
+          if (freshUser) {
+            token.weight = freshUser.weight
+          }
+        }
       }
       return token
     },

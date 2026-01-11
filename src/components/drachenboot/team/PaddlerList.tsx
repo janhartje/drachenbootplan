@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Pencil, Trash2, Link as LinkIcon, AlertTriangle, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import SkillBadges from '../../ui/SkillBadges';
 import { Paddler } from '@/types';
@@ -8,6 +8,8 @@ import { useDrachenboot } from '@/context/DrachenbootContext';
 import { useTeam } from '@/context/TeamContext';
 import { useSession } from 'next-auth/react';
 import { THEME_MAP, ThemeKey } from '@/constants/themes';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { getAvatarUrl, getInitials, onAvatarRefresh } from '@/lib/avatar-utils';
 
 interface PaddlerListProps {
   paddlers: Paddler[];
@@ -26,6 +28,7 @@ const PaddlerList: React.FC<PaddlerListProps> = ({ paddlers, editingId, onEdit, 
   const { data: session } = useSession();
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [avatarCacheBuster, setAvatarCacheBuster] = useState(() => Date.now());
   const itemsPerPage = 15;
 
   const totalPages = Math.ceil(paddlers.length / itemsPerPage);
@@ -38,6 +41,13 @@ const PaddlerList: React.FC<PaddlerListProps> = ({ paddlers, editingId, onEdit, 
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+
+  // Listen for avatar refresh events to update cache buster
+  useEffect(() => {
+    return onAvatarRefresh(() => {
+      setAvatarCacheBuster(Date.now());
+    });
+  }, []);
 
   // Cleanup timer on unmount or change
   React.useEffect(() => {
@@ -103,7 +113,18 @@ const PaddlerList: React.FC<PaddlerListProps> = ({ paddlers, editingId, onEdit, 
                       }`}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="w-8 h-8 border border-slate-200 dark:border-slate-700">
+                          {p.user?.id && (
+                            <AvatarImage
+                              src={getAvatarUrl(p.user.id, p.user.image, avatarCacheBuster) || ''}
+                              alt={p.name}
+                            />
+                          )}
+                          <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs">
+                            {getInitials(p.name)}
+                          </AvatarFallback>
+                        </Avatar>
                         <div className="font-medium text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                           {p.name}
                           {isLinked && <LinkIcon size={14} className={theme?.text || 'text-blue-500'} />}

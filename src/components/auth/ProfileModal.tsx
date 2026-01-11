@@ -1,16 +1,20 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSession } from "next-auth/react"
-import { updateProfile } from "@/app/actions/user"
-import { Save, X, Info } from "lucide-react"
+import { updateProfile, uploadProfileImage, deleteProfileImage, getUserProfile } from "@/app/actions/user"
+import { Save, X, Info, Upload, Trash2, Camera } from "lucide-react"
 import { useTranslations } from 'next-intl';
 import { useDrachenboot } from "@/context/DrachenbootContext"
 import { useTeam } from '@/context/TeamContext';
 import { FormInput } from "@/components/ui/FormInput"
 import { WeightInput } from "@/components/ui/WeightInput"
 import { SkillSelector, SkillsState } from "@/components/ui/SkillSelector"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { ConfirmModal, AlertModal } from "@/components/ui/Modals"
+import { triggerProfileRefresh } from "@/hooks/useUserProfile"
+import { triggerAvatarRefresh } from "@/lib/avatar-utils"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -27,6 +31,12 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [skills, setSkills] = useState<SkillsState>({ left: false, right: false, drum: false, steer: false })
   const [isSaving, setIsSaving] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showErrorAlert, setShowErrorAlert] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load current user's data from their paddler record
   useEffect(() => {
@@ -46,6 +56,25 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
   }, [session?.user?.id, session?.user?.name, paddlers, isOpen])
 
+  // Separate effect for image preview - fetch from server
+  useEffect(() => {
+    const loadImage = async () => {
+      if (session?.user?.id && isOpen) {
+        try {
+          const userProfile = await getUserProfile()
+          if (userProfile) {
+            const currentImage = userProfile.customImage || userProfile.image || null
+            setImagePreview(currentImage)
+          }
+        } catch {
+          // Silently fall back to session image if fetch fails
+          setImagePreview(null)
+        }
+      }
+    }
+    loadImage()
+  }, [session?.user?.id, isOpen])
+
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -58,6 +87,167 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   const handleSkillChange = (skill: keyof SkillsState) => {
     setSkills(prev => ({ ...prev, [skill]: !prev[skill] }))
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrorMessage(t('invalidFileType') || 'Please select an image file')
+      setShowErrorAlert(true)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+
+    // Validate file size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMessage(t('fileTooLarge') || 'Image must be less than 2MB')
+      setShowErrorAlert(true)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      return
+    }
+
+    setIsUploadingImage(true)
+
+    try {
+      // Convert to base64
+      const reader = new FileReader()
+
+      reader.onerror = () => {
+        setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+        setShowErrorAlert(true)
+        setIsUploadingImage(false)
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''
+        }
+      }
+
+      reader.onloadend = async () => {
+        const base64String = reader.result as string
+
+        // Create a temporary image to resize
+        const img = new Image()
+
+        img.onerror = () => {
+          setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+          setShowErrorAlert(true)
+          setIsUploadingImage(false)
+          if (fileInputRef.current) {
+            fileInputRef.current.value = ''
+          }
+        }
+
+        img.onload = async () => {
+          try {
+            // Resize to max 400x400
+            const canvas = document.createElement('canvas')
+            let width = img.width
+            let height = img.height
+            const maxSize = 400
+
+            if (width > height) {
+              if (width > maxSize) {
+                height *= maxSize / width
+                width = maxSize
+              }
+            } else {
+              if (height > maxSize) {
+                width *= maxSize / height
+                height = maxSize
+              }
+            }
+
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+
+            if (!ctx) {
+              setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+              setShowErrorAlert(true)
+              setIsUploadingImage(false)
+              if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+              }
+              return
+            }
+
+            ctx.drawImage(img, 0, 0, width, height)
+
+            // Convert to base64
+            const resizedBase64 = canvas.toDataURL(file.type, 0.9)
+
+            // Upload to server
+            await uploadProfileImage(resizedBase64)
+
+            // Reload profile to get updated image
+            const userProfile = await getUserProfile()
+            if (userProfile) {
+              setImagePreview(userProfile.customImage || userProfile.image || null)
+            }
+
+            // Trigger refresh in all useUserProfile hooks (e.g., UserMenu)
+            triggerProfileRefresh()
+            
+            // Trigger refresh of avatar images in paddler lists (EventList, PaddlerList)
+            triggerAvatarRefresh()
+
+            setIsUploadingImage(false)
+
+            // Reset file input
+            if (fileInputRef.current) {
+              fileInputRef.current.value = ''
+            }
+          } catch {
+            setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+            setShowErrorAlert(true)
+            setIsUploadingImage(false)
+            if (fileInputRef.current) {
+              fileInputRef.current.value = ''
+            }
+          }
+        }
+        img.src = base64String
+      }
+      reader.readAsDataURL(file)
+    } catch {
+      setErrorMessage(t('imageUploadFailed') || 'Failed to upload image')
+      setShowErrorAlert(true)
+      setIsUploadingImage(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  const handleDeleteImage = async () => {
+    setShowDeleteConfirm(false)
+    setIsUploadingImage(true)
+    try {
+      await deleteProfileImage()
+
+      // Reload profile to get updated image (should be null or OAuth image)
+      const userProfile = await getUserProfile()
+      if (userProfile) {
+        // After delete, show OAuth image or null (which will show fallback)
+        setImagePreview(userProfile.image || null)
+      } else {
+        // If no profile, clear the image preview
+        setImagePreview(null)
+      }
+
+      // Trigger refresh in all useUserProfile hooks (e.g., UserMenu)
+      triggerProfileRefresh()
+      
+      // Trigger refresh of avatar images in paddler lists (EventList, PaddlerList)
+      triggerAvatarRefresh()
+    } catch {
+      setErrorMessage(t('imageDeleteFailed') || 'Failed to delete image')
+      setShowErrorAlert(true)
+    } finally {
+      setIsUploadingImage(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -82,6 +272,8 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   if (!isOpen || !session) return null
 
   const isFormValid = name.trim() !== '' && weight.trim() !== ''
+  // Show delete button if there's a custom image in preview that's different from OAuth image
+  const hasCustomImage = imagePreview !== null && imagePreview !== session?.user?.image && imagePreview?.startsWith('data:image/')
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
@@ -101,6 +293,58 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {/* Profile Picture Section */}
+          <div className="flex flex-col items-center gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="relative">
+              <Avatar className="w-24 h-24 border-2 border-slate-300 dark:border-slate-700">
+                {imagePreview && <AvatarImage src={imagePreview} alt={name} />}
+                <AvatarFallback className="bg-slate-200 dark:bg-slate-800 text-2xl text-slate-500 dark:text-slate-400">
+                  {name ? name.substring(0, 2).toUpperCase() : 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="absolute bottom-0 right-0 p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors disabled:opacity-50"
+              >
+                <Camera size={16} />
+              </button>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploadingImage}
+                className="text-xs px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+              >
+                <Upload size={12} />
+                {isUploadingImage ? t('uploading') || 'Uploading...' : t('uploadImage') || 'Upload'}
+              </button>
+              {hasCustomImage && (
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={isUploadingImage}
+                  className="text-xs px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                >
+                  <Trash2 size={12} />
+                  {t('delete') || 'Delete'}
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+              {t('profileImageHint') || 'Max 2MB, JPEG/PNG/WebP/GIF'}
+            </p>
+          </div>
+
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1">
               <div className="flex justify-between items-baseline mb-1">
@@ -169,6 +413,25 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           </div>
         </form>
       </div>
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        onCancel={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDeleteImage}
+        title={t('confirmDeleteImage') || 'Delete Profile Picture'}
+        message={t('confirmDeleteImageMessage') || 'Are you sure you want to delete your profile picture? This action cannot be undone.'}
+        isDestructive
+        isLoading={isUploadingImage}
+      />
+
+      <AlertModal
+        isOpen={showErrorAlert}
+        onClose={() => setShowErrorAlert(false)}
+        title={t('error') || 'Error'}
+        message={errorMessage}
+        type="error"
+      />
     </div>
   )
 }

@@ -2,8 +2,8 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Drachenboot Manager API",
-        "version": "2.5.0",
-        "description": "API documentation for the Drachenboot Manager application with multi-team support."
+        "version": "2.7.0",
+        "description": "API documentation for the Drachenboot Manager application with multi-team support.\n\nFor details on Custom Profile Pictures (upload/delete via Server Actions), please refer to the documentation in `docs/custom-profile-pictures.md`."
     },
     "servers": [
         {
@@ -352,7 +352,10 @@
                                                 "description": "Team website URL"
                                             }
                                         },
-                                        "required": ["id", "name"]
+                                        "required": [
+                                            "id",
+                                            "name"
+                                        ]
                                     }
                                 }
                             }
@@ -3153,7 +3156,8 @@
                             },
                             "image": {
                                 "type": "string",
-                                "nullable": true
+                                "nullable": true,
+                                "description": "OAuth provider profile image URL (Google/GitHub)"
                             }
                         },
                         "nullable": true

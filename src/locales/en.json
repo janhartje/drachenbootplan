@@ -80,6 +80,17 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.9.0",
+            "date": "January 2026",
+            "features": [
+                "New: Custom profile pictures can now be uploaded and are displayed in the team list, events, and header."
+            ],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Profile pictures are now displayed in the event participant list (e.g., Google profile picture)."
+            ]
+        },
+        {
             "version": "3.8.0",
             "date": "January 2026",
             "features": [
@@ -669,6 +680,8 @@
     "completeProfile": "Complete Profile",
     "confirm": "Confirm",
     "confirmDelete": "Yes, delete team",
+    "confirmDeleteImage": "Delete Profile Picture",
+    "confirmDeleteImageMessage": "Are you sure you want to delete your profile picture? This action cannot be undone.",
     "confirmLeaveTeamBody": "Are you sure you want to leave this team? You will lose access to all events and data.",
     "confirmLeaveTeamButton": "Yes, Leave",
     "confirmLeaveTeamTitle": "Leave Team?",
@@ -755,6 +768,7 @@
     "emailWelcomeIntro": "Welcome to Drachenboot Manager. We're excited to have you on board!",
     "emailWelcomeLinkHint": "If the button doesn't work, copy this link into your browser:",
     "emailWelcomeSubject": "Welcome to Drachenboot Manager!",
+    "error": "Error",
     "errorGenericMessage": "An unexpected error occurred.",
     "errorGenericTitle": "An error occurred",
     "errorGlobalMessage": "A critical error occurred and the application could not be loaded.",
@@ -800,6 +814,7 @@
         "subtitle": "The ultimate AI seating planner for your team",
         "title": "Dragon Boat Lineup"
     },
+    "fileTooLarge": "Image must be less than 2MB",
     "filter": "Filter",
     "filterBySkills": "Filter by skills",
     "forTeam": "for",
@@ -901,7 +916,9 @@
     "icalSyncUnknownError": "Unknown error",
     "icalSyncUpdated": "updated",
     "icalSyncing": "Syncing...",
+    "imageDeleteFailed": "Failed to delete image",
     "imageTooLarge": "Image too large (max 5MB)",
+    "imageUploadFailed": "Failed to upload image",
     "import": "Import",
     "importButton": "Import",
     "importData": "Import Data",
@@ -914,6 +931,7 @@
     "imprintLiabilityLinksText": "Our offer contains links to external third-party websites, over whose content we have no influence. Therefore, we cannot assume any liability for this external content. The respective provider or operator of the pages is always responsible for the content of the linked pages. The linked pages were checked for possible legal violations at the time of linking. Illegal content was not recognizable at the time of linking. However, permanent monitoring of the content of the linked pages is not reasonable without concrete evidence of an infringement. As soon as we become aware of legal violations, we will remove such links immediately.",
     "info": "Information",
     "installPWA": "Install App",
+    "invalidFileType": "Please select an image file",
     "invitationFailed": "Failed to invite member",
     "invitationSuccess": "Invitation sent successfully!",
     "invite": "Invite",
@@ -1254,6 +1272,7 @@
     },
     "profile": "Profile",
     "profileGlobalHint": "Name & Weight apply to all teams.",
+    "profileImageHint": "Max 2MB, JPEG/PNG/WebP/GIF",
     "profileLocalHint": "Skills apply only to this team.",
     "profileSubtitle": "Profile",
     "promises": "Confirmed",
@@ -1344,6 +1363,8 @@
     "unknownEvent": "Unknown Event",
     "unsure": "Unsure",
     "upgradeTeam": "Upgrade Team",
+    "uploadImage": "Upload",
+    "uploading": "Uploading...",
     "userAlreadyMember": "User is already a team member",
     "viewPlan": "View Plan",
     "visitHelpCenter": "Visit Help Center",

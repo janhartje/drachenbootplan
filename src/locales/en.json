@@ -80,6 +80,15 @@
     "changelog": "Changelog",
     "changelogData": [
         {
+            "version": "3.9.1",
+            "date": "January 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Event participant list and attendance counts now ignore team list search and skill filters."
+            ]
+        },
+        {
             "version": "3.9.0",
             "date": "January 2026",
             "features": [

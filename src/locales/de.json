@@ -80,6 +80,15 @@
     "changelog": "Versionshistorie",
     "changelogData": [
         {
+            "version": "3.9.1",
+            "date": "Januar 2026",
+            "features": [],
+            "technical": [],
+            "bugfixes": [
+                "Fix: Teilnehmerliste und Zusage-Zähler in Terminen sind nicht mehr vom Team-Such- oder Skill-Filter abhängig."
+            ]
+        },
+        {
             "version": "3.9.0",
             "date": "Januar 2026",
             "features": [

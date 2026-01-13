@@ -42,3 +42,11 @@ export function filterAndSortPaddlers(
 
   return filtered;
 }
+
+export function sortPaddlersForEvents(
+  paddlers: Paddler[],
+  sortBy: string,
+  sortOrder: 'asc' | 'desc'
+): Paddler[] {
+  return filterAndSortPaddlers(paddlers, '', [], sortBy, sortOrder);
+}

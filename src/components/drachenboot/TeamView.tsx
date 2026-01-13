@@ -32,7 +32,7 @@ import { ImportModal } from './team/ImportModal';
 import { ProBadge } from './pro/ProBadge';
 import PaddlerList from './team/PaddlerList';
 import TeamToolbar from './team/TeamToolbar';
-import { filterAndSortPaddlers } from '@/utils/paddlerFilters';
+import { filterAndSortPaddlers, sortPaddlersForEvents } from '@/utils/paddlerFilters';
 
 import { THEME_MAP } from '@/constants/themes';
 
@@ -126,6 +126,11 @@ const TeamView: React.FC = () => {
     [paddlers, searchTerm, filterSkills, sortBy, sortOrder]
   );
 
+  const eventPaddlers = useMemo(
+    () => sortPaddlersForEvents(paddlers, sortBy, sortOrder),
+    [paddlers, sortBy, sortOrder]
+  );
+
   const paddlerToEdit = useMemo(() =>
     editingPaddlerId ? paddlers.find(p => p.id === editingPaddlerId) || null : null,
     [editingPaddlerId, paddlers]);
@@ -159,19 +164,6 @@ const TeamView: React.FC = () => {
 
     return false;
   }, [myPaddler]);
-
-  // DEBUG: Trace onboarding logic
-  React.useEffect(() => {
-    console.log('DEBUG: TeamView State', {
-      hasSession: !!session,
-      userId: session?.user?.id,
-      paddlersCount: paddlers.length,
-      myPaddler,
-      myPaddlerSkills: myPaddler?.skills,
-      showOnboarding
-    });
-  }, [session, paddlers, myPaddler, showOnboarding]);
-
 
   // --- ACTIONS ---
   const handleOnboardingSave = async (data: Partial<import('@/types').Paddler>) => {
@@ -512,7 +504,7 @@ const TeamView: React.FC = () => {
                     </button>
                   </InfoCard>
                 )}
-                <EventsSection sortedPaddlers={sortedPaddlers} onEdit={setEditingEvent} />
+                <EventsSection sortedPaddlers={eventPaddlers} onEdit={setEditingEvent} />
               </div>
 
               {/* Paddler Grid (Mobile) / List (Desktop) */}
@@ -592,7 +584,7 @@ const TeamView: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Event Liste */}
               <div className="lg:col-span-1 flex flex-col">
-                <EventsSection sortedPaddlers={sortedPaddlers} onEdit={setEditingEvent} />
+                <EventsSection sortedPaddlers={eventPaddlers} onEdit={setEditingEvent} />
 
               </div>
 
